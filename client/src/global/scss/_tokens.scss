@@ -1,0 +1,111 @@
+@use "sass:map";
+
+/**
+ * colors
+ */
+$colorMap: (
+  primary: #ffc857,
+  secondary: #2c4a6f,
+  tertiary: #92c58a,
+  accent: #c0a023,
+  muted: #dddddd,
+  mutedGray: #f2f3f2,
+  success: #00a050,
+  warning: #ffae00,
+  danger: #950000,
+  mutedHighlight: #f4f4f4,
+  footer: #f5f5f5,
+  footerText: #3c3c3c,
+  cardBackground: #f61e45d2,
+  highlight: #ffd966,
+  highlightBackground: #7373731a,
+  text: #20303b,
+  textDark: #10181d,
+  textWhite: #fff,
+  backgroundWhite: #ffff,
+  backgroundBlack: #222222,
+);
+
+/**
+ * Breakpoints
+ */
+$screenSizeMap: (
+  default: 0px,
+  small: 640px,
+  medium: 960px,
+  large: 1200px,
+  xlarge: 1600px,
+  xxlarge: 1950px,
+);
+
+/**
+ * Typography
+ */
+$fontSizeMap: (
+  xxsmall: 0.75rem,
+  xsmall: 0.875rem,
+  default: 1rem,
+  small: 1.125rem,
+  medium: 1.25rem,
+  large: 1.5rem,
+  xlarge: 2rem,
+  xxlarge: 3.25rem,
+  xxxlarge: 3.875rem,
+  xxxxlarge: 6.25rem,
+);
+
+/**
+ * Fontweights
+ */
+$fontWeightMap: (
+  extraLight: 200,
+  light: 300,
+  default: 400,
+  medium: 500,
+  semiBold: 600,
+  bold: 700,
+  extraBold: 800,
+  black: 900,
+);
+
+$fontFamilyMap: (
+  primary: "poppins",
+  secondary: "Quicksand",
+);
+
+/**
+ * Spacings
+ */
+$spacingMap: (
+  xxsmall: 0.313rem,
+  xsmall: 0.625rem,
+  small: 1.25rem,
+  default: 1.875rem,
+  medium: 3.125rem,
+  large: 4.375rem,
+  xlarge: 6.25rem,
+);
+
+@function color($key) {
+  @return map.get($colorMap, $key);
+}
+
+@function breakpoint($key) {
+  @return map.get($screenSizeMap, $key);
+}
+
+@function fontsize($key) {
+  @return map.get($fontSizeMap, $key);
+}
+
+@function fontweight($key) {
+  @return map.get($fontWeightMap, $key);
+}
+
+@function spacing($key) {
+  @return map.get($spacingMap, $key);
+}
+
+@function fontFamily($key) {
+  @return map.get($fontFamilyMap, $key);
+}

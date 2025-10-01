@@ -1,0 +1,29 @@
+@use "./tokens" as *;
+
+@mixin breakpoint($breakpoint, $until: false) {
+  // If the key exists in the map
+  @if map-has-key($screenSizeMap, $breakpoint) {
+    @if $until {
+      @media (max-width: (map-get($screenSizeMap, $breakpoint) - 1px)) {
+        @content;
+      }
+    } @else {
+      @media (min-width: map-get($screenSizeMap, $breakpoint)) {
+        @content;
+      }
+    }
+  }
+
+  // If the key doesn't exist in the map
+  @else {
+    @warn "Unfortunately, no value could be retrieved from `#{$breakpoint}`. "
+        + "Available breakpoints are: #{map-keys($screenSizeMap)}.";
+  }
+}
+@mixin textHover($color: color(text), $weight: 500) {
+  transition: all 0.3s ease;
+  &:hover {
+    color: darken($color, 10%);
+    font-weight: $weight;
+  }
+}

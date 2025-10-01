@@ -1,0 +1,72 @@
+@use "./tokens" as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: color(text);
+  font-family: fontFamily(primary), sans-serif;
+  font-weight: fontweight(default);
+  line-height: 1.5;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: color(backgroundBlack);
+  }
+}
+
+ul {
+  list-style-type: none;
+}
+
+img {
+  width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  color: color(text);
+  font-size: fontsize(default);
+}
+
+// Scroll on top ICon
+.arrow-scroll {
+  width: 40px;
+
+  position: fixed;
+  bottom: 25px;
+  right: 2px;
+  padding: 0;
+  cursor: pointer;
+  z-index: 10000;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+// global notification styling
+.uk-notification-message-primary {
+  color: #02b812 !important;
+}
+
+.uk-notification-message {
+  font-weight: 600 !important;
+  font-size: fontsize(default) !important;
+  font-family: fontFamily(primary) !important;
+}
