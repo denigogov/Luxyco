@@ -1,7 +1,7 @@
 import Button from "./whitelabel/src/atoms/button/a-button";
 
 import type { ButtonTypes } from "./whitelabel/src/atoms/button/a-button.types";
-import type { InputTypes } from "./whitelabel/src/atoms/input/a-button.types";
+import type { InputTypes } from "./whitelabel/src/atoms/input/a-input.types";
 import Input from "./whitelabel/src/atoms/input/a-input";
 
 const App = () => {
@@ -9,16 +9,19 @@ const App = () => {
     label: "some text",
     size: "large",
     type: "button",
-    style: "tertiary",
-    disabled: true,
+    style: "primary",
+    disabled: false,
   };
 
   const input: InputTypes = {
     type: "text",
-    label: "hoho",
-    placeholder: "vmvmmv",
+    label: "Label",
+    placeholder: "placeholder",
+    name: "username",
+    autocomplete: false,
+    required: true,
     icon: {
-      name: "plus",
+      name: "user",
       position: "left",
     },
   };
@@ -27,7 +30,7 @@ const App = () => {
     <div className="test">
       app
       <Button {...button} />
-      <h3>input</h3>
+      <h3>A - Input</h3>
       <Input {...input} />
     </div>
   );
