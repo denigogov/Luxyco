@@ -4,7 +4,6 @@ import Input from "./whitelabel/src/atoms/input/a-input";
 import Button from "./whitelabel/src/atoms/button/A-Button";
 import Navbar from "./whitelabel/src/organisms/navbar/O-Navbar";
 import { o_navbarData } from "./whitelabel/src/organisms/navbar/o-navbar.data";
-import { useUIState } from "./utils/hooks/useUIState";
 
 const App = () => {
   const button: ButtonTypes = {
@@ -49,6 +48,7 @@ const App = () => {
   return (
     <div className="test">
       app
+      <h1>TEST APP DEPLOYMENT</h1>
       <Button {...button} />
       <Button {...button1} />
       <h3>A - Input </h3>
