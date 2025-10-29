@@ -4,26 +4,41 @@
  * colors
  */
 $colorMap: (
-  primary: #ffc857,
-  secondary: #2c4a6f,
-  tertiary: #92c58a,
+  primary: #1e87f0,
+  secondary: #3d6ae0,
+  tertiary: #0b304e,
   accent: #c0a023,
-  muted: #dddddd,
+
+  muted: #f0f4ff,
   mutedGray: #f2f3f2,
-  success: #00a050,
-  warning: #ffae00,
-  danger: #950000,
-  mutedHighlight: #f4f4f4,
-  footer: #f5f5f5,
+
+  success: #2ca84a,
+  warning: #ffb340,
+  danger: #c53333,
+
+  mutedHighlight: #f5f7fb,
+
+  footer: #f7f8fa,
   footerText: #3c3c3c,
-  cardBackground: #f61e45d2,
+
   highlight: #ffd966,
   highlightBackground: #7373731a,
-  text: #20303b,
-  textDark: #10181d,
-  textWhite: #fff,
-  backgroundWhite: #ffff,
+
+  text: #7c7b84,
+  textLight: #767676,
+  textDark: #555,
+
+  borderLight: #e5e7eb,
+
+  backgroundWhite: #ffffff,
   backgroundBlack: #222222,
+
+  linearPrimaryHover:
+    linear-gradient(
+      90deg,
+      rgba(30, 135, 240, 0.15) 0%,
+      rgba(30, 135, 240, 0) 30%
+    ),
 );
 
 /**
