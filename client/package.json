@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "storybook": "pnpm --filter ./src/whitelabel run storybook"
   },
+  "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
