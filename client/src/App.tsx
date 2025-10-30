@@ -48,7 +48,6 @@ const App = () => {
   return (
     <div className="test">
       app
-      <h1>TEST APP DEPLOYMENT</h1>
       <Button {...button} />
       <Button {...button1} />
       <h3>A - Input </h3>
