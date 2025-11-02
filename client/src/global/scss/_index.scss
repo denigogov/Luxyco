@@ -1,5 +1,12 @@
 @use "./tokens" as *;
 
+:root {
+  --nav-expanded: 260px;
+  --nav-collapsed: 80px;
+  --nav-backgroundColor: #ffffff;
+  --main-backgroundColor: #ffffff;
+}
+
 * {
   margin: 0;
   padding: 0;
