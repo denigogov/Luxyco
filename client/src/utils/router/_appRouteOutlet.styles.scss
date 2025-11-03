@@ -19,7 +19,7 @@
     margin-left: var(--nav-collapsed);
   }
 
-  @media (max-width: 767px) {
+  @include breakpoint(medium, true) {
     margin-left: 0;
 
     &--collapsed {
