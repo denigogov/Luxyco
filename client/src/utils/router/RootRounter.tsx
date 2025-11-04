@@ -4,13 +4,11 @@ import {
   Route,
 } from "react-router";
 import AppRouteOutlet from "./AppRouteOutlet";
+import Login from "../../whitelabel/src/molecules/login/M-Login";
+import { m_loginData } from "../../whitelabel/src/molecules/login/m-login.data";
 
 const Test = () => {
-  return (
-    <div>
-      <h1>Vmro Dpmne Root</h1>
-    </div>
-  );
+  return <Login {...m_loginData} />;
 };
 
 const Kur = () => {
