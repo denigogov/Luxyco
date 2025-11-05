@@ -1,15 +1,12 @@
 import {
   createBrowserRouter,
   createRoutesFromElements,
+  Navigate,
   Route,
 } from "react-router";
 import AppRouteOutlet from "./AppRouteOutlet";
-import Login from "../../whitelabel/src/molecules/login/M-Login";
-import { m_loginData } from "../../whitelabel/src/molecules/login/m-login.data";
-
-const Test = () => {
-  return <Login {...m_loginData} />;
-};
+import { LoginRoutes } from "./routes/login/Login.routes";
+import { SettingsRoutes } from "./routes/settings/Settings.routes";
 
 const Kur = () => {
   return (
@@ -19,11 +16,16 @@ const Kur = () => {
   );
 };
 
+const Dashboard = () => <div>Dashboard Route Page</div>;
+
 const routes = createRoutesFromElements(
   <>
+    {LoginRoutes}
     <Route path="/" element={<AppRouteOutlet />}>
-      <Route index element={<Test />} />
+      <Route index element={<Navigate to="/dashboard" replace />} />
+      <Route path="dashboard" element={<Dashboard />} />
       <Route path="/personal" element={<Kur />} />
+      {SettingsRoutes}
     </Route>
   </>
 );

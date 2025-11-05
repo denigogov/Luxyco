@@ -1,25 +1,25 @@
 import { createContext, useState, type ReactNode } from "react";
 
 export type AuthContextType = {
-  navOpen: () => void;
-  setNavOpen: (state: boolean) => void;
-  isNavOpen: boolean;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
 
-  const navOpen = () => setIsNavOpen((prev) => !prev);
-  const setNavOpen = (state: boolean) => setIsNavOpen(state);
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
 
   return (
     <AuthContext.Provider
       value={{
-        navOpen,
-        setNavOpen,
-        isNavOpen,
+        login,
+        logout,
+        isAuthenticated,
       }}
     >
       {children}

@@ -1,10 +1,11 @@
-import { Outlet } from "react-router";
-import Navbar from "../../whitelabel/src/organisms/navbar/O-Navbar";
-import { o_navbarData } from "../../whitelabel/src/organisms/navbar/o-navbar.data";
+import { Navigate, Outlet } from "react-router";
 import { useEffect } from "react";
 import UIkit from "uikit";
-import { useUIState } from "../../whitelabel/src/global/utils/hooks/useUIState";
+import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
 import "./_appRouteOutlet.styles.scss";
+import Navbar from "../whitelabel/src/organisms/navbar/O-Navbar";
+import { o_navbarData } from "../whitelabel/src/organisms/navbar/o-navbar.data";
+import { useAuth } from "../utils/hooks/useAuth";
 
 const AppRoute: React.FC = () => {
   const { isNavOpen } = useUIState();
@@ -12,6 +13,12 @@ const AppRoute: React.FC = () => {
     // @ts-expect-error
     UIkit.update();
   }, []);
+
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="app-layout">
