@@ -10,7 +10,7 @@ import { useAuth } from "../utils/hooks/useAuth";
 const AppRoute: React.FC = () => {
   const { isNavOpen } = useUIState();
   useEffect(() => {
-    // @ts-expect-error
+    // @ts-expect-error/won't able to fix type
     UIkit.update();
   }, []);
 
