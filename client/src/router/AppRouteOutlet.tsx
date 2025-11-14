@@ -15,6 +15,7 @@ const AppRoute: React.FC = () => {
   }, []);
 
   const { isAuthenticated } = useAuth();
+  console.log("APP ROUTE RENDERED", location.pathname, isAuthenticated);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

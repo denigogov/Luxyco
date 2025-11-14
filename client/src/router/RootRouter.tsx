@@ -12,8 +12,7 @@ import { brandConfig } from "../utils/brands";
 import { DashboardsRoutes } from "./routes/dashboard/Dashboard.routes";
 import { OrdersRoutes } from "./routes/order/Orders.routes";
 import B_Error from "../whitelabel/src/blocks/b-error/b-error";
-
-// const Dashboard = () => <div>Dashboard Route Page</div>;
+import { b_errorData } from "../whitelabel/src/blocks/b-error/b-error.data";
 
 const routesMap: Record<string, any> = {
   settings: SettingsRoutes,
@@ -27,10 +26,12 @@ const activeRoutes = (brandConfig.routes.includeGroups || [])
 const routes = createRoutesFromElements(
   <>
     {LoginRoutes}
+    {/* just test */}
+    <Route path="*" element={<B_Error {...b_errorData} />} />
+
     <Route path="/" element={<AppRouteOutlet />}>
       <Route index element={<Navigate to="/dashboard" replace />} />
       {activeRoutes}
-      <Route path="*" element={<B_Error />} />
     </Route>
   </>
 );
