@@ -1,5 +1,4 @@
 import brand_logo from "../../assets/icons/luxycoLogo-Black.png";
-const ORDER_ROUTE = ["/order/all-orders", "/order/new-order"];
 
 export const BRAND_BUBO = {
   id: "bubo",
@@ -8,16 +7,23 @@ export const BRAND_BUBO = {
   logo: brand_logo,
   routes: {
     includeGroups: ["/", "dashboard", "order"],
-    includePaths: [
-      "/",
-      ...ORDER_ROUTE,
-      "/customers",
-      "/delivery",
-      "/personal",
-      "/settings",
-      "/settings/price",
-      "settings/status",
-    ],
+    includePaths: {
+      "/": true,
+
+      "/order": {
+        "/order/all-orders": true,
+        "/order/new-order": true,
+      },
+      "/settings": {
+        "/settings": false,
+        "/settings/price": false,
+        "/settings/status": false,
+      },
+
+      "/customers": false,
+      "/delivery": false,
+      "/personal": false,
+    },
   },
   features: {
     inventory: true,

@@ -1,4 +1,5 @@
 import { Navigate, Route } from "react-router";
+import { allowedPaths } from "../../../utils/brands";
 
 const Price = () => (
   <div>
@@ -11,10 +12,26 @@ const Status = () => (
   </div>
 );
 
+const settingsSubRoute = [
+  {
+    fullPath: "/settings/status",
+    path: "status",
+    element: <Status />,
+  },
+  {
+    fullPath: "/settings/price",
+    path: "price",
+    element: <Price />,
+  },
+];
+
 export const SettingsRoutes = (
   <Route path="/settings">
     <Route index element={<Navigate to="/settings/price" replace />} />
-    <Route path="price" element={<Price />} />
-    <Route path="status" element={<Status />} />
+    {settingsSubRoute
+      .filter((r) => allowedPaths.includes(r.fullPath))
+      .map((r) => (
+        <Route key={r.path} path={r.path} element={r.element} />
+      ))}
   </Route>
 );

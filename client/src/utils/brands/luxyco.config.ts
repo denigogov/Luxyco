@@ -1,7 +1,5 @@
 import brand_logo from "../../assets/icons/luxycoLogo-Black.png";
 
-const ORDER_ROUTE = ["/order/all-orders", "/order/new-order"];
-
 export const BRAND_LUXYCO = {
   id: "luxyco",
   name: "Luxyco",
@@ -9,17 +7,24 @@ export const BRAND_LUXYCO = {
   logo: brand_logo,
 
   routes: {
-    includeGroups: ["/", "dashboard", "order"],
-    includePaths: [
-      "/",
-      ...ORDER_ROUTE,
-      "/customers",
-      "/delivery",
-      "/personal",
-      "/settings",
-      "/settings/price",
-      "settings/status",
-    ],
+    includeGroups: ["/", "dashboard", "order", "settings"],
+    includePaths: {
+      "/": true,
+
+      "/order": {
+        "/order/all-orders": true,
+        "/order/new-order": false,
+      },
+      "/settings": {
+        "/settings": true,
+        "/settings/price": true,
+        "/settings/status": true,
+      },
+
+      "/customers": true,
+      "/delivery": true,
+      "/personal": true,
+    },
   },
   //   features: {
   //     inventory: true,

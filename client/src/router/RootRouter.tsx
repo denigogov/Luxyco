@@ -11,8 +11,7 @@ import { brandConfig } from "../utils/brands";
 
 import { DashboardsRoutes } from "./routes/dashboard/Dashboard.routes";
 import { OrdersRoutes } from "./routes/order/Orders.routes";
-import B_Error from "../whitelabel/src/blocks/b-error/b-error";
-import { b_errorData } from "../whitelabel/src/blocks/b-error/b-error.data";
+import ErrorWrapper from "../components/blocks/ErrorWrapper";
 
 const routesMap: Record<string, any> = {
   settings: SettingsRoutes,
@@ -23,16 +22,17 @@ const routesMap: Record<string, any> = {
 const activeRoutes = (brandConfig.routes.includeGroups || [])
   .map((key: string) => routesMap[key])
   .filter(Boolean);
+
 const routes = createRoutesFromElements(
   <>
     {LoginRoutes}
     {/* just test */}
-    <Route path="*" element={<B_Error {...b_errorData} />} />
 
     <Route path="/" element={<AppRouteOutlet />}>
-      <Route index element={<Navigate to="/dashboard" replace />} />
+      <Route index element={<Navigate to="dashboard" replace />} />
       {activeRoutes}
     </Route>
+    <Route path="*" element={<ErrorWrapper />} />
   </>
 );
 export const router = createBrowserRouter(routes);
