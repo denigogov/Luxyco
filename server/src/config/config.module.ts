@@ -6,7 +6,7 @@ import { envValidationSchema } from './env.validation';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // ConfigService available everywhere
+      isGlobal: true, // ConfigService available everywhere 123
       load: [configuration], // configuration.ts
       validationSchema: envValidationSchema,
     }),
