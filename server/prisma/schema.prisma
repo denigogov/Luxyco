@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model account_types {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  name       String   @unique(map: "account_types_name_unique") @db.VarChar(50)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+  users      users[]
+}
+
+model customer_addresses {
+  id                      BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id             BigInt    @db.UnsignedBigInt
+  street                  String    @db.VarChar(100)
+  city                    String    @db.VarChar(50)
+  postal_code             String    @db.VarChar(20)
+  country                 String    @db.VarChar(50)
+  formatted_address       String    @db.VarChar(255)
+  latitude                Decimal   @db.Decimal(10, 8)
+  longitude               Decimal   @db.Decimal(11, 8)
+  is_verified_by_provider Boolean   @default(false)
+  is_default              Boolean   @default(false)
+  is_active               Boolean   @default(true)
+  created_at              DateTime  @default(now()) @db.Timestamp(0)
+  updated_at              DateTime  @default(now()) @db.Timestamp(0)
+  customers               customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "customer_addresses_customer_id_foreign")
+  orders                  orders[]
+
+  @@index([customer_id], map: "customer_addresses_customer_id_index")
+  @@index([customer_id, is_default], map: "customer_addresses_default_index")
+}
+
+model customer_notes {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id        BigInt    @db.UnsignedBigInt
+  related_order_id   BigInt?   @db.UnsignedBigInt
+  created_by_user_id BigInt?   @db.UnsignedBigInt
+  note_text          String    @db.Text
+  is_active          Boolean   @default(true)
+  created_at         DateTime  @default(now()) @db.Timestamp(0)
+  updated_at         DateTime  @default(now()) @db.Timestamp(0)
+  users              users?    @relation(fields: [created_by_user_id], references: [id], map: "customer_notes_created_by_user_id_foreign")
+  customers          customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "customer_notes_customer_id_foreign")
+  orders             orders?   @relation(fields: [related_order_id], references: [id], map: "customer_notes_related_order_id_foreign")
+
+  @@index([created_by_user_id], map: "customer_notes_created_by_user_id_index")
+  @@index([customer_id], map: "customer_notes_customer_id_index")
+  @@index([related_order_id], map: "customer_notes_related_order_id_index")
+}
+
+model customers {
+  id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  first_name         String               @db.VarChar(50)
+  last_name          String               @db.VarChar(50)
+  phone_number       String               @unique(map: "customers_phone_number_unique") @db.VarChar(20)
+  is_active          Boolean              @default(true)
+  created_at         DateTime             @default(now()) @db.Timestamp(0)
+  updated_at         DateTime             @default(now()) @db.Timestamp(0)
+  customer_addresses customer_addresses[]
+  customer_notes     customer_notes[]
+  orders             orders[]
+}
+
+model delivery_type {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  type_name  String   @unique(map: "delivery_type_name_unique") @db.VarChar(50)
+  price      Decimal  @db.Decimal(10, 2)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+  orders     orders[]
+}
+
+model driver_current_locations {
+  id             BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  driver_user_id BigInt   @unique(map: "driver_current_locations_driver_unique") @db.UnsignedBigInt
+  latitude       Decimal  @db.Decimal(10, 8)
+  longitude      Decimal  @db.Decimal(11, 8)
+  updated_at     DateTime @default(now()) @db.Timestamp(0)
+  users          users    @relation(fields: [driver_user_id], references: [id], onDelete: Cascade, map: "driver_current_locations_driver_user_id_foreign")
+}
+
+model order_pieces {
+  id                  BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  order_id            BigInt         @db.UnsignedBigInt
+  piece_index         Int            @db.UnsignedInt
+  label_code          String         @unique(map: "order_pieces_label_code_unique") @db.VarChar(100)
+  product_type_id     Int?           @db.UnsignedInt
+  width               Decimal?       @db.Decimal(10, 2)
+  height              Decimal?       @db.Decimal(10, 2)
+  price               Decimal        @default(0.00) @db.Decimal(10, 2)
+  piece_note          String?        @db.Text
+  measured_by_user_id BigInt?        @db.UnsignedBigInt
+  measured_at         DateTime?      @db.Timestamp(0)
+  created_at          DateTime       @default(now()) @db.Timestamp(0)
+  updated_at          DateTime       @default(now()) @db.Timestamp(0)
+  users               users?         @relation(fields: [measured_by_user_id], references: [id], map: "order_pieces_measured_by_user_id_foreign")
+  orders              orders         @relation(fields: [order_id], references: [id], onDelete: Cascade, map: "order_pieces_order_id_foreign")
+  product_types       product_types? @relation(fields: [product_type_id], references: [id], map: "order_pieces_product_type_id_foreign")
+
+  @@index([measured_by_user_id], map: "order_pieces_measured_by_user_id_index")
+  @@index([order_id], map: "order_pieces_order_id_index")
+  @@index([product_type_id], map: "order_pieces_product_type_id_index")
+}
+
+model orders {
+  id                  BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  qr_code             String              @unique(map: "orders_qr_code_unique") @db.VarChar(100)
+  customer_id         BigInt?             @db.UnsignedBigInt
+  delivery_address_id BigInt?             @db.UnsignedBigInt
+  delivery_type_id    Int?                @db.UnsignedInt
+  order_status_id     Int?                @db.UnsignedInt
+  created_by_user_id  BigInt?             @db.UnsignedBigInt
+  scheduled_date      DateTime            @db.Date
+  total_pieces        Int                 @db.UnsignedInt
+  measured_pieces     Int                 @default(0) @db.UnsignedInt
+  total_price         Decimal             @default(0.00) @db.Decimal(10, 2)
+  order_note          String?             @db.Text
+  created_at          DateTime            @default(now()) @db.Timestamp(0)
+  updated_at          DateTime            @default(now()) @db.Timestamp(0)
+  customer_notes      customer_notes[]
+  order_pieces        order_pieces[]
+  users               users?              @relation(fields: [created_by_user_id], references: [id], map: "orders_created_by_user_id_foreign")
+  customers           customers?          @relation(fields: [customer_id], references: [id], map: "orders_customer_id_foreign")
+  customer_addresses  customer_addresses? @relation(fields: [delivery_address_id], references: [id], map: "orders_delivery_address_id_foreign")
+  delivery_type       delivery_type?      @relation(fields: [delivery_type_id], references: [id], map: "orders_delivery_type_id_foreign")
+  status              status?             @relation(fields: [order_status_id], references: [id], map: "orders_order_status_id_foreign")
+
+  @@index([created_by_user_id], map: "orders_created_by_user_id_index")
+  @@index([customer_id], map: "orders_customer_id_index")
+  @@index([delivery_address_id], map: "orders_delivery_address_id_index")
+  @@index([delivery_type_id], map: "orders_delivery_type_id_index")
+  @@index([order_status_id], map: "orders_order_status_id_index")
+  @@index([scheduled_date], map: "orders_scheduled_date_index")
+}
+
+model price_model {
+  id            Int             @id @default(autoincrement()) @db.UnsignedInt
+  name          String          @unique(map: "price_model_name_unique") @db.VarChar(50)
+  is_active     Boolean         @default(true)
+  created_at    DateTime        @default(now()) @db.Timestamp(0)
+  updated_at    DateTime        @default(now()) @db.Timestamp(0)
+  product_types product_types[]
+}
+
+model product_types {
+  id               Int            @id @default(autoincrement()) @db.UnsignedInt
+  name             String         @unique(map: "product_types_name_unique") @db.VarChar(100)
+  base_price       Decimal        @db.Decimal(10, 2)
+  pricing_model_id Int            @db.UnsignedInt
+  is_active        Boolean        @default(true)
+  created_at       DateTime       @default(now()) @db.Timestamp(0)
+  updated_at       DateTime       @default(now()) @db.Timestamp(0)
+  order_pieces     order_pieces[]
+  price_model      price_model    @relation(fields: [pricing_model_id], references: [id], map: "product_types_pricing_model_id_foreign")
+
+  @@index([pricing_model_id], map: "product_types_pricing_model_id_index")
+}
+
+model status {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  status_name String   @unique(map: "status_name_unique") @db.VarChar(50)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @db.Timestamp(0)
+  orders      orders[]
+}
+
+model users {
+  id                       BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  first_name               String                    @db.VarChar(50)
+  last_name                String                    @db.VarChar(50)
+  username                 String                    @unique(map: "users_username_unique") @db.VarChar(50)
+  password                 String                    @db.VarChar(255)
+  phone_number             String                    @unique(map: "users_phone_number_unique") @db.VarChar(20)
+  account_type_id          Int                       @db.UnsignedInt
+  is_active                Boolean                   @default(true)
+  created_at               DateTime                  @default(now()) @db.Timestamp(0)
+  updated_at               DateTime                  @default(now()) @db.Timestamp(0)
+  customer_notes           customer_notes[]
+  driver_current_locations driver_current_locations?
+  order_pieces             order_pieces[]
+  orders                   orders[]
+  account_types            account_types             @relation(fields: [account_type_id], references: [id], map: "users_account_type_id_foreign")
+
+  @@index([account_type_id], map: "users_account_type_id_index")
+}
