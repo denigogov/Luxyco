@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -16,8 +17,8 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post()
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customersService.create(createCustomerDto);
+  create(@Body() dto: CreateCustomerDto) {
+    return this.customersService.create(dto);
   }
 
   @Get()
@@ -26,21 +27,20 @@ export class CustomersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.customersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.customersService.findOne(id);
   }
 
-  //
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() updateCustomerDto: UpdateCustomerDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCustomerDto,
   ) {
-    return this.customersService.update(+id, updateCustomerDto);
+    return this.customersService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.customersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.customersService.remove(id);
   }
 }
