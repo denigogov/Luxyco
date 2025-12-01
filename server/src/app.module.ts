@@ -5,9 +5,15 @@ import { AppService } from './app.service';
 import { AppConfigModule } from './config/config.module';
 import { UsersModule } from './modules/users/users.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { CustomerAddressesModule } from './modules/customer-addresses/customer-addresses.module';
 
 @Module({
-  imports: [AppConfigModule, UsersModule, CustomersModule],
+  imports: [
+    AppConfigModule,
+    UsersModule,
+    CustomersModule,
+    CustomerAddressesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
