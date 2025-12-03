@@ -12,11 +12,13 @@ import { brandConfig } from "../utils/brands";
 import { DashboardsRoutes } from "./routes/dashboard/Dashboard.routes";
 import { OrdersRoutes } from "./routes/order/Orders.routes";
 import ErrorWrapper from "../components/blocks/ErrorWrapper";
+import { CustomersRoutes } from "./routes/customers/Customers.routes";
 
 const routesMap: Record<string, any> = {
   settings: SettingsRoutes,
   dashboard: DashboardsRoutes,
   order: OrdersRoutes,
+  customers: CustomersRoutes,
 };
 
 const activeRoutes = (brandConfig.routes.includeGroups || [])

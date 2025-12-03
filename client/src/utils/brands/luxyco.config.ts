@@ -7,7 +7,7 @@ export const BRAND_LUXYCO = {
   logo: brand_logo,
 
   routes: {
-    includeGroups: ["/", "dashboard", "order", "settings"],
+    includeGroups: ["/", "dashboard", "order", "settings", "customers"],
     includePaths: {
       "/": true,
 
