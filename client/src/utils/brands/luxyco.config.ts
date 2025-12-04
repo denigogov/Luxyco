@@ -21,7 +21,10 @@ export const BRAND_LUXYCO = {
         "/settings/status": true,
       },
 
-      "/customers": true,
+      "/customers": {
+        "/customers": true,
+        "/customers/:customerId": true,
+      },
       "/delivery": true,
       "/personal": true,
     },
