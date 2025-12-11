@@ -9,15 +9,18 @@ import Icons from "uikit/dist/js/uikit-icons";
 import "uikit/dist/css/uikit.min.css";
 import "uikit/dist/js/uikit.min.js";
 import App from "./App.tsx";
+import { QueryProvider } from "./query/QueryProvider.tsx";
 
 UIkit.use(Icons);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-      <UIProvider>
-        <App />
-      </UIProvider>
+      <QueryProvider>
+        <UIProvider>
+          <App />
+        </UIProvider>
+      </QueryProvider>
     </AuthProvider>
   </StrictMode>
 );
