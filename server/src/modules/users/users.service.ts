@@ -3,49 +3,50 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { CustomersQueryDto } from '../customers/dto/get-customers.dto';
+import { PrismaService } from 'src/infrastructure/database/prisma.service';
+import { account_types, users } from '@prisma/client';
+export type UserWithRole = users & { account_types: account_types | null };
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
-  private nextId = 1;
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): User[] {
-    return this.users;
+  async findAll() {
+    return this.prisma.users.findMany({
+      where: {
+        is_active: true,
+      },
+      omit: {
+        account_type_id: true,
+        password: true,
+        updated_at: true,
+        created_at: true,
+      },
+
+      include: {
+        account_types: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
   }
 
-  findOne(id: number): User {
-    const user = this.users.find((u) => u.id === id);
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    return user;
+  async findByUsername(username: string): Promise<UserWithRole | null> {
+    return this.prisma.users.findUnique({
+      where: { username, is_active: true },
+      include: {
+        account_types: true,
+      },
+    });
   }
 
-  create(dto: CreateUserDto): User {
-    const newUser: User = {
-      id: this.nextId++,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      email: dto.email,
-      role: dto.role ?? 'admin',
-    };
+  findOne() {}
 
-    this.users.push(newUser);
-    return newUser;
-  }
+  create(dto: CreateUserDto) {}
 
-  update(id: number, dto: UpdateUserDto): User {
-    const user = this.findOne(id);
+  update(id: number, dto: UpdateUserDto) {}
 
-    Object.assign(user, dto);
-    return user;
-  }
-
-  remove(id: number): void {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    this.users.splice(index, 1);
-  }
+  remove(id: number): void {}
 }

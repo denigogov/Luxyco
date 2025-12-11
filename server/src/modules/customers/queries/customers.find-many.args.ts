@@ -72,9 +72,15 @@ export function buildCustomersFindManyArgs(
 
   return {
     where,
-    include: {
+    select: {
+      id: true,
+      first_name: true,
+      last_name: true,
+      phone_number: true,
       customer_addresses: {
-        select: customerAddressSelect,
+        select: {
+          formatted_address: true,
+        },
         where: { is_active: true },
       },
     },

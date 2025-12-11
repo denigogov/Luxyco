@@ -8,13 +8,18 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomersQueryDto } from './dto/get-customers.dto';
 import { BulkIdsDto } from './dto/bulk-delete.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
@@ -23,6 +28,7 @@ export class CustomersController {
   create(@Body() dto: CreateCustomerDto) {
     return this.customersService.create(dto);
   }
+  @Roles('SUPER_ADMIN', 'ADMIN')
   @Get('deleted')
   findDeleted(@Query() query: CustomersQueryDto) {
     return this.customersService.findDeleted(query);

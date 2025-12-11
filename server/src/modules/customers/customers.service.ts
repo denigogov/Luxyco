@@ -83,7 +83,6 @@ export class CustomersService {
       throw new BadRequestException('No fields provided to update');
     }
 
-    console.log(id, dto);
     await this.findOne(id);
 
     const data: any = {};

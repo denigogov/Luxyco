@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AppValidationPipe } from './common/pipes/app-validation.pipe';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,13 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter()); // global error
 
-  await app.listen(process.env.PORT || 3000);
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
