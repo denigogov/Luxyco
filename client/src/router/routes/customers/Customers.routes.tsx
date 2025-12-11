@@ -1,8 +1,7 @@
 import { Route } from "react-router";
-import Table from "../../../whitelabel/src/molecules/table/M-table";
-import { m_tableData } from "../../../whitelabel/src/molecules/table/m-table.data";
 import { allowedPaths } from "../../../utils/brands";
 import CustomerDetails from "../../../whitelabel/src/blocks/customerDetals/CustomerDetails";
+import Customers from "../../../components/blocks/customers/Customers";
 
 const orderSubRoutes = [
   {
@@ -14,7 +13,7 @@ const orderSubRoutes = [
 
 export const CustomersRoutes = (
   <Route path="customers">
-    <Route index element={<Table {...m_tableData} />} />
+    <Route index element={<Customers />} />
 
     {orderSubRoutes
       .filter((r) => allowedPaths.includes(r.fullPath))
