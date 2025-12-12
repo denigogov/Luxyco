@@ -9,6 +9,7 @@ import Button from "../../../whitelabel/src/atoms/button/A-Button";
 import type { ButtonTypes } from "../../../whitelabel/src/atoms/button/a-button.types";
 import TableSort from "../../../whitelabel/src/molecules/tableSort/M_tableSort";
 import type { SortOption } from "../../../whitelabel/src/molecules/tableSort/M_tableSort";
+import ErrorWrapper from "../ErrorWrapper";
 
 const Customers: React.FC = () => {
   // sort options (dynamic-friendly)
@@ -39,10 +40,13 @@ const Customers: React.FC = () => {
     },
   ];
 
-  const { data, isLoading } = useCustomersList();
+  const { data, isLoading, error } = useCustomersList();
   const rows: rowTypes[] = (data as any)?.data ?? [];
 
   if (isLoading) return <h1>Loading</h1>;
+
+  // example !
+  if (error && !rows) return <ErrorWrapper />;
 
   const ButtonFilterOpen: ButtonTypes = {
     label: "Филтери",
@@ -73,7 +77,7 @@ const Customers: React.FC = () => {
         </div>
       </div>
 
-      <Table {...m_tableData} rows={rows} />
+      <Table {...m_tableData} />
     </div>
   );
 };
