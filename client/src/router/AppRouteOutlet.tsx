@@ -8,11 +8,12 @@ import { o_navbarData } from "../whitelabel/src/organisms/navbar/o-navbar.data";
 import { useAuth } from "../utils/hooks/useAuth";
 import { allowedPaths } from "../utils/brands";
 import { setLastValidRoute } from "../utils/routes/routeStore";
+import type { NavbarTypes } from "../whitelabel/src/organisms/navbar/o-navbar.types";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
   const { isNavOpen } = useUIState();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     // @ts-expect-error/won't able to fix type
@@ -33,9 +34,22 @@ const AppRoute: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
+  const handleLogoutUser = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    logout();
+  };
+
+  const navbarConfig: NavbarTypes = {
+    ...o_navbarData,
+    logoutButton: {
+      ...o_navbarData.logoutButton,
+      onClick: (e) => handleLogoutUser(e),
+    },
+  };
+
   return (
     <div className="app-layout">
-      <Navbar {...o_navbarData} />
+      <Navbar {...navbarConfig} />
       <main className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}>
         <Outlet />
       </main>
