@@ -39,8 +39,26 @@ const Customers: React.FC = () => {
     },
   ];
 
+  // add new type because of the backend nested data
+  type CustomerAddress = {
+    formattedAddress?: string;
+  };
+  // extendded because of the customerAddresses nested data from backend
+  type RowWithAddress = rowTypes & {
+    customerAddresses?: CustomerAddress[];
+    formattedAddress: string;
+  };
+
   const { data, isLoading, error } = useCustomersList();
-  const rows: rowTypes[] = (data as any)?.data ?? [];
+  const rawRows: RowWithAddress[] = (data as any)?.data ?? [];
+
+  const rows = rawRows.map((c) => ({
+    ...c,
+    formattedAddress:
+      c.customerAddresses?.[0]?.formattedAddress ?? "Клиентот нема адреса",
+  }));
+
+  console.log(rows);
 
   if (isLoading) return <h1>Loading</h1>;
   if (error) return <ErrorWrapper />;
