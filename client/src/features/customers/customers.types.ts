@@ -40,19 +40,19 @@ export interface CustomerAdress {
   postal_code: number;
   country: string;
   formatted_address: string;
-  is_default: boolean;
-  is_active: boolean;
+  isDefault: boolean;
+  isActive: boolean;
   latitude: number;
   longitude: number;
 }
 
 export type Customer = {
   id: number;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   phone_number: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  customer_addresses: CustomerAdress[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  customerAddresses: CustomerAdress[];
 };

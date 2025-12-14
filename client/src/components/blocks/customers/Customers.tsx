@@ -12,7 +12,6 @@ import type { SortOption } from "../../../whitelabel/src/molecules/tableSort/M_t
 import ErrorWrapper from "../ErrorWrapper";
 
 const Customers: React.FC = () => {
-  // sort options (dynamic-friendly)
   const sortOptions: SortOption[] = [
     {
       key: "name_asc",
@@ -44,9 +43,7 @@ const Customers: React.FC = () => {
   const rows: rowTypes[] = (data as any)?.data ?? [];
 
   if (isLoading) return <h1>Loading</h1>;
-
-  // example !
-  if (error && !rows) return <ErrorWrapper />;
+  if (error) return <ErrorWrapper />;
 
   const ButtonFilterOpen: ButtonTypes = {
     label: "Филтери",
@@ -77,7 +74,7 @@ const Customers: React.FC = () => {
         </div>
       </div>
 
-      <Table {...m_tableData} />
+      <Table {...m_tableData} rows={rows} />
     </div>
   );
 };
