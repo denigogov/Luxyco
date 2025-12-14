@@ -78,10 +78,11 @@ export function buildCustomersFindManyArgs(
       last_name: true,
       phone_number: true,
       customer_addresses: {
+        take: 1,
+        where: { is_active: true, is_default: true },
         select: {
           formatted_address: true,
         },
-        where: { is_active: true },
       },
     },
     orderBy,
