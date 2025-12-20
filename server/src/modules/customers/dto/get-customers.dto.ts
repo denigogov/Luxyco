@@ -20,6 +20,11 @@ export class CustomersQueryDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(50)
+  village?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(100)
   street?: string;
 

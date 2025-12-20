@@ -21,6 +21,11 @@ export class CreateCustomerAddressDto {
   @MaxLength(50)
   city: string;
 
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  village: string;
+
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional()
   @IsString()

@@ -22,6 +22,7 @@ model customer_addresses {
   street                  String    @db.VarChar(100)
   city                    String    @db.VarChar(50)
   postal_code             String    @db.VarChar(20)
+  village                 String?   @db.VarChar(50)
   country                 String    @db.VarChar(50)
   formatted_address       String    @db.VarChar(255)
   latitude                Decimal   @db.Decimal(10, 8)

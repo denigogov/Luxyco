@@ -7,7 +7,8 @@ export function buildCustomersFindManyArgs(
   customerAddressSelect: any,
   isActive: boolean,
 ) {
-  const { name, city, street, phoneNumber, search, sortBy, sortDir } = query;
+  const { name, city, street, phoneNumber, search, sortBy, sortDir, village } =
+    query;
 
   const where: any = { is_active: isActive };
   const AND: any[] = [];
@@ -25,6 +26,7 @@ export function buildCustomersFindManyArgs(
             OR: [
               { city: { contains: search } },
               { street: { contains: search } },
+              { village: { contains: search } },
             ],
           },
         },
@@ -49,12 +51,13 @@ export function buildCustomersFindManyArgs(
     });
   }
 
-  if (city || street) {
+  if (city || street || village) {
     AND.push({
       customer_addresses: {
         some: {
           is_active: true,
           ...(city && { city: { contains: city } }),
+          ...(village && { village: { contains: village } }),
           ...(street && { street: { contains: street } }),
         },
       },
@@ -82,6 +85,7 @@ export function buildCustomersFindManyArgs(
         where: { is_active: true, is_default: true },
         select: {
           formatted_address: true,
+          village: true,
         },
       },
     },

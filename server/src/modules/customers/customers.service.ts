@@ -18,6 +18,7 @@ export class CustomersService {
     id: true,
     street: true,
     city: true,
+    village: true,
     postal_code: true,
     country: true,
     formatted_address: true,

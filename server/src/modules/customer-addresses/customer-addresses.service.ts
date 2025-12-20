@@ -17,6 +17,7 @@ export class CustomerAddressesService {
     street: true,
     city: true,
     postal_code: true,
+    village: true,
     country: true,
     formatted_address: true,
     is_default: true,
@@ -73,6 +74,7 @@ export class CustomerAddressesService {
           customer_id: customerId,
           street: dto.street,
           city: dto.city,
+          village: dto.village,
           postal_code: dto.postalCode,
           country: dto.country,
           is_default: shouldBeDefault,
@@ -163,6 +165,7 @@ export class CustomerAddressesService {
         data: {
           street: dto.street ?? undefined,
           city: dto.city ?? undefined,
+          village: dto.village ?? undefined,
           postal_code: dto.postalCode ?? undefined,
           country: dto.country ?? undefined,
           formatted_address: dto.formattedAddress ?? undefined,
