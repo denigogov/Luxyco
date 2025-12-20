@@ -27,3 +27,16 @@
     font-weight: $weight;
   }
 }
+
+@mixin overflowScroll($color: color(borderLight), $weight: 0.5px) {
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: $weight;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $color;
+  }
+}

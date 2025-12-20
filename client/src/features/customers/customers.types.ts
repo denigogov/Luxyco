@@ -13,6 +13,7 @@ export type CustomersListParams = {
   phoneNumber?: string;
   city?: string;
   street?: string;
+  village?: string;
 };
 
 export type NormalizedCustomersListParams = {
@@ -31,6 +32,7 @@ export type NormalizedCustomersListParams = {
   phoneNumber?: string;
   city?: string;
   street?: string;
+  village?: string;
 };
 
 export interface CustomerAdress {
@@ -44,6 +46,7 @@ export interface CustomerAdress {
   isActive: boolean;
   latitude: number;
   longitude: number;
+  village: string;
 }
 
 export type Customer = {

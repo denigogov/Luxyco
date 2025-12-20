@@ -1,33 +1,42 @@
-// src/api/customers.api.ts
 import { apiGet } from "./http";
-import type { NormalizedCustomersListParams } from "../features/customers/customers.types";
+import type {
+  NormalizedCustomersListParams,
+  Customer,
+} from "../features/customers/customers.types";
+
+export type CustomersListResponse = {
+  data: Customer[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
 
 export function getCustomersList(
   params: NormalizedCustomersListParams,
   signal?: AbortSignal
-) {
-  const qs = new URLSearchParams();
+): Promise<CustomersListResponse> {
+  const sp = new URLSearchParams();
 
-  // always include
-  qs.set("page", String(params.page));
-  qs.set("limit", String(params.limit));
+  sp.set("page", String(params.page));
+  sp.set("limit", String(params.limit));
 
-  if (params.limit !== 20) {
-    qs.set("limit", String(params.limit));
-  }
+  if (params.search) sp.set("search", params.search);
+  if (params.name) sp.set("name", params.name);
+  if (params.phoneNumber) sp.set("phoneNumber", params.phoneNumber);
+  if (params.city) sp.set("city", params.city);
+  if (params.street) sp.set("street", params.street);
+  if (params.village) sp.set("village", params.village);
 
-  // only include if non-empty
-  if (params.search) qs.set("search", params.search);
+  if (params.sortBy) sp.set("sortBy", params.sortBy);
+  if (params.sortDir) sp.set("sortDir", params.sortDir);
 
-  if (params.name) qs.set("name", params.name);
-  if (params.phoneNumber) qs.set("phoneNumber", params.phoneNumber);
-  if (params.city) qs.set("city", params.city);
-  if (params.street) qs.set("street", params.street);
+  const query = sp.toString();
+  const path = query ? `/customers?${query}` : "/customers";
 
-  if (params.sortBy) qs.set("sortBy", params.sortBy);
-  if (params.sortDir) qs.set("sortDir", params.sortDir);
-
-  return apiGet(`/customers?${qs.toString()}`, signal);
+  return apiGet<CustomersListResponse>(path, signal);
 }
 
 export function getCustomerById(id: number) {

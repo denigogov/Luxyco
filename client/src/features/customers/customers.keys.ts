@@ -15,8 +15,8 @@ export const normalizeCustomersListParams = (
   phoneNumber: p.phoneNumber?.trim() || undefined,
   city: p.city?.trim() || undefined,
   street: p.street?.trim() || undefined,
+  village: p.village?.trim() || undefined,
 
-  // keep optional so initial URL stays short
   sortBy: p.sortBy?.trim() || undefined,
   sortDir: p.sortDir || undefined,
 });
