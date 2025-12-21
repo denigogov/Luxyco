@@ -13,7 +13,7 @@ import type { NavbarTypes } from "../whitelabel/src/organisms/navbar/o-navbar.ty
 const AppRoute: React.FC = () => {
   const location = useLocation();
   const { isNavOpen } = useUIState();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, status } = useAuth();
 
   useEffect(() => {
     // @ts-expect-error/won't able to fix type
@@ -30,14 +30,18 @@ const AppRoute: React.FC = () => {
     }
   }, [location.pathname]);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
   const handleLogoutUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     logout();
   };
+
+  if (status === "checking") {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   const navbarConfig: NavbarTypes = {
     ...o_navbarData,

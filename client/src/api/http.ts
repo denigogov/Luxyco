@@ -71,31 +71,48 @@ function buildHeaders(init: RequestInit, token: string | null) {
   return headers;
 }
 
-async function refreshAccessToken() {
-  const url = buildUrl("/auth/refresh");
+/**  single shared in-flight refresh */
+let refreshPromise: Promise<string> | null = null;
 
-  const res = await fetch(url, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!res.ok) {
-    const err: any = new Error("Refresh failed");
-    err.status = res.status;
-    err.body = await res.text().catch(() => "");
-    clearAuth();
-    throw err;
+export function refreshAccessToken(): Promise<string> {
+  if (refreshPromise) {
+    // someone already started refresh → reuse that
+    return refreshPromise;
   }
 
-  const data = (await res.json()) as AuthStorage & {
-    user: AuthStorage["user"];
-    accessToken: string;
-  };
+  refreshPromise = (async () => {
+    try {
+      const url = buildUrl("/auth/refresh");
 
-  saveAuth({ user: data.user, accessToken: data.accessToken });
+      const res = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
 
-  return data.accessToken;
+      if (!res.ok) {
+        const err: any = new Error("Refresh failed");
+        err.status = res.status;
+        err.body = await res.text().catch(() => "");
+        clearAuth();
+        throw err;
+      }
+
+      const data = (await res.json()) as AuthStorage & {
+        user: AuthStorage["user"];
+        accessToken: string;
+      };
+
+      saveAuth({ user: data.user, accessToken: data.accessToken });
+
+      return data.accessToken;
+    } finally {
+      // very important: always reset, success or error
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 async function requestWithAutoRefresh<T>(
