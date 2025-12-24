@@ -1,18 +1,13 @@
 .app-layout {
-  display: flex;
-  min-height: 100vh;
-
   @include breakpoint(medium, true) {
     padding-top: spacing(medium);
   }
 }
 
 .app-main {
-  flex: 1;
   margin-left: var(--nav-expanded);
   padding: 5px;
   transition: margin-left 0.3s ease;
-  min-height: 100vh;
   background: var(--main-backgroundColor);
 
   &--collapsed {

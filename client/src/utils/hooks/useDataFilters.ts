@@ -4,7 +4,16 @@ import type { CustomersListParams } from "../../features/customers/customers.typ
 
 type Filters = Pick<
   CustomersListParams,
-  "name" | "street" | "city" | "phoneNumber" | "limit" | "village"
+  | "name"
+  | "street"
+  | "city"
+  | "phoneNumber"
+  | "limit"
+  | "village"
+  | "sortBy"
+  | "sortDir"
+  | "page"
+  | "search"
 >;
 
 type SetFiltersArg = Partial<Filters> | ((prev: Filters) => Partial<Filters>);
@@ -26,6 +35,10 @@ export function useDataFilters() {
       phoneNumber: read("phoneNumber"),
       limit: read("limit"),
       village: read("village"),
+      sortBy: read("sortBy"),
+      sortDir: read("sortDir"),
+      page: read("page"),
+      search: read("search"),
     };
   }, [searchParams]);
 

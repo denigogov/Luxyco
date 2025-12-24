@@ -1,8 +1,18 @@
+import brandLogoLight from "../../assets/logo/luxyCo-Light-logo.svg";
+import brandLogoDark from "../../assets/logo/luxyCo-Dark-logo.svg";
+import brandLogoDark_slogan from "../../assets/logo/luxyCo-Dark.svg";
+import brandLogoLight_slogan from "../../assets/logo/luxyCo-Light.svg";
+
 export const BRAND_BRANDB = {
   id: "brandB",
   name: "brandB",
-  logo: "/brandB/logo.svg",
   slogan: "Test · Analyze · Test",
+  logo: {
+    default: brandLogoDark,
+    logo_mobile: brandLogoLight,
+    logoFull_dark: brandLogoDark_slogan,
+    logoFull_light: brandLogoLight_slogan,
+  },
   routes: {
     includeGroups: ["settings", "dashboard", "order"],
     includePaths: {

@@ -128,7 +128,7 @@ async function requestWithAutoRefresh<T>(
   const token = getAccessToken();
 
   // first request
-  let res = await fetch(url, {
+  const res = await fetch(url, {
     ...init,
     credentials: "include",
     headers: buildHeaders(init, token),

@@ -1,4 +1,4 @@
-export type CustomersSortBy = "created_at" | "name";
+export type CustomersSortBy = "createdAt" | "name";
 export type CustomersSortDir = "asc" | "desc";
 
 export type CustomersListParams = {
