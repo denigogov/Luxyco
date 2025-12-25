@@ -1,6 +1,6 @@
-import type { ButtonTypes } from "../../../whitelabel/src/atoms/button/a-button.types";
-import type { InputTypes } from "../../../whitelabel/src/atoms/input/a-input.types";
-import type { rowTypes } from "../../../whitelabel/src/molecules/table/m-table.types";
+import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type { InputTypes } from "../../../../whitelabel/src/atoms/input/a-input.types";
+import type { rowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 
 export interface CustomersTypes {
   ButtonFilterOpen: ButtonTypes;

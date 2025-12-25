@@ -1,7 +1,7 @@
 import { Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
 import CustomerDetails from "../../../whitelabel/src/blocks/customerDetals/CustomerDetails";
-import Customers from "../../../components/blocks/customers/Customers";
+import Customers from "../../../components/blocks/customers/All/Customers";
 
 const orderSubRoutes = [
   {

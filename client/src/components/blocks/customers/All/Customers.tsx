@@ -2,25 +2,25 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { useCustomersList } from "../../../features/customers/customers.queries";
-import Table from "../../../whitelabel/src/molecules/table/M-table";
-import { m_tableData } from "../../../whitelabel/src/molecules/table/m-table.data";
-import TableFilter from "../../../whitelabel/src/molecules/tableFilter/M_tableFilter";
-import Button from "../../../whitelabel/src/atoms/button/A-Button";
-import type { ButtonTypes } from "../../../whitelabel/src/atoms/button/a-button.types";
-import ErrorWrapper from "../ErrorWrapper";
-import { useDataFilters } from "../../../utils/hooks/useDataFilters";
-import { m_tableFilterData } from "../../../whitelabel/src/molecules/tableFilter/m-tableFilter.data";
-import type { FilterValues } from "../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
-import TableSort from "../../../whitelabel/src/molecules/tableSort/M_tableSort";
-import { m_tableSortData } from "../../../whitelabel/src/molecules/tableSort/m-tableSort.data";
-import type { SortOption } from "../../../whitelabel/src/molecules/tableSort/m-tableSort.types";
-import Input from "../../../whitelabel/src/atoms/input/a-input";
-import { useDebouncer } from "../../../utils/helpers/debouncer";
-import type { ActiveTagItem } from "../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import ActiveTag from "../../../whitelabel/src/molecules/activeTag/ActiveTag";
-import { m_activeTagData } from "../../../whitelabel/src/molecules/activeTag/m-activeTag.data";
-import TableFooterPagination from "../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
+import { useCustomersList } from "../../../../features/customers/customers.queries";
+import Table from "../../../../whitelabel/src/molecules/table/M-table";
+import { m_tableData } from "../../../../whitelabel/src/molecules/table/m-table.data";
+import TableFilter from "../../../../whitelabel/src/molecules/tableFilter/M_tableFilter";
+import Button from "../../../../whitelabel/src/atoms/button/A-Button";
+import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import ErrorWrapper from "../../ErrorWrapper";
+import { useDataFilters } from "../../../../utils/hooks/useDataFilters";
+import { m_tableFilterData } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFilter.data";
+import type { FilterValues } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
+import TableSort from "../../../../whitelabel/src/molecules/tableSort/M_tableSort";
+import { m_tableSortData } from "../../../../whitelabel/src/molecules/tableSort/m-tableSort.data";
+import type { SortOption } from "../../../../whitelabel/src/molecules/tableSort/m-tableSort.types";
+import Input from "../../../../whitelabel/src/atoms/input/a-input";
+import { useDebouncer } from "../../../../utils/helpers/debouncer";
+import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import ActiveTag from "../../../../whitelabel/src/molecules/activeTag/ActiveTag";
+import { m_activeTagData } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.data";
+import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import { customersData } from "./customers.data";
 import type { RowWithAddress } from "./customers.types";
 
