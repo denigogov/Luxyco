@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import UIkit from "uikit";
 import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
 import "./_appRouteOutlet.styles.scss";
@@ -14,6 +14,7 @@ const AppRoute: React.FC = () => {
   const location = useLocation();
   const { isNavOpen } = useUIState();
   const { isAuthenticated, logout, status } = useAuth();
+  const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
 
   useEffect(() => {
     // @ts-expect-error/won't able to fix type
@@ -29,6 +30,36 @@ const AppRoute: React.FC = () => {
       console.log(path);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    const onOnline = () => {
+      setIsUserOnline(true);
+      UIkit.notification({
+        message: "Повторно сте онлајн ✅",
+        status: "success",
+        pos: "top-center",
+      });
+    };
+
+    const onOffline = () => {
+      setIsUserOnline(false);
+      UIkit.notification({
+        message: "Немате интернет конекција (офлајн) ⚠️",
+        status: "danger",
+        pos: "top-center",
+      });
+    };
+
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+
+    if (!navigator.onLine) onOffline();
+
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
 
   const handleLogoutUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -55,6 +86,17 @@ const AppRoute: React.FC = () => {
     <div className="app-layout">
       <Navbar {...navbarConfig} />
       <main className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}>
+        {!isUserOnline && (
+          <div
+            className="uk-alert-warning"
+            uk-alert="true"
+            style={{ margin: 0 }}
+          >
+            <p className="uk-margin-remove ">
+              Офлајн сте. Некои функционалности може да не работат.
+            </p>
+          </div>
+        )}
         <Outlet />
       </main>
     </div>
