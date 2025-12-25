@@ -3,6 +3,8 @@ import { QueryClient } from "@tanstack/react-query";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      networkMode: "offlineFirst",
+
       // good defaults for admin dashboards
       staleTime: 30_000, // data fresh for 30s
       gcTime: 10 * 60_000, // cache kept for 10 min
@@ -16,6 +18,7 @@ export const queryClient = new QueryClient({
       },
     },
     mutations: {
+      networkMode: "offlineFirst",
       retry: 0,
     },
   },
