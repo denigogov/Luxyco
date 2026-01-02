@@ -3,12 +3,18 @@ import { allowedPaths } from "../../../utils/brands";
 
 const AllOrder = () => <h1>AllOrder page</h1>;
 const Neworder = () => <h1>Neworder page</h1>;
+const OrderDetail = () => <h1>Order details page</h1>;
 
 const orderSubRoutes = [
   {
     fullPath: "/order/all-orders",
     path: "all-orders",
     element: <AllOrder />,
+  },
+  {
+    fullPath: "/order/:id",
+    path: ":id",
+    element: <OrderDetail />,
   },
   {
     fullPath: "/order/new-order",

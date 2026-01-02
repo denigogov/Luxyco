@@ -50,29 +50,3 @@ a {
 p {
   font-size: fontsize(default);
 }
-
-// Scroll on top ICon
-.arrow-scroll {
-  width: 40px;
-
-  position: fixed;
-  bottom: 25px;
-  right: 2px;
-  padding: 0;
-  cursor: pointer;
-  z-index: 10000;
-
-  &:active {
-    transform: scale(0.9);
-  }
-}
-// global notification styling
-.uk-notification-message-primary {
-  color: #02b812 !important;
-}
-
-.uk-notification-message {
-  font-weight: 600 !important;
-  font-size: fontsize(default) !important;
-  font-family: fontFamily(primary) !important;
-}

@@ -3,6 +3,7 @@ import type {
   NormalizedCustomersListParams,
   Customer,
 } from "../features/customers/customers.types";
+import type { CustomerDetailsTypes } from "../components/blocks/customers/Details/customerDetails.types";
 
 export type CustomersListResponse = {
   data: Customer[];
@@ -39,6 +40,6 @@ export function getCustomersList(
   return apiGet<CustomersListResponse>(path, signal);
 }
 
-export function getCustomerById(id: number) {
-  return apiGet(`/customers/${id}`);
+export function getCustomerById(id: number, signal?: AbortSignal) {
+  return apiGet<CustomerDetailsTypes>(`/customers/${id}`, signal);
 }

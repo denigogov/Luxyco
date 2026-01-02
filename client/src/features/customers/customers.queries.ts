@@ -16,7 +16,7 @@ export function useCustomersList(params?: CustomersListParams) {
 export function useCustomer(id: number) {
   return useQuery({
     queryKey: customersKeys.detail(id),
-    queryFn: () => getCustomerById(id),
+    queryFn: ({ signal }) => getCustomerById(id, signal),
     enabled: id > 0,
   });
 }

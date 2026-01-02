@@ -22,6 +22,7 @@ export const BRAND_LUXYCO = {
       "/order": {
         "/order/all-orders": true,
         "/order/new-order": false,
+        "/order/:id": true,
       },
       "/settings": {
         "/settings": true,

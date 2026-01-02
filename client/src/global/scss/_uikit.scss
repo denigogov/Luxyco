@@ -1,0 +1,23 @@
+// global notification styling
+.uk-notification-message-primary {
+  color: #02b812 !important;
+}
+
+.uk-notification-message {
+  font-weight: 600 !important;
+  font-size: fontsize(default) !important;
+  font-family: fontFamily(primary) !important;
+}
+
+.uk-label-primary {
+  background-color: #3d6ae0;
+}
+
+.uk-label-warning {
+  background-color: #fcdca7;
+  color: black;
+}
+.uk-label-danger {
+  background-color: #ff282845;
+  color: black;
+}
