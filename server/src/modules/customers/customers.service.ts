@@ -9,6 +9,7 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { paginate } from 'src/common/utils/pagination.util';
 import { CustomersQueryDto } from './dto/get-customers.dto';
 import { buildCustomersFindManyArgs } from './queries/customers.find-many.args';
+import { getCustomerWithStats } from './queries/customer.find-one-with-stats';
 
 @Injectable()
 export class CustomersService {
@@ -26,6 +27,7 @@ export class CustomersService {
     is_active: true,
     latitude: true,
     longitude: true,
+    is_verified_by_provider: true,
   } as const;
 
   private async ensureDeleted(id: number) {
@@ -55,28 +57,42 @@ export class CustomersService {
     return paginate(this.prisma.customers as any, baseArgs, query);
   }
 
-  async findOne(id: number, isActive: boolean = true) {
-    const customer = await this.prisma.customers.findUnique({
-      where: { id },
-      include: {
-        customer_addresses: {
-          select: this.customerAddressSelect,
-          where: { is_active: isActive },
+  async findOne(
+    id: number,
+    isActive: boolean = true,
+    sendSimpleData: boolean = false,
+  ) {
+    if (sendSimpleData) {
+      const customer = await this.prisma.customers.findUnique({
+        where: { id },
+        include: {
+          customer_addresses: {
+            select: this.customerAddressSelect,
+            where: { is_active: isActive },
+          },
         },
-      },
-    });
+      });
 
-    if (!customer) {
-      throw new NotFoundException(`Customer with id ${id} not found`);
+      if (!customer) {
+        throw new NotFoundException(`Customer with id ${id} not found`);
+      }
+
+      if (isActive && !customer.is_active) {
+        throw new NotFoundException(
+          `Customer with id ${id} not found or is not active`,
+        );
+      }
+
+      return customer;
     }
 
-    if (isActive && !customer.is_active) {
-      throw new NotFoundException(
-        `Customer with id ${id} not found or is not active`,
-      );
-    }
-
-    return customer;
+    // return with all details
+    return getCustomerWithStats(
+      this.prisma,
+      id,
+      this.customerAddressSelect,
+      isActive,
+    );
   }
 
   async update(id: number, dto: UpdateCustomerDto) {
@@ -84,7 +100,7 @@ export class CustomersService {
       throw new BadRequestException('No fields provided to update');
     }
 
-    await this.findOne(id);
+    await this.findOne(id, true, true);
 
     const data: any = {};
     if (dto.firstName !== undefined) data.first_name = dto.firstName;
@@ -103,7 +119,7 @@ export class CustomersService {
   }
 
   async remove(id: number) {
-    const customer = await this.findOne(id);
+    const customer = await this.findOne(id, true, true);
 
     await this.prisma.$transaction([
       this.prisma.customers.update({
