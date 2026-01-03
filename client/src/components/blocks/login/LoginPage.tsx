@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate, useNavigate, useSearchParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 
 import Login from "../../../whitelabel/src/molecules/login/M-Login";
@@ -19,7 +19,24 @@ type LoginResponse = {
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, isAuthenticated } = useAuth();
+
+  const redirectToRaw = searchParams.get("redirectTo");
+
+  let redirectToDecoded = "/";
+  if (redirectToRaw) {
+    try {
+      redirectToDecoded = decodeURIComponent(redirectToRaw);
+    } catch {
+      redirectToDecoded = "/";
+    }
+  }
+
+  const redirectTo = redirectToDecoded.startsWith("/")
+    ? redirectToDecoded
+    : "/";
+
   const localStorageUsername =
     getLocalStorageGroup("userPreference")?.username ?? "";
 
@@ -33,12 +50,12 @@ const LoginPage = () => {
       apiPost<LoginResponse>("/auth/login", body),
     onSuccess: (data) => {
       login(data);
-      navigate("/", { replace: true });
+      navigate(redirectTo, { replace: true });
     },
   });
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {

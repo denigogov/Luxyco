@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import UIkit from "uikit";
 import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
@@ -12,6 +12,7 @@ import type { NavbarTypes } from "../whitelabel/src/organisms/navbar/o-navbar.ty
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isNavOpen } = useUIState();
   const { isAuthenticated, logout, status } = useAuth();
   const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
@@ -61,6 +62,7 @@ const AppRoute: React.FC = () => {
 
   const handleLogoutUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    navigate("/login", { replace: true });
     logout();
   };
 
@@ -69,7 +71,18 @@ const AppRoute: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    const target = location.pathname + location.search + location.hash;
+
+    if (target === "/") {
+      return <Navigate to="/login" replace />;
+    }
+
+    return (
+      <Navigate
+        to={`/login?redirectTo=${encodeURIComponent(target)}`}
+        replace
+      />
+    );
   }
 
   const navbarConfig: NavbarTypes = {
