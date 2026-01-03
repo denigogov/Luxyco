@@ -14,13 +14,13 @@ export const BRAND_BUBO = {
     logoFull_light: brandLogoLight_slogan,
   },
   routes: {
-    includeGroups: ["/", "dashboard", "order"],
+    includeGroups: ["/", "dashboard", "order", "customers"],
     includePaths: {
       "/": true,
 
       "/order": {
-        "/order/all-orders": true,
-        "/order/new-order": true,
+        "/orders/all": true,
+        "/orders/new": true,
       },
       "/settings": {
         "/settings": false,
@@ -28,7 +28,18 @@ export const BRAND_BUBO = {
         "/settings/status": false,
       },
 
-      "/customers": false,
+      "/customers": {
+        "/customers": true,
+        "/customers/:customerId": false,
+
+        // addresses
+        "/customers/:customerId/addresses/:addressId/edit": false,
+        "/customers/:customerId/addresses/new": false,
+
+        // notes
+        "/customers/:customerId/notes/:noteId/edit": false,
+        "/customers/:customerId/notes/:noteId/add": false,
+      },
       "/delivery": false,
       "/personal": false,
     },

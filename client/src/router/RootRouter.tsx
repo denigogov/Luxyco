@@ -17,7 +17,7 @@ import { CustomersRoutes } from "./routes/customers/Customers.routes";
 const routesMap: Record<string, any> = {
   settings: SettingsRoutes,
   dashboard: DashboardsRoutes,
-  order: OrdersRoutes,
+  orders: OrdersRoutes,
   customers: CustomersRoutes,
 };
 
@@ -28,13 +28,11 @@ const activeRoutes = (brandConfig.routes.includeGroups || [])
 const routes = createRoutesFromElements(
   <>
     {LoginRoutes}
-    {/* just test */}
-
     <Route path="/" element={<AppRouteOutlet />}>
       <Route index element={<Navigate to="dashboard" replace />} />
       {activeRoutes}
+      <Route path="*" element={<ErrorWrapper />} />
     </Route>
-    <Route path="*" element={<ErrorWrapper />} />
   </>
 );
 export const router = createBrowserRouter(routes);

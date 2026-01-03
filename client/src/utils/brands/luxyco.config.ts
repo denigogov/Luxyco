@@ -15,14 +15,15 @@ export const BRAND_LUXYCO = {
   },
 
   routes: {
-    includeGroups: ["/", "dashboard", "order", "settings", "customers"],
+    includeGroups: ["/", "dashboard", "orders", "settings", "customers"],
     includePaths: {
       "/": true,
 
-      "/order": {
-        "/order/all-orders": true,
-        "/order/new-order": false,
-        "/order/:id": true,
+      "/orders": {
+        "/orders": true,
+        "/orders/new": true,
+        "/orders/:id": true,
+        "/orders/:id/edit": true,
       },
       "/settings": {
         "/settings": true,
@@ -33,6 +34,14 @@ export const BRAND_LUXYCO = {
       "/customers": {
         "/customers": true,
         "/customers/:customerId": true,
+
+        // addresses
+        "/customers/:customerId/addresses/:addressId/edit": true,
+        "/customers/:customerId/addresses/new": true,
+
+        // notes
+        "/customers/:customerId/notes/:noteId/edit": true,
+        "/customers/:customerId/notes/add": true,
       },
       "/delivery": true,
       "/personal": true,

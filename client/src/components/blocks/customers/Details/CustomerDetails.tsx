@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import { useCustomer } from "../../../../features/customers/customers.queries";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
 import { customerDetailsData } from "./customerDetails.data";
@@ -67,7 +67,8 @@ const CustomerDetails: React.FC = () => {
               label: "Уреди",
               style: "link",
               role: "edit",
-              onClick: () => alert(`edit note", ${note?.id}`),
+              onClick: () =>
+                navigate(`/customers/${customerId}/notes/${note?.id}/edit`),
             },
             {
               label: "Избриши",
@@ -116,7 +117,9 @@ const CustomerDetails: React.FC = () => {
               style: "link",
               role: "edit",
               onClick: () =>
-                navigate(`/customers/${customerId}/addresses/${a.id}/edit`),
+                navigate(`/customers/${customerId}/addresses/${a.id}/edit`, {
+                  state: a,
+                }),
             },
             {
               label: "Избриши",
@@ -154,6 +157,34 @@ const CustomerDetails: React.FC = () => {
     });
   }, [customerOrders]);
 
+  // header dropdown options buttons
+  const handleDropdownClick = (name: string, stateData = {}) => {
+    switch (name) {
+      case "editCustomer":
+        navigate(`/customers/${customerId}/edit`);
+        return;
+
+      case "newAddress":
+        navigate(`/customers/${customerId}/addresses/new`, {
+          state: stateData,
+        });
+        return;
+
+      case "newNote":
+        navigate(`/customers/${customerId}/notes/add`, {
+          state: stateData,
+        });
+        return;
+
+      case "deactivateCustomer":
+        alert(`delete user ${data?.firstName ?? ""}`);
+        return;
+
+      default:
+        console.warn("Unknown dropdown role:", name);
+        return;
+    }
+  };
   const breadcrumbsProps = useMemo(() => {
     return {
       ...m_breadcrumbsData,
@@ -165,10 +196,7 @@ const CustomerDetails: React.FC = () => {
         ...m_breadcrumbsData.dropdown,
         items: m_breadcrumbsData.dropdown.items.map((btn) => ({
           ...btn,
-          onClick:
-            btn.role === "edit"
-              ? () => navigate(`/customers/${customerId}/edit`)
-              : () => alert(`delete user ${data?.firstName ?? ""}`),
+          onClick: () => handleDropdownClick(btn?.name ?? ""),
         })),
       },
     };
@@ -280,6 +308,7 @@ const CustomerDetails: React.FC = () => {
             <Button
               {...customerDetailsData?.customerHeader?.newOrderBtn}
               label={isMobile ? "нарачка" : "Додади нарачка"}
+              onClick={() => navigate(`/orders/new?customerId=${customerId}`)}
             />
           </div>
         </div>
@@ -287,6 +316,8 @@ const CustomerDetails: React.FC = () => {
 
       <BoxStatistic {...customerStatistic} />
       <Tabs {...tabsData} />
+
+      <Outlet />
     </div>
   );
 };

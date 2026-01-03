@@ -1,4 +1,4 @@
-import { Navigate, Route } from "react-router";
+import { Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
 
 const AllOrder = () => <h1>AllOrder page</h1>;
@@ -7,25 +7,20 @@ const OrderDetail = () => <h1>Order details page</h1>;
 
 const orderSubRoutes = [
   {
-    fullPath: "/order/all-orders",
-    path: "all-orders",
-    element: <AllOrder />,
-  },
-  {
-    fullPath: "/order/:id",
+    fullPath: "/orders/:id",
     path: ":id",
     element: <OrderDetail />,
   },
   {
-    fullPath: "/order/new-order",
-    path: "new-order",
+    fullPath: "/orders/new",
+    path: "new",
     element: <Neworder />,
   },
 ];
 
 export const OrdersRoutes = (
-  <Route path="order">
-    <Route index element={<Navigate to="all-orders" replace />} />
+  <Route path="orders">
+    <Route index element={<AllOrder />} />
 
     {orderSubRoutes
       .filter((r) => allowedPaths.includes(r.fullPath))

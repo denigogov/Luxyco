@@ -73,7 +73,8 @@ const AppRoute: React.FC = () => {
   if (!isAuthenticated) {
     const target = location.pathname + location.search + location.hash;
 
-    if (target === "/") {
+    // if user is already trying to access login (even /login/whatever), just go to /login
+    if (target === "/" || target.startsWith("/login")) {
       return <Navigate to="/login" replace />;
     }
 
