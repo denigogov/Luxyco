@@ -7,6 +7,7 @@ import EditAddresses from "../../../components/blocks/customers/Addresses/EditAd
 import NewCustomerAddress from "../../../components/blocks/customers/Addresses/NewAddress/NewCustomerAddress";
 import NewNote from "../../../components/blocks/customers/Notes/NewNote";
 import EditNote from "../../../components/blocks/customers/Notes/EditNote";
+import AddCustomer from "../../../components/blocks/customers/AddCustomer/AddCustomer";
 
 // test component here i don't create new components !
 
@@ -17,6 +18,11 @@ const modalBase = {
 };
 
 const orderSubRoutes = [
+  {
+    fullPath: "/customers/new",
+    path: "new",
+    element: <AddCustomer />,
+  },
   {
     fullPath: "/customers/:customerId/addresses/new",
     path: ":customerId/addresses/new",

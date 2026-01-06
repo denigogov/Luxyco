@@ -1,9 +1,13 @@
-import { apiGet } from "./http";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./http";
 import type {
   NormalizedCustomersListParams,
   Customer,
+  CreateCustomer,
 } from "../features/customers/customers.types";
-import type { CustomerDetailsTypes } from "../components/blocks/customers/Details/customerDetails.types";
+import type {
+  CustomerAddressTypes,
+  CustomerDetailsTypes,
+} from "../components/blocks/customers/Details/customerDetails.types";
 
 export type CustomersListResponse = {
   data: Customer[];
@@ -42,4 +46,31 @@ export function getCustomersList(
 
 export function getCustomerById(id: number, signal?: AbortSignal) {
   return apiGet<CustomerDetailsTypes>(`/customers/${id}`, signal);
+}
+
+export function createCustomer(body: CreateCustomer, signal?: AbortSignal) {
+  return apiPost<Customer>("/customers", body, signal);
+}
+
+export function createCustomerAddress(
+  customerId: number,
+  dto: CustomerAddressTypes
+) {
+  return apiPost(`/customer-addresses/${customerId}`, dto);
+}
+
+export function updateCustomer(id: number, dto: Partial<Customer>) {
+  return apiPatch<Customer>(`/customers/${id}`, dto);
+}
+
+// export function updateCustomer(
+//   id: number,
+//   body: UpdateCustomerDto,
+//   signal?: AbortSignal
+// ) {
+//   return apiPatch<Customer>(`/customers/${id}`, body, signal);
+// }
+
+export function deleteCustomer(id: number, signal?: AbortSignal) {
+  return apiDelete<void>(`/customers/${id}`, signal);
 }

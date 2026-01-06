@@ -9,6 +9,12 @@ export const customersData: CustomersTypes = {
     toggleTarget: "#customers-filters",
   },
 
+  buttonAddCustomer: {
+    label: "Нов клиент",
+    style: "secondary",
+    icon: { name: "plus", position: "right" },
+  },
+
   customSelectButton: {
     label: "",
     style: "default",

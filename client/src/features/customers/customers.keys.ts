@@ -28,4 +28,10 @@ export const customersKeys = {
     [...customersKeys.lists(), params] as const,
   details: () => [...customersKeys.all, "detail"] as const,
   detail: (id: number) => [...customersKeys.details(), id] as const,
+
+  mutations: {
+    create: () => ["customers", "create"] as const,
+    createAddress: (customerId: number) =>
+      ["customers", customerId, "addresses", "create"] as const,
+  },
 };

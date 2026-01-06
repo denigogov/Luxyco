@@ -6,6 +6,7 @@ export interface CustomersTypes {
   ButtonFilterOpen: ButtonTypes;
   customSelectButton: ButtonTypes;
   searchInputData: InputTypes;
+  buttonAddCustomer: ButtonTypes;
 }
 
 // add new type because of the backend nested data

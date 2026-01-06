@@ -53,9 +53,14 @@ export type Customer = {
   id: number;
   firstName: string;
   lastName: string;
-  phone_number: string;
+  phoneNumber: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
   customerAddresses: CustomerAdress[];
 };
+
+export type CreateCustomer = Pick<
+  Customer,
+  "firstName" | "lastName" | "phoneNumber"
+>;

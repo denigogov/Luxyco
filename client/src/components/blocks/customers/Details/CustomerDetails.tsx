@@ -83,7 +83,9 @@ const CustomerDetails: React.FC = () => {
   }, [customerNotes]);
 
   const boxSectionData = useMemo<BoxSectionTypes>(() => {
-    const addresses = (customerAddresses ?? []).filter((a) => a.isActive);
+    const addresses = (customerAddresses ?? [])
+      .filter((a) => a.isActive)
+      .sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 
     return {
       noItemsMessage: "Корисникот нема додадено адреса",
@@ -101,7 +103,9 @@ const CustomerDetails: React.FC = () => {
         const title = titleParts.join(", ") || a.formattedAddress || "Адреса";
 
         const content = [
-          `${a.postalCode ?? ""} ${a.city ?? ""}`.trim(),
+          `${a.postalCode ?? ""} ${a.city ?? ""} ${
+            a.village ? "- " + a.village : ""
+          }`.trim(),
           a.country,
         ]
           .filter(Boolean)
@@ -194,9 +198,9 @@ const CustomerDetails: React.FC = () => {
       },
       dropdown: {
         ...m_breadcrumbsData.dropdown,
-        items: m_breadcrumbsData.dropdown.items.map((btn) => ({
+        items: m_breadcrumbsData?.dropdown?.items.map((btn) => ({
           ...btn,
-          onClick: () => handleDropdownClick(btn?.name ?? ""),
+          onClick: () => handleDropdownClick(btn?.name ?? "", data),
         })),
       },
     };
@@ -217,7 +221,7 @@ const CustomerDetails: React.FC = () => {
             break;
 
           case "avgOrderPrice":
-            value = `${data?.stats.avgOrderValue.toFixed(2) ?? 0} ден.`;
+            value = `${data?.stats?.avgOrderValue.toFixed(2) ?? 0} ден.`;
             break;
 
           case "lastOrder":
@@ -246,6 +250,8 @@ const CustomerDetails: React.FC = () => {
     const tel = `tel:${data?.phoneNumber.replace(/\s+/g, "")}`;
     window.location.href = tel;
   };
+
+  const defaultAddress = data?.customerAddresses?.find((a) => a.isDefault);
 
   const tabsData: TabsProps = {
     tabData: {
@@ -284,8 +290,8 @@ const CustomerDetails: React.FC = () => {
             </div>
 
             <div className="uk-margin-small-top">
-              {data?.customerAddresses?.[0]?.street ?? "Без Адреса"} <br />
-              {data?.customerAddresses?.[0]?.city ?? ""}
+              {defaultAddress?.street ?? "Без Адреса"} <br />
+              {defaultAddress?.city ?? ""}
             </div>
 
             <div className="uk-margin-small-top  uk-text-muted">

@@ -23,10 +23,13 @@ import { m_activeTagData } from "../../../../whitelabel/src/molecules/activeTag/
 import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import { customersData } from "./customers.data";
 import type { RowWithAddress } from "./customers.types";
+import { useNavigate } from "react-router";
 
 // add new type because of the backend nested data
 
 const Customers: React.FC = () => {
+  const navigate = useNavigate();
+
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
 
   const {
@@ -276,6 +279,10 @@ const Customers: React.FC = () => {
     handleFilterReset();
   };
 
+  const navigateCreateNewCustomer = () => {
+    navigate("new");
+  };
+
   return (
     <div>
       {/* global search */}
@@ -297,12 +304,25 @@ const Customers: React.FC = () => {
           <Button {...customersData.ButtonFilterOpen} />
         </div>
 
+        <div className="uk-inline uk-hidden@s">
+          <Button
+            {...customersData.buttonAddCustomer}
+            onClick={navigateCreateNewCustomer}
+          />
+        </div>
+
         {/* sort dropdown */}
-        <div>
+        <div className="uk-grid-small@s" uk-grid="true">
           <TableSort
             {...m_tableSortData}
             value={sortKey} // string | null
             onChange={handleSortValue}
+          />
+
+          <Button
+            {...customersData.buttonAddCustomer}
+            onClick={navigateCreateNewCustomer}
+            className="uk-visible@m"
           />
         </div>
       </div>

@@ -60,13 +60,14 @@ async function parseJsonOrVoid<T>(res: Response): Promise<T> {
 
 /** build headers with optional token + json body */
 function buildHeaders(init: RequestInit, token: string | null) {
-  const base = init.headers ?? {};
+  const headers = new Headers(init.headers);
 
-  const headers: HeadersInit = {
-    ...base,
-    ...(init.body ? { "Content-Type": "application/json" } : {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
+  // only set json content-type when sending a JSON string body
+  if (typeof init.body === "string") {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   return headers;
 }
@@ -175,4 +176,28 @@ export function apiPost<T>(path: string, body?: unknown, signal?: AbortSignal) {
         !path.includes("/auth/login") && !path.includes("/auth/refresh"),
     }
   );
+}
+
+export function apiPut<T>(path: string, body?: unknown, signal?: AbortSignal) {
+  return requestWithAutoRefresh<T>(path, {
+    method: "PUT",
+    signal,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+export function apiPatch<T>(
+  path: string,
+  body?: unknown,
+  signal?: AbortSignal
+) {
+  return requestWithAutoRefresh<T>(path, {
+    method: "PATCH",
+    signal,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+export function apiDelete<T>(path: string, signal?: AbortSignal) {
+  return requestWithAutoRefresh<T>(path, { method: "DELETE", signal });
 }

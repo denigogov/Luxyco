@@ -33,6 +33,7 @@ export const BRAND_LUXYCO = {
 
       "/customers": {
         "/customers": true,
+        "/customers/new": true,
         "/customers/:customerId": true,
 
         // addresses
