@@ -18,6 +18,7 @@ import { BulkIdsDto } from './dto/bulk-delete.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('customers')
@@ -25,9 +26,10 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post()
-  create(@Body() dto: CreateCustomerDto) {
+  create(@Body() dto: CreateCustomerFullDto) {
     return this.customersService.create(dto);
   }
+
   @Roles('SUPER_ADMIN', 'ADMIN')
   @Get('deleted')
   findDeleted(@Query() query: CustomersQueryDto) {

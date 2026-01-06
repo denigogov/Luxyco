@@ -10,6 +10,7 @@ import { paginate } from 'src/common/utils/pagination.util';
 import { CustomersQueryDto } from './dto/get-customers.dto';
 import { buildCustomersFindManyArgs } from './queries/customers.find-many.args';
 import { getCustomerWithStats } from './queries/customer.find-one-with-stats';
+import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
 
 @Injectable()
 export class CustomersService {
@@ -37,13 +38,47 @@ export class CustomersService {
       throw new BadRequestException(`Customer ${id} is not deleted`);
     return c;
   }
-
-  async create(dto: CreateCustomerDto) {
+  async create(dto: CreateCustomerFullDto) {
     return this.prisma.customers.create({
       data: {
         first_name: dto.firstName,
         last_name: dto.lastName,
         phone_number: dto.phoneNumber,
+
+        customer_addresses: dto.address
+          ? {
+              create: {
+                street: dto.address.street,
+                city: dto.address.city,
+                village: dto.address.village ?? null,
+                postal_code: dto.address.postalCode,
+                country: dto.address.country,
+                formatted_address: dto.address.formattedAddress,
+                latitude: dto.address.latitude as any,
+                longitude: dto.address.longitude as any,
+                is_default: dto.address.isDefault ?? true,
+                is_active: true,
+                is_verified_by_provider:
+                  dto.address.isVerifiedByProvider ?? false,
+              },
+            }
+          : undefined,
+
+        customer_notes: dto.noteText?.trim()
+          ? {
+              create: {
+                note_text: dto.noteText.trim(),
+                is_active: true,
+                created_by_user_id: 1,
+              },
+            }
+          : undefined,
+      },
+      include: {
+        customer_addresses: { select: this.customerAddressSelect },
+        customer_notes: {
+          select: { id: true, note_text: true, created_at: true },
+        },
       },
     });
   }
