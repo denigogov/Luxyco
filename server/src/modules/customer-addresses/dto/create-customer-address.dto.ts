@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
 import {
   IsBoolean,
-  IsDecimal,
+  IsLatitude,
+  IsLongitude,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -48,11 +49,11 @@ export class CreateCustomerAddressDto {
   @MaxLength(255)
   formattedAddress: string;
 
-  @IsDecimal()
+  @IsLatitude()
   @IsNotEmpty()
   latitude: number;
 
-  @IsDecimal()
+  @IsLongitude()
   @IsNotEmpty()
   longitude: number;
 
