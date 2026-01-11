@@ -198,6 +198,21 @@ export function apiPatch<T>(
   });
 }
 
-export function apiDelete<T>(path: string, signal?: AbortSignal) {
-  return requestWithAutoRefresh<T>(path, { method: "DELETE", signal });
+export function apiDelete<T>(
+  path: string,
+  body?: unknown,
+  signal?: AbortSignal
+) {
+  return requestWithAutoRefresh<T>(
+    path,
+    {
+      method: "DELETE",
+      signal,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    },
+    {
+      allowRefresh:
+        !path.includes("/auth/login") && !path.includes("/auth/refresh"),
+    }
+  );
 }

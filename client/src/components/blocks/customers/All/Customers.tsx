@@ -1,8 +1,12 @@
 // Customers.tsx
 
-import { useEffect, useMemo, useState } from "react";
+import { Activity, useEffect, useEffectEvent, useMemo, useState } from "react";
 
-import { useCustomersList } from "../../../../features/customers/customers.queries";
+import {
+  useCustomersList,
+  useDeleteCustomer,
+  useDeleteCustomersBulk,
+} from "../../../../features/customers/customers.queries";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
 import { m_tableData } from "../../../../whitelabel/src/molecules/table/m-table.data";
 import TableFilter from "../../../../whitelabel/src/molecules/tableFilter/M_tableFilter";
@@ -24,11 +28,31 @@ import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A
 import { customersData } from "./customers.data";
 import type { RowWithAddress } from "./customers.types";
 import { useNavigate } from "react-router";
+import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 
 // add new type because of the backend nested data
 
 const Customers: React.FC = () => {
+  const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const navigate = useNavigate();
+
+  const bulkDelete = useDeleteCustomersBulk();
+  const deleteMut = useDeleteCustomer();
+
+  const handleMultipleCustomersDelete = () => {
+    bulkDelete.mutate(selectedCustomers);
+    setSelectedCustomers([]);
+  };
+
+  const handleDeleteCustomer = useEffectEvent((row: RowTypes) => {
+    const id = Number(row.id);
+    if (!id) return;
+    const ok = window.confirm(
+      `Delete ${row.firstName ?? ""} ${row.lastName ?? ""}?`
+    );
+    if (!ok) return;
+    deleteMut.mutate(id);
+  });
 
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
 
@@ -308,9 +332,16 @@ const Customers: React.FC = () => {
           <Button
             {...customersData.buttonAddCustomer}
             onClick={navigateCreateNewCustomer}
-          />
+          />{" "}
         </div>
-
+        <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
+          <div className="uk-inline uk-hidden@s">
+            <Button
+              {...customersData.buttonDeleteCustomersBuld}
+              onClick={handleMultipleCustomersDelete}
+            />
+          </div>
+        </Activity>
         {/* sort dropdown */}
         <div className="uk-grid-small@s" uk-grid="true">
           <TableSort
@@ -324,6 +355,14 @@ const Customers: React.FC = () => {
             onClick={navigateCreateNewCustomer}
             className="uk-visible@m"
           />
+
+          <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
+            <Button
+              {...customersData.buttonDeleteCustomersBuld}
+              onClick={handleMultipleCustomersDelete}
+              className="uk-visible@m"
+            />
+          </Activity>
         </div>
       </div>
 
@@ -351,7 +390,13 @@ const Customers: React.FC = () => {
         </div>
       </div>
 
-      <Table {...m_tableData} rows={rows} resetTable={resetLocalSort} />
+      <Table
+        {...m_tableData}
+        rows={rows}
+        resetTable={resetLocalSort}
+        setSelectedCustomers={setSelectedCustomers}
+        onRowDelete={handleDeleteCustomer}
+      />
       {/* FILTER TABLE FOOTER   */}
       <TableFooterPagination
         meta={(data as any)?.meta}

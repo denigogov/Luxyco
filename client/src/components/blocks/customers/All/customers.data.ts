@@ -14,7 +14,11 @@ export const customersData: CustomersTypes = {
     style: "secondary",
     icon: { name: "plus", position: "right" },
   },
-
+  buttonDeleteCustomersBuld: {
+    label: "Избриши",
+    style: "danger",
+    icon: { name: "trash", position: "right" },
+  },
   customSelectButton: {
     label: "",
     style: "default",

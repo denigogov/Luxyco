@@ -9,6 +9,7 @@ type FormBuilderProps<T extends FieldValues> = {
   fields: RHFInputProps<T>[];
   onSubmit: (values: T) => void | Promise<void>;
   submitButton: ButtonTypes;
+  cancelButton?: ButtonTypes;
   className?: string;
 };
 
@@ -16,6 +17,7 @@ export function FormBuilder<T extends FieldValues>({
   fields,
   onSubmit,
   submitButton,
+  cancelButton,
   className,
 }: FormBuilderProps<T>) {
   const defaultValues = useMemo(() => {
@@ -28,21 +30,58 @@ export function FormBuilder<T extends FieldValues>({
 
   const methods = useForm<T>({
     defaultValues,
-    mode: "onSubmit",
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
+  const handleSubmit = methods.handleSubmit(async (values) => {
+    await onSubmit(values);
+    methods.reset();
   });
 
   return (
     <FormProvider {...methods}>
       <form
-        className={className}
-        onSubmit={methods.handleSubmit(onSubmit)}
-        style={{ display: "grid", gap: 10 }}
+        className={`uk-grid-small ${className ?? ""}`}
+        data-uk-grid
+        onSubmit={handleSubmit}
       >
         {fields.map((f) => (
-          <RHFInput key={String(f.name)} {...f} />
+          <div
+            key={String(f.name)}
+            className={f.width ? `uk-width-1-${f.width}` : "uk-width-1-1"}
+          >
+            <RHFInput {...f} />
+          </div>
         ))}
+        <div
+          className="
+    uk-width-1-1
+    uk-grid-small
+    uk-margin-medium-top
+    uk-child-width-1-1
+    uk-child-width-auto@m
+    uk-flex-right@m
+  "
+          uk-grid="true"
+        >
+          {cancelButton && (
+            <div>
+              <Button
+                {...cancelButton}
+                className="uk-width-1-1 uk-width-auto@m"
+              />
+            </div>
+          )}
 
-        <Button {...submitButton} type="submit" />
+          <div>
+            <Button
+              {...submitButton}
+              type="submit"
+              className="uk-width-1-1 uk-width-auto@m"
+            />
+          </div>
+        </div>
       </form>
     </FormProvider>
   );

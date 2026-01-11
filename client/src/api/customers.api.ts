@@ -71,6 +71,10 @@ export function updateCustomer(id: number, dto: Partial<Customer>) {
 //   return apiPatch<Customer>(`/customers/${id}`, body, signal);
 // }
 
-export function deleteCustomer(id: number, signal?: AbortSignal) {
+export function deleteSingleCustomer(id: number, signal?: AbortSignal) {
   return apiDelete<void>(`/customers/${id}`, signal);
+}
+
+export function deleteMultiCustomers(ids: number[], signal?: AbortSignal) {
+  return apiDelete<void>("/customers/bulk", { ids }, signal);
 }

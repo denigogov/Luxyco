@@ -15,23 +15,28 @@ export type RHFInputProps<T extends FieldValues> = Omit<
 > & {
   name: Path<T>;
   defaultValue?: any;
-  rules?: any; // can be RegisterOptions<T, Path<T>> if you want strict typing
+  rules?: any;
+  width?: string | number;
 };
 
-export function RHFInput<T extends FieldValues>(props: RHFInputProps<T>) {
+export function RHFInput<T extends FieldValues>({
+  defaultValue,
+  rules,
+  width,
+  ...rest
+}: RHFInputProps<T>) {
   const { control } = useFormContext<T>();
 
   return (
     <Controller
-      name={props.name}
+      name={rest.name}
       control={control}
-      defaultValue={props.defaultValue ?? ""}
-      rules={props.rules}
+      defaultValue={defaultValue ?? ""}
+      rules={rules}
       render={({ field, fieldState }) => (
         <Input
-          {...props}
-          value={(field.value ?? "") as any}
-          onChange={field.onChange}
+          {...rest}
+          {...field}
           error={{ message: fieldState.error?.message }}
         />
       )}

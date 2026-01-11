@@ -26,8 +26,10 @@ const CustomerDetails: React.FC = () => {
 
   const onBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/customers");
+    const from = (state as any)?.from;
+
+    console.log(from);
+    navigate(from ?? "/customers", { replace: true });
   };
 
   const customerFromState = state?.customer;
@@ -290,8 +292,10 @@ const CustomerDetails: React.FC = () => {
             </div>
 
             <div className="uk-margin-small-top">
-              {defaultAddress?.street ?? "Без Адреса"} <br />
-              {defaultAddress?.city ?? ""}
+              {defaultAddress?.formattedAddress
+                ? " Ул. " + defaultAddress?.formattedAddress
+                : "Без Адреса"}{" "}
+              <br />
             </div>
 
             <div className="uk-margin-small-top  uk-text-muted">

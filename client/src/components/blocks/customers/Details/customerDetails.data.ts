@@ -60,7 +60,6 @@ const CustomerOrderTable: TableTypes = {
     {
       header: "Акција",
       key: "action",
-      enableSort: false,
       classes: "uk-table-shrink uk-text-nowrap",
     },
   ],
@@ -93,6 +92,7 @@ const CustomerOrderTable: TableTypes = {
       label: "Преглед",
       size: "medium",
       style: "text",
+      role: "details",
     },
   ],
 };

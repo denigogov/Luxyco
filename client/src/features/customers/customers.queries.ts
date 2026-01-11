@@ -7,7 +7,8 @@ import {
 import {
   createCustomer,
   createCustomerAddress,
-  deleteCustomer,
+  deleteMultiCustomers,
+  deleteSingleCustomer,
   getCustomerById,
   getCustomersList,
   updateCustomer,
@@ -93,9 +94,25 @@ export function useDeleteCustomer() {
 
   return useMutation({
     mutationKey: ["customers", "delete"] as const,
-    mutationFn: (id: number) => deleteCustomer(id),
+    mutationFn: (id: number) => deleteSingleCustomer(id),
     onSuccess: (_data, id) => {
       qc.removeQueries({ queryKey: customersKeys.detail(id) });
+      qc.invalidateQueries({ queryKey: customersKeys.lists() });
+    },
+  });
+}
+
+export function useDeleteCustomersBulk() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["customers", "bulk-delete"] as const,
+    mutationFn: (ids: number[]) => deleteMultiCustomers(ids),
+    onSuccess: (_data, ids) => {
+      ids.forEach((id) =>
+        qc.removeQueries({ queryKey: customersKeys.detail(id) })
+      );
+
       qc.invalidateQueries({ queryKey: customersKeys.lists() });
     },
   });

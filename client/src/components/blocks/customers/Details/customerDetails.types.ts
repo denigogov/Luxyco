@@ -8,8 +8,8 @@ export interface CustomerAddressTypes {
   formattedAddress: string;
   isDefault: boolean;
   isActive: boolean;
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
   isVerifiedByProvider: boolean;
 }
 

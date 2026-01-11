@@ -1,88 +1,94 @@
 import React from "react";
-import { useForm, FormProvider } from "react-hook-form";
 import { useCreateCustomerAddress } from "../../../../../features/customers/customers.queries";
-import { RHFInput } from "../../../../organisms/CustomizableForm/RHFInput";
-import Button from "../../../../../whitelabel/src/atoms/button/A-Button";
-import type { CustomerAddressTypes } from "../../Details/customerDetails.types";
-import { useParams } from "react-router";
+import { FormBuilder } from "../../../../organisms/CustomizableForm/FormBuilder";
+import type { RHFInputProps } from "../../../../organisms/CustomizableForm/RHFInput";
+import type {
+  CustomerAddressTypes,
+  CustomerDetailsTypes,
+} from "../../Details/customerDetails.types";
+import { useLocation, useParams } from "react-router";
 import { customerAddressAdd } from "./customerAddressAdd.data";
 import Breadcrumbs from "../../../../../whitelabel/src/molecules/Breadcrumbs/M-Breadcrumbs";
+import "./_newCustomerAddress.scss";
+import { phoneNumberFormat } from "../../../../../utils/helpers/phoneNumberFormat";
 
 const NewCustomerAddress: React.FC = () => {
-  const { customerId } = useParams();
+  const location = useLocation();
+  const customerFromState = location.state as CustomerDetailsTypes | undefined;
+  const customerName = [
+    customerFromState?.firstName,
+    customerFromState?.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
+  const { customerId } = useParams();
   const customerIdNum = Number(customerId);
   const validId = Number.isFinite(customerIdNum) && customerIdNum > 0;
 
   const createMut = useCreateCustomerAddress(customerIdNum);
 
-  const methods = useForm<CustomerAddressTypes>({
-    mode: "onSubmit",
-    defaultValues: {
-      street: "",
-      city: "",
-      village: "",
-      postalCode: "",
-      country: "MK",
-      formattedAddress: "",
-      latitude: undefined as any,
-      longitude: undefined as any,
-      isDefault: true,
-      isVerifiedByProvider: true,
-    } as any,
-  });
+  const fields =
+    customerAddressAdd.filedsData as RHFInputProps<CustomerAddressTypes>[];
 
-  // all fields in one form
+  const onSubmit = async (values: CustomerAddressTypes) => {
+    if (!validId) return;
 
-  // const onSubmit = methods.handleSubmit(async (values) => {
-  //   const payload = {
-  //     street: values.street,
-  //     city: values.city,
-  //     village: values.village || undefined,
-  //     postalCode: values.postalCode,
-  //     country: values.country,
-  //     formattedAddress: values.formattedAddress,
-  //     latitude: (values as any).latitude,
-  //     longitude: (values as any).longitude,
-  //     isDefault: true,
-  //     isVerifiedByProvider: true,
-  //   };
-  //   if (!validId) return;
-  //   await createMut.mutateAsync(payload as CustomerAddressTypes);
-  // });
-  const onSubmit = methods.handleSubmit(async (values) => {
-    if (!validId) return <p className="uk-text-danger">Invalid customer id.</p>;
-
+    console.log(values);
     await createMut.mutateAsync({
       ...values,
+      formattedAddress: `${values.street}, ${values.city} `,
+      latitude: "11.1111",
+      longitude: "11.1111",
       isDefault: true,
-      isVerifiedByProvider: true,
+      isVerifiedByProvider: false,
     });
-  });
+  };
 
   return (
-    <div>
+    <div className="b-newCustomerAddress">
       <Breadcrumbs {...customerAddressAdd.breadcrumbs} />
-      <h1>New Customer</h1>
-      <FormProvider {...methods}>
-        <form
-          onSubmit={onSubmit}
-          style={{ display: "grid", gap: 10, maxWidth: 520 }}
-        >
-          {customerAddressAdd?.filedsData.map((f) => (
-            <RHFInput key={String(f.name)} {...(f as any)} />
-          ))}
 
-          <div className="uk-flex uk-flex-right uk-gap-small uk-margin-small-top">
-            <Button
-              label={createMut.isPending ? "Creating..." : "Create"}
-              style="primary"
-              loading={createMut.isPending}
-              disabled={createMut.isPending}
-              type="submit"
-            />
+      {customerName && (
+        <div className="b-newCustomerAddress__customerData">
+          <div className="b-newCustomerAddress__customerData-initial">
+            {customerFromState?.firstName.charAt(0)}{" "}
+            {customerFromState?.lastName.charAt(0)}
           </div>
+          <div>
+            <p className="b-newCustomerAddress__customerData-name">
+              {customerName}
+            </p>
+            {customerFromState?.phoneNumber && (
+              <p>{phoneNumberFormat(customerFromState?.phoneNumber)}</p>
+            )}
+          </div>
+        </div>
+      )}
 
+      <div className="uk-flex uk-flex-center uk-margin-medium-top">
+        <div className="uk-box-shadow-medium uk-padding">
+          <FormBuilder<CustomerAddressTypes>
+            fields={fields}
+            onSubmit={onSubmit}
+            submitButton={{
+              ...customerAddressAdd.submitButton,
+              label:
+                createMut.isPending || createMut.isSuccess
+                  ? ""
+                  : "Додај Адреса ",
+              loading: createMut.isPending,
+              disabled: createMut.isPending,
+            }}
+            cancelButton={
+              customerAddressAdd?.cancelButton && {
+                ...customerAddressAdd?.cancelButton,
+                label: createMut.isSuccess ? "врати се назад" : "Откажи",
+                disabled: createMut.isPending,
+              }
+            }
+            className="uk-margin-small-top"
+          />
           {createMut.isError ? (
             <p className="uk-text-danger uk-margin-small-top">
               {String(
@@ -91,14 +97,13 @@ const NewCustomerAddress: React.FC = () => {
               )}
             </p>
           ) : null}
-
           {createMut.isSuccess ? (
             <p className="uk-text-success uk-margin-small-top">
-              Customer created (ID: {(createMut.data as any)?.id})
+              Успешно додадена адреса
             </p>
           ) : null}
-        </form>
-      </FormProvider>
+        </div>
+      </div>
     </div>
   );
 };

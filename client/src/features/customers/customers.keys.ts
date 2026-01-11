@@ -34,4 +34,6 @@ export const customersKeys = {
     createAddress: (customerId: number) =>
       ["customers", customerId, "addresses", "create"] as const,
   },
+  deleteOne: () => ["customers", "delete"] as const,
+  deleteMany: () => ["customers", "bulk-delete"] as const,
 };
