@@ -81,6 +81,7 @@ export class CustomerAddressesService {
           formatted_address: dto.formattedAddress,
           latitude: dto.latitude ?? 0,
           longitude: dto.longitude ?? 0,
+          is_verified_by_provider: dto?.isVerifiedByProvider,
         },
         select: this.customerAddressSelect,
       });
