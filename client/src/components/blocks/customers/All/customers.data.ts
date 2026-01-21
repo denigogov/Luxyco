@@ -14,11 +14,15 @@ export const customersData: CustomersTypes = {
     style: "secondary",
     icon: { name: "plus", position: "right" },
   },
-  buttonDeleteCustomersBuld: {
-    label: "Избриши",
-    style: "danger",
-    icon: { name: "trash", position: "right" },
+
+  modalDeleteCustomerBulk: {
+    openButton: {
+      label: "Избриши",
+      style: "danger",
+      icon: { name: "trash", position: "right" },
+    },
   },
+
   customSelectButton: {
     label: "",
     style: "default",
@@ -37,5 +41,12 @@ export const customersData: CustomersTypes = {
       position: "right",
     },
     placeholder: "име/ презиме/ улица/ град/ село/ телефон",
+  },
+
+  confirmationDeleteDialog: {
+    type: "danger",
+    title: "Избриши Клиент",
+    message:
+      "Оваа акција ќе го избрише клиентот и сите поврзани податоци. Дали сакате да продолжите?",
   },
 };

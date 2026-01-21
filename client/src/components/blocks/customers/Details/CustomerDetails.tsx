@@ -1,9 +1,12 @@
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";
-import { useCustomer } from "../../../../features/customers/customers.queries";
+import {
+  useCustomer,
+  useDeleteCustomer,
+} from "../../../../features/customers/customers.queries";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
 import { customerDetailsData } from "./customerDetails.data";
 import { timeFormat } from "../../../../utils/helpers/timeFormat";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Tabs, {
   type TabsProps,
 } from "../../../../whitelabel/src/organisms/Tabs/Tabs";
@@ -11,178 +14,187 @@ import "./customersDetails.styles.scss";
 import Breadcrumbs from "../../../../whitelabel/src/molecules/Breadcrumbs/M-Breadcrumbs";
 import { m_breadcrumbsData } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.data";
 import BoxStatistic from "../../../../whitelabel/src/organisms/BoxStatistic/O-BoxStatistic";
-import "./customersDetails.styles.scss";
 import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import BoxSection from "../../../../whitelabel/src/organisms/BoxSection/O-BoxSection";
 import { o_boxStatisticData } from "../../../../whitelabel/src/organisms/BoxStatistic/o-boxStatistic.data";
 import type { BoxSectionTypes } from "../../../../whitelabel/src/organisms/BoxSection/o-boxSection.types";
 import { phoneNumberFormat } from "../../../../utils/helpers/phoneNumberFormat";
+import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
+import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
+import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type {
+  CustomerAddressTypes,
+  CustomerNotes,
+  CustomerOrderTypes,
+} from "./customerDetails.types";
+
+import {
+  mapOrdersToRows,
+  buildNotesBoxSectionData,
+  buildAddressesBoxSectionData,
+  buildCustomerStatistic,
+  buildBreadcrumbsProps,
+} from "./customerDetails.helpers";
+
+import {
+  notifyDanger,
+  notifySuccess,
+} from "../../../../whitelabel/src/atoms/notification/Notification";
+
+type deleteType = "address" | "note" | "customer";
 
 const CustomerDetails: React.FC = () => {
-  const [isMobile, _] = useState(window.innerWidth < 960);
+  const [isMobile] = useState(window.innerWidth < 960);
   const { customerId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  const deleteMututation = useDeleteCustomer();
+
+  const modalCloseRef = useRef<null | (() => void)>(null);
+
   const onBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const from = (state as any)?.from;
-
-    console.log(from);
     navigate(from ?? "/customers", { replace: true });
   };
 
-  const customerFromState = state?.customer;
+  const customerFromState = (state as any)?.customer;
 
   const { data, isLoading, error } = useCustomer(
-    customerFromState?.id || customerId
+    customerFromState?.id ?? customerId
   );
 
-  const customerOrders = data?.orders ?? [];
-  const customerAddresses = data?.customerAddresses ?? [];
-  const customerNotes = data?.customerNote ?? [];
+  const customerOrders: CustomerOrderTypes[] = data?.orders ?? [];
+  const customerAddresses: CustomerAddressTypes[] =
+    data?.customerAddresses ?? [];
+  const customerNotes: CustomerNotes[] = data?.customerNote ?? [];
 
-  const notesBoxSectionData = useMemo<BoxSectionTypes>(() => {
-    return {
-      noItemsMessage: "Корисникот нема забелешки",
-      items: customerNotes.map((note) => {
-        const createdBy = [note?.users?.firstName, note?.users?.lastName]
-          .filter(Boolean)
-          .join(" ")
-          .trim();
+  const closeModal = () => {
+    modalCloseRef.current?.();
+  };
 
-        return {
-          marker: [
-            {
-              text: timeFormat(note.createdAt),
-              style: "primary",
-            },
-          ],
+  const handleSingleDelete = async (type: deleteType, id?: string) => {
+    switch (type) {
+      case "address":
+        console.log("address deleted", id);
 
-          title: note.noteText ?? "",
-          content: [
-            `Последно уредување: ${timeFormat(note.updatedAt)}`,
-            `Креирано од: ${createdBy || "/"}`,
-          ].join(" \n "),
-          action: [
-            {
-              label: "Уреди",
-              style: "link",
-              role: "edit",
-              onClick: () =>
-                navigate(`/customers/${customerId}/notes/${note?.id}/edit`),
-            },
-            {
-              label: "Избриши",
-              style: "link",
-              role: "delete",
-              onClick: () => alert(`delete address ${note?.id}`),
-            },
-          ],
-        };
-      }),
-    };
-  }, [customerNotes]);
+        break;
 
-  const boxSectionData = useMemo<BoxSectionTypes>(() => {
-    const addresses = (customerAddresses ?? [])
-      .filter((a) => a.isActive)
-      .sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+      case "customer":
+        {
+          try {
+            await deleteMututation.mutateAsync(Number(id));
 
-    return {
-      noItemsMessage: "Корисникот нема додадено адреса",
-      items: addresses.map((a) => {
-        const marker = [
-          ...(a.isVerifiedByProvider
-            ? [{ text: "Верифицирана", style: "success" as const }]
-            : []),
-          ...(a.isDefault
-            ? [{ text: "Активна", style: "primary" as const }]
-            : []),
-        ];
+            notifySuccess({
+              title: "Успешно избришан клиент",
+              text: "Клиентот е успешно избришан.",
+              pos: "bottom-right",
+            });
 
-        const titleParts = [a.street, a.city].filter(Boolean);
-        const title = titleParts.join(", ") || a.formattedAddress || "Адреса";
+            navigate("../");
+          } catch (err) {
+            notifyDanger({
+              title: "Неуспешно бришење",
+              text: "Се случи грешка при бришење на клиентот. Обидете се повторно.",
+              pos: "bottom-right",
+            });
+          }
+        }
 
-        const content = [
-          `${a.postalCode ?? ""} ${a.city ?? ""} ${
-            a.village ? "- " + a.village : ""
-          }`.trim(),
-          a.country,
-        ]
-          .filter(Boolean)
-          .join(" \n ");
+        break;
 
-        return {
-          marker,
-          title,
-          content,
-          action: [
-            {
-              label: "Уреди",
-              style: "link",
-              role: "edit",
-              onClick: () =>
-                navigate(`/customers/${customerId}/addresses/${a.id}/edit`, {
-                  state: a,
-                }),
-            },
-            {
-              label: "Избриши",
-              style: "link",
-              role: "delete",
-              onClick: () => alert(`delete address ${a.id}`),
-            },
-          ],
-        };
-      }),
-    };
-  }, [customerAddresses]);
+      case "note":
+        console.log("note deleted", id);
+        break;
 
+      default:
+        break;
+    }
+    // closeModal();
+  };
+
+  const buildConfirmButtons = (
+    type: deleteType,
+    id?: string
+  ): ButtonTypes[] => [
+    {
+      label: "Откажи",
+      style: "default",
+      onClick: closeModal,
+    },
+    {
+      label: "Избриши",
+      style: "danger",
+      onClick: () => handleSingleDelete(type, id),
+    },
+  ];
+
+  // Orders rows
   const rows = useMemo(() => {
-    return customerOrders.map((c) => {
-      const hasUnmeasuredPieces = c?.measuredPieces !== c?.totalPieces;
-
-      return {
-        ...c,
-        createdAt: timeFormat(c?.createdAt),
-        scheduledDate: timeFormat(c?.scheduledDate),
-        deliveryType: c?.deliveryType ?? "не дефинирано",
-        qrCode: c?.qrCode ?? 0,
-        totalPrice: `${(c?.totalPrice ?? 0).toFixed(2)} ден.`,
-        totalM2: `${(c?.totalM2 ?? 0).toFixed(2)} m²`,
-        status: c?.status ?? "",
-        messuredPieces: `${c?.measuredPieces ?? 0}/${c?.totalPieces ?? 0}`,
-        rowMarker: hasUnmeasuredPieces
-          ? {
-              variant: "warning" as const,
-              message: "Нарачката содржи неизмерени парчиња",
-            }
-          : undefined,
-      };
-    });
+    return mapOrdersToRows(customerOrders, timeFormat);
   }, [customerOrders]);
+
+  // Notes section
+  const notesBoxSectionData = useMemo<BoxSectionTypes>(() => {
+    const cid = String(customerId ?? "");
+    return buildNotesBoxSectionData({
+      notes: customerNotes,
+      timeFormat,
+      onEditNote: (noteId) =>
+        navigate(`/customers/${cid}/notes/${noteId}/edit`),
+      onDeleteNote: (noteId) => handleSingleDelete("note", noteId),
+    });
+  }, [customerNotes, customerId, navigate]);
+
+  // Addresses section
+  const addressesBoxSectionData = useMemo<BoxSectionTypes>(() => {
+    const cid = String(customerId ?? "");
+    return buildAddressesBoxSectionData({
+      addresses: customerAddresses,
+      customerId: cid,
+      onEditAddress: (address) =>
+        navigate(`/customers/${cid}/addresses/${address.id}/edit`, {
+          state: address,
+        }),
+      buildDeleteModals: (address) => {
+        const addressId = String(address?.id ?? "");
+        const modals: ModalTypes[] = [
+          {
+            openButton: { label: "избриши", style: "link" },
+            children: (
+              <ConfirmDialog
+                {...customerDetailsData.confirmDeleteAddressDialog}
+                buttons={buildConfirmButtons("address", addressId)}
+              />
+            ),
+            onClose: (close) => (modalCloseRef.current = close),
+          },
+        ];
+        return modals;
+      },
+    });
+  }, [customerAddresses, customerId, navigate]);
 
   // header dropdown options buttons
   const handleDropdownClick = (name: string, stateData = {}) => {
+    const cid = String(customerId ?? "");
+
     switch (name) {
       case "editCustomer":
-        navigate(`/customers/${customerId}/edit`);
+        navigate(`/customers/${cid}/edit`);
         return;
 
       case "newAddress":
-        navigate(`/customers/${customerId}/addresses/new`, {
-          state: stateData,
-        });
+        navigate(`/customers/${cid}/addresses/new`, { state: stateData });
         return;
 
       case "newNote":
-        navigate(`/customers/${customerId}/notes/add`, {
-          state: stateData,
-        });
+        navigate(`/customers/${cid}/notes/add`, { state: stateData });
         return;
 
       case "deactivateCustomer":
+        // your modal handles delete now; keep if you still want this action
         alert(`delete user ${data?.firstName ?? ""}`);
         return;
 
@@ -191,62 +203,32 @@ const CustomerDetails: React.FC = () => {
         return;
     }
   };
+
+  // Breadcrumbs props (buttons + modal)
   const breadcrumbsProps = useMemo(() => {
-    return {
-      ...m_breadcrumbsData,
-      returnLink: {
-        ...m_breadcrumbsData.returnLink,
-        onClick: onBack,
-      },
-      dropdown: {
-        ...m_breadcrumbsData.dropdown,
-        items: m_breadcrumbsData?.dropdown?.items.map((btn) => ({
-          ...btn,
-          onClick: () => handleDropdownClick(btn?.name ?? "", data),
-        })),
-      },
-    };
-  }, [customerId, navigate, onBack, data?.firstName]);
+    return buildBreadcrumbsProps({
+      base: m_breadcrumbsData,
+      onBack,
+      data,
+      onDropdownClick: handleDropdownClick,
+      modalChildren: (
+        <ConfirmDialog
+          {...customerDetailsData.confirmDeleteCustomerDialog}
+          buttons={buildConfirmButtons("customer", String(customerId ?? ""))}
+        />
+      ),
+      setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
+    });
+  }, [onBack, data, customerId]);
 
+  // Statistic
   const customerStatistic = useMemo(() => {
-    return {
-      item: o_boxStatisticData.item.map((box) => {
-        let value = box.heading.subline?.text ?? "";
-
-        switch (box.key) {
-          case "totalOrder":
-            value = data?.stats?.totalOrders.toString() ?? "0";
-            break;
-
-          case "totalPrice":
-            value = `${data?.stats?.totalMoney.toFixed(2) ?? 0} ден.`;
-            break;
-
-          case "avgOrderPrice":
-            value = `${data?.stats?.avgOrderValue.toFixed(2) ?? 0} ден.`;
-            break;
-
-          case "lastOrder":
-            value = data?.stats?.lastOrderDate
-              ? timeFormat(data?.stats?.lastOrderDate)
-              : "/";
-
-            break;
-        }
-
-        return {
-          ...box,
-          heading: {
-            ...box.heading,
-            subline: {
-              ...(box.heading.subline ?? { style: "lead", text: "" }),
-              text: value,
-            },
-          },
-        };
-      }),
-    };
-  }, [data, o_boxStatisticData.item]);
+    return buildCustomerStatistic({
+      templateItems: o_boxStatisticData.item,
+      stats: data?.stats,
+      timeFormat,
+    });
+  }, [data?.stats]);
 
   const handleCall = async () => {
     const tel = `tel:${data?.phoneNumber.replace(/\s+/g, "")}`;
@@ -255,39 +237,48 @@ const CustomerDetails: React.FC = () => {
 
   const defaultAddress = data?.customerAddresses?.find((a) => a.isDefault);
 
-  const tabsData: TabsProps = {
-    tabData: {
-      tabID: "Orders",
-      items: [
-        {
-          tabName: "Нарачки",
-          active: true,
-          component: <Table {...customerDetailsData.orderTable} rows={rows} />,
-        },
-        {
-          tabName: "Адреси",
-          component: <BoxSection {...boxSectionData} />,
-        },
-        {
-          tabName: "Забелешки",
-          component: <BoxSection {...notesBoxSectionData} />,
-        },
-      ],
-    },
-  };
+  const tabsData: TabsProps = useMemo(
+    () => ({
+      tabData: {
+        tabID: "Orders",
+        items: [
+          {
+            tabName: "Нарачки",
+            active: true,
+            component: (
+              <Table {...customerDetailsData.orderTable} rows={rows} />
+            ),
+          },
+          {
+            tabName: "Адреси",
+            component: <BoxSection {...addressesBoxSectionData} />,
+          },
+          {
+            tabName: "Забелешки",
+            component: <BoxSection {...notesBoxSectionData} />,
+          },
+        ],
+      },
+    }),
+    [rows, addressesBoxSectionData, notesBoxSectionData]
+  );
+
+  if (isLoading) return <h3>Loading</h3>;
+  if (error) return <h3>error</h3>;
 
   return (
     <div className="b-customerDetails">
       <Breadcrumbs {...breadcrumbsProps} />
 
-      <div className="uk-card-default  uk-padding-small">
+      <div className="uk-card-default uk-padding-small">
         <div className="uk-flex uk-flex-middle uk-flex-between">
           {/* Left side */}
           <div className="b-customerDetails__name">
-            <div className="uk-text-large uk-text-bold uk-margin-remove ">
+            <div className="uk-text-large uk-text-bold uk-margin-remove">
               {`${data?.firstName ?? ""} ${data?.lastName ?? ""}`}
             </div>
-            <div className=" uk-margin-remove">
+
+            <div className="uk-margin-remove">
               {phoneNumberFormat(data?.phoneNumber ?? "")}
             </div>
 
@@ -298,14 +289,14 @@ const CustomerDetails: React.FC = () => {
               <br />
             </div>
 
-            <div className="uk-margin-small-top  uk-text-muted">
+            <div className="uk-margin-small-top uk-text-muted">
               Клиент од: {timeFormat(data?.createdAt ?? "")}
             </div>
           </div>
 
           {/* Right side */}
           <div
-            className="uk-flex uk-flex-middle  uk-grid-small uk-flex-right"
+            className="uk-flex uk-flex-middle uk-grid-small uk-flex-right"
             uk-grid="true"
           >
             {isMobile && (
@@ -326,7 +317,6 @@ const CustomerDetails: React.FC = () => {
 
       <BoxStatistic {...customerStatistic} />
       <Tabs {...tabsData} />
-
       <Outlet />
     </div>
   );

@@ -1,6 +1,5 @@
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import UIkit from "uikit";
 import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
 import "./_appRouteOutlet.styles.scss";
 import Navbar from "../whitelabel/src/organisms/navbar/O-Navbar";
@@ -9,6 +8,10 @@ import { useAuth } from "../utils/hooks/useAuth";
 import { allowedPaths } from "../utils/brands";
 import { setLastValidRoute } from "../utils/routes/routeStore";
 import type { NavbarTypes } from "../whitelabel/src/organisms/navbar/o-navbar.types";
+import {
+  notifySuccess,
+  notifyWarning,
+} from "../whitelabel/src/atoms/notification/Notification";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -16,11 +19,6 @@ const AppRoute: React.FC = () => {
   const { isNavOpen } = useUIState();
   const { isAuthenticated, logout, status } = useAuth();
   const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
-
-  useEffect(() => {
-    // @ts-expect-error/won't able to fix type
-    UIkit.update();
-  }, []);
 
   useEffect(() => {
     const path = location.pathname;
@@ -35,18 +33,19 @@ const AppRoute: React.FC = () => {
   useEffect(() => {
     const onOnline = () => {
       setIsUserOnline(true);
-      UIkit.notification({
-        message: "Повторно сте онлајн ✅",
-        status: "success",
+      notifySuccess({
+        title: "Повторно сте онлајн",
+        text: "Вашата интернет конекција е стабилна",
         pos: "top-center",
       });
     };
 
     const onOffline = () => {
       setIsUserOnline(false);
-      UIkit.notification({
-        message: "Немате интернет конекција (офлајн) ⚠️",
-        status: "danger",
+
+      notifyWarning({
+        title: "Немате интернет конекција (офлајн)",
+        text: "Брат ми нема интернет",
         pos: "top-center",
       });
     };

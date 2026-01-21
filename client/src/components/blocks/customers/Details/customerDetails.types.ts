@@ -1,3 +1,5 @@
+import type { BoxSectionTypes } from "../../../../whitelabel/src/organisms/BoxSection/o-boxSection.types";
+
 export interface CustomerAddressTypes {
   id: number;
   street: string;
@@ -52,6 +54,7 @@ export interface CustomerNotes {
   };
 }
 
+// for the api
 export interface CustomerDetailsTypes {
   id: number;
   firstName: string;
@@ -64,4 +67,5 @@ export interface CustomerDetailsTypes {
   stats: CustomerStatsTypes;
   orders?: CustomerOrderTypes[];
   customerNote: CustomerNotes[];
+  addressesBox: BoxSectionTypes;
 }

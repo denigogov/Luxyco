@@ -1,5 +1,7 @@
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { BoxSectionTypes } from "../../../../whitelabel/src/organisms/BoxSection/o-boxSection.types";
 
 const CustomerOrderTable: TableTypes = {
   classes: "",
@@ -87,14 +89,16 @@ const CustomerOrderTable: TableTypes = {
     },
   ],
 
-  actionButtons: [
-    {
-      label: "Преглед",
-      size: "medium",
-      style: "text",
-      role: "details",
-    },
-  ],
+  actionButtons: {
+    buttons: [
+      {
+        label: "Преглед",
+        size: "medium",
+        style: "text",
+        role: "details",
+      },
+    ],
+  },
 };
 
 const callButton: ButtonTypes = {
@@ -111,10 +115,56 @@ const newOrderBtn: ButtonTypes = {
   style: "secondary",
 };
 
+const addressesBox: BoxSectionTypes = {
+  noItemsMessage: "Корисникот нема додадено адреса",
+  items: [],
+};
+
+const confirmDeleteCustomerDialog: ConfirmDialogTypes = {
+  type: "danger",
+  title: "Избриши Клиент",
+  message:
+    "Оваа акција ќе го избрише клиентот и сите поврзани податоци. Дали сакате да продолжите?",
+  buttons: [
+    {
+      label: "Откажи",
+      style: "default",
+      className: "uk-modal-close",
+    },
+    {
+      label: "Избриши",
+      style: "danger",
+      role: "cancel",
+    },
+  ],
+};
+
+const confirmDeleteAddressDialog: ConfirmDialogTypes = {
+  type: "danger",
+  title: "Избриши Адреса",
+  message:
+    "Со бришење на адресата може да влијае на идни испораки/нарачки. Дали сакате да продолжите?",
+  buttons: [
+    {
+      label: "Откажи",
+      style: "default",
+      className: "uk-modal-close",
+    },
+    {
+      label: "Избриши",
+      style: "danger",
+      role: "cancel",
+    },
+  ],
+};
+
 export const customerDetailsData = {
   orderTable: CustomerOrderTable,
   customerHeader: {
     callButton,
     newOrderBtn,
   },
+  addressesBox,
+  confirmDeleteAddressDialog,
+  confirmDeleteCustomerDialog,
 };

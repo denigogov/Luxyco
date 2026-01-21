@@ -84,7 +84,6 @@ export function useUpdateCustomer(id: number) {
         ...updated,
       }));
       qc.invalidateQueries({ queryKey: customersKeys.lists() });
-      // qc.invalidateQueries({ queryKey: customersKeys.detail(id) }); // optional
     },
   });
 }

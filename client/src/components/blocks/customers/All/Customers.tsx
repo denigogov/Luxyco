@@ -1,6 +1,14 @@
 // Customers.tsx
 
-import { Activity, useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  Activity,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   useCustomersList,
@@ -29,8 +37,13 @@ import { customersData } from "./customers.data";
 import type { RowWithAddress } from "./customers.types";
 import { useNavigate } from "react-router";
 import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
-
-// add new type because of the backend nested data
+import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
+import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
+import {
+  notifyDanger,
+  notifySuccess,
+} from "../../../../whitelabel/src/atoms/notification/Notification";
+import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 
 const Customers: React.FC = () => {
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
@@ -39,19 +52,57 @@ const Customers: React.FC = () => {
   const bulkDelete = useDeleteCustomersBulk();
   const deleteMut = useDeleteCustomer();
 
-  const handleMultipleCustomersDelete = () => {
-    bulkDelete.mutate(selectedCustomers);
-    setSelectedCustomers([]);
+  const modalCloseRef = useRef<null | (() => void)>(null);
+
+  const closeModal = () => {
+    modalCloseRef.current?.();
   };
 
-  const handleDeleteCustomer = useEffectEvent((row: RowTypes) => {
+  const handleMultipleCustomersDelete = async () => {
+    try {
+      bulkDelete.mutateAsync(selectedCustomers);
+      setSelectedCustomers([]);
+      closeModal();
+
+      notifySuccess({
+        title: "Успешно избришани клиент",
+        text: "Клиентите се успешно избришани.",
+        pos: "bottom-right",
+      });
+    } catch (err) {
+      notifyDanger({
+        title: "Неуспешно бришење",
+        text: "Се случи грешка при бришење на клиентите. Обидете се повторно.",
+        pos: "bottom-right",
+      });
+
+      console.error(err);
+    }
+  };
+
+  const handleDeleteCustomer = useEffectEvent(async (row: RowTypes) => {
     const id = Number(row.id);
-    if (!id) return;
-    const ok = window.confirm(
-      `Delete ${row.firstName ?? ""} ${row.lastName ?? ""}?`
-    );
-    if (!ok) return;
-    deleteMut.mutate(id);
+    if (!Number.isFinite(id) || id <= 0) return;
+
+    try {
+      await deleteMut.mutateAsync(id);
+
+      closeModal();
+
+      notifySuccess({
+        title: "Успешно избришан клиент",
+        text: "Клиентот е успешно избришан.",
+        pos: "bottom-right",
+      });
+    } catch (err) {
+      notifyDanger({
+        title: "Неуспешно бришење",
+        text: "Се случи грешка при бришење на клиентот. Обидете се повторно.",
+        pos: "bottom-right",
+      });
+
+      console.error(err);
+    }
   });
 
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
@@ -119,6 +170,43 @@ const Customers: React.FC = () => {
 
   const { data, isLoading, error } = useCustomersList(params);
   const rawRows: RowWithAddress[] = (data as any)?.data ?? [];
+
+  const tableActionButton: ModalTypes[] = [
+    {
+      openButton: { label: "Избриши", style: "link" },
+      onClose: (close) => (modalCloseRef.current = close),
+    },
+  ];
+
+  const confirmDeleteBulklButtons: ButtonTypes[] = [
+    { label: "Откажи", style: "default", onClick: closeModal },
+    {
+      label: "Избриши",
+      style: "danger",
+      onClick: () => {
+        handleMultipleCustomersDelete();
+      },
+    },
+  ];
+
+  const renderDeleteCustomerDialog = useCallback(
+    (row: RowTypes) => (
+      <ConfirmDialog
+        {...customersData.confirmationDeleteDialog}
+        buttons={[
+          { label: "Откажи", style: "default", onClick: closeModal },
+          {
+            label: "Избриши",
+            style: "danger",
+            onClick: () => {
+              handleDeleteCustomer(row);
+            },
+          },
+        ]}
+      />
+    ),
+    [closeModal, handleDeleteCustomer]
+  );
 
   const rows = useMemo(() => {
     return rawRows.map((c) => ({
@@ -336,10 +424,17 @@ const Customers: React.FC = () => {
         </div>
         <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
           <div className="uk-inline uk-hidden@s">
-            <Button
-              {...customersData.buttonDeleteCustomersBuld}
-              onClick={handleMultipleCustomersDelete}
-            />
+            {customersData.modalDeleteCustomerBulk && (
+              <Modal
+                {...customersData.modalDeleteCustomerBulk}
+                onClose={(close) => (modalCloseRef.current = close)}
+              >
+                <ConfirmDialog
+                  {...customersData.confirmationDeleteDialog}
+                  buttons={confirmDeleteBulklButtons}
+                />
+              </Modal>
+            )}
           </div>
         </Activity>
         {/* sort dropdown */}
@@ -357,11 +452,24 @@ const Customers: React.FC = () => {
           />
 
           <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
-            <Button
-              {...customersData.buttonDeleteCustomersBuld}
-              onClick={handleMultipleCustomersDelete}
-              className="uk-visible@m"
-            />
+            {customersData.modalDeleteCustomerBulk && (
+              <Modal
+                {...customersData.modalDeleteCustomerBulk}
+                onClose={(close) => (modalCloseRef.current = close)}
+                openButton={{
+                  ...customersData.modalDeleteCustomerBulk.openButton,
+                  label:
+                    customersData.modalDeleteCustomerBulk.openButton?.label ??
+                    "",
+                  className: "uk-visible@m",
+                }}
+              >
+                <ConfirmDialog
+                  {...customersData.confirmationDeleteDialog}
+                  buttons={confirmDeleteBulklButtons}
+                />
+              </Modal>
+            )}
           </Activity>
         </div>
       </div>
@@ -392,10 +500,15 @@ const Customers: React.FC = () => {
 
       <Table
         {...m_tableData}
+        actionButtons={{
+          buttons: [...(m_tableData.actionButtons?.buttons ?? [])],
+          modals: [...(tableActionButton ?? [])],
+        }}
         rows={rows}
         resetTable={resetLocalSort}
         setSelectedCustomers={setSelectedCustomers}
         onRowDelete={handleDeleteCustomer}
+        renderActionModalChildren={renderDeleteCustomerDialog}
       />
       {/* FILTER TABLE FOOTER   */}
       <TableFooterPagination

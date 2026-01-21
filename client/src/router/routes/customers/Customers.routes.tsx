@@ -8,13 +8,15 @@ import NewCustomerAddress from "../../../components/blocks/customers/Addresses/N
 import NewNote from "../../../components/blocks/customers/Notes/NewNote";
 import EditNote from "../../../components/blocks/customers/Notes/EditNote";
 import AddCustomer from "../../../components/blocks/customers/AddCustomer/AddCustomer";
+import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 
 // test component here i don't create new components !
 
-const modalBase = {
-  modalOpen: true,
-  modalBackgroundScroll: "hidden" as const,
-  modalClose: { top: false, bottom: true, outSide: false },
+const modalBase: ModalTypes = {
+  options: {
+    initialOpen: true,
+    returnBack: true,
+  },
 };
 
 const orderSubRoutes = [
@@ -35,12 +37,7 @@ const customerDetailsSubRoutee = [
     fullPath: "/customers/:customerId/addresses/:addressId/edit",
     path: "addresses/:addressId/edit",
     element: (
-      <Modal
-        modalData={{
-          ...modalBase,
-          modalName: { name: "Edit address", button: true, classes: "" },
-        }}
-      >
+      <Modal {...modalBase}>
         <EditAddresses />
       </Modal>
     ),
@@ -49,12 +46,7 @@ const customerDetailsSubRoutee = [
     fullPath: "/customers/:customerId/notes/:noteId/edit",
     path: "notes/:noteId/edit",
     element: (
-      <Modal
-        modalData={{
-          ...modalBase,
-          modalName: { name: "Edit note", button: true, classes: "" },
-        }}
-      >
+      <Modal {...modalBase}>
         <EditNote />
       </Modal>
     ),
@@ -63,12 +55,7 @@ const customerDetailsSubRoutee = [
     fullPath: "/customers/:customerId/notes/add",
     path: "notes/add",
     element: (
-      <Modal
-        modalData={{
-          ...modalBase,
-          modalName: { name: "Add note", button: true, classes: "" },
-        }}
-      >
+      <Modal {...modalBase}>
         <NewNote />
       </Modal>
     ),
