@@ -37,3 +37,11 @@ export const customersKeys = {
   deleteOne: () => ["customers", "delete"] as const,
   deleteMany: () => ["customers", "bulk-delete"] as const,
 };
+
+export const customerAddressesKeys = {
+  all: ["customer-addresses"] as const,
+  detail: (addressId: number) =>
+    [...customerAddressesKeys.all, "detail", addressId] as const,
+  listByCustomer: (customerId: number) =>
+    [...customerAddressesKeys.all, "list", { customerId }] as const,
+};

@@ -1,13 +1,13 @@
-import { apiDelete, apiGet, apiPatch, apiPost } from "./http";
+import { apiDelete, apiGet, apiPatch, apiPost } from "../http";
 import type {
   NormalizedCustomersListParams,
   Customer,
   CreateCustomer,
-} from "../features/customers/customers.types";
+} from "../../features/customers/customers.types";
 import type {
   CustomerAddressTypes,
   CustomerDetailsTypes,
-} from "../components/blocks/customers/Details/customerDetails.types";
+} from "../../components/blocks/customers/Details/customerDetails.types";
 
 export type CustomersListResponse = {
   data: Customer[];

@@ -12,7 +12,7 @@ import {
   getCustomerById,
   getCustomersList,
   updateCustomer,
-} from "../../api/customers.api";
+} from "../../api/customers/customers.api";
 import type {
   CreateCustomer,
   Customer,

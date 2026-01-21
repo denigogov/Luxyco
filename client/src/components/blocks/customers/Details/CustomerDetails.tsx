@@ -40,6 +40,7 @@ import {
   notifyDanger,
   notifySuccess,
 } from "../../../../whitelabel/src/atoms/notification/Notification";
+import { useDeleteCustomerAddress } from "../../../../features/customers/customersAddresses.queries";
 
 type deleteType = "address" | "note" | "customer";
 
@@ -50,6 +51,7 @@ const CustomerDetails: React.FC = () => {
   const navigate = useNavigate();
 
   const deleteMututation = useDeleteCustomer();
+  const deleteAddress = useDeleteCustomerAddress();
 
   const modalCloseRef = useRef<null | (() => void)>(null);
 
@@ -61,9 +63,9 @@ const CustomerDetails: React.FC = () => {
 
   const customerFromState = (state as any)?.customer;
 
-  const { data, isLoading, error } = useCustomer(
-    customerFromState?.id ?? customerId
-  );
+  const cid = Number(customerFromState?.id ?? customerId ?? 0);
+
+  const { data, isLoading, error } = useCustomer(cid);
 
   const customerOrders: CustomerOrderTypes[] = data?.orders ?? [];
   const customerAddresses: CustomerAddressTypes[] =
@@ -77,7 +79,29 @@ const CustomerDetails: React.FC = () => {
   const handleSingleDelete = async (type: deleteType, id?: string) => {
     switch (type) {
       case "address":
-        console.log("address deleted", id);
+        if (!customerId || !id) return;
+
+        try {
+          await deleteAddress.mutateAsync({
+            customerId: Number(customerId),
+            addressId: Number(id),
+          });
+
+          notifySuccess({
+            title: "Успешно избришана адресата",
+            text: "Адресата на клиентот е успешно избришан.",
+            pos: "bottom-right",
+          });
+          closeModal();
+        } catch (error) {
+          notifyDanger({
+            title: "Неуспешно бришење",
+            text: "Се случи грешка при бришење на адресата. Обидете се повторно.",
+            pos: "bottom-right",
+          });
+
+          console.log(error);
+        }
 
         break;
 
