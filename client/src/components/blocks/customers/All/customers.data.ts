@@ -40,7 +40,7 @@ export const customersData: CustomersTypes = {
       name: "search",
       position: "right",
     },
-    placeholder: "име/ презиме/ улица/ град/ село/ телефон",
+    placeholder: "Пребарај: име • презиме • улица • град • село • телефон",
   },
 
   confirmationDeleteDialog: {
@@ -48,5 +48,11 @@ export const customersData: CustomersTypes = {
     title: "Избриши Клиент",
     message:
       "Оваа акција ќе го избрише клиентот и сите поврзани податоци. Дали сакате да продолжите?",
+  },
+
+  notification: {
+    title: "Успешно избришани клиент",
+    text: "Клиентите се успешно избришани.",
+    pos: "bottom-right",
   },
 };

@@ -39,14 +39,14 @@ import { useNavigate } from "react-router";
 import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
-import {
-  notifyDanger,
-  notifySuccess,
-} from "../../../../whitelabel/src/atoms/notification/Notification";
+
 import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
+import { customersMessages, notificationAlert } from "./customersMessages ";
 
 const Customers: React.FC = () => {
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
+  const [resetSelection, setResetSelection] = useState(false);
+
   const navigate = useNavigate();
 
   const bulkDelete = useDeleteCustomersBulk();
@@ -59,23 +59,17 @@ const Customers: React.FC = () => {
   };
 
   const handleMultipleCustomersDelete = async () => {
+    const messageData = customersMessages.deleteBulk(selectedCustomers.length);
     try {
-      bulkDelete.mutateAsync(selectedCustomers);
+      await bulkDelete.mutateAsync(selectedCustomers);
       setSelectedCustomers([]);
+      setResetSelection((v) => !v);
+
+      console.log("sss", selectedCustomers);
       closeModal();
-
-      notifySuccess({
-        title: "Успешно избришани клиент",
-        text: "Клиентите се успешно избришани.",
-        pos: "bottom-right",
-      });
+      notificationAlert.success(messageData.success);
     } catch (err) {
-      notifyDanger({
-        title: "Неуспешно бришење",
-        text: "Се случи грешка при бришење на клиентите. Обидете се повторно.",
-        pos: "bottom-right",
-      });
-
+      notificationAlert.error(messageData.error);
       console.error(err);
     }
   };
@@ -86,21 +80,10 @@ const Customers: React.FC = () => {
 
     try {
       await deleteMut.mutateAsync(id);
-
       closeModal();
-
-      notifySuccess({
-        title: "Успешно избришан клиент",
-        text: "Клиентот е успешно избришан.",
-        pos: "bottom-right",
-      });
+      notificationAlert.success(customersMessages.deleteOne.success);
     } catch (err) {
-      notifyDanger({
-        title: "Неуспешно бришење",
-        text: "Се случи грешка при бришење на клиентот. Обидете се повторно.",
-        pos: "bottom-right",
-      });
-
+      notificationAlert.error(customersMessages.deleteOne.error);
       console.error(err);
     }
   });
@@ -145,7 +128,7 @@ const Customers: React.FC = () => {
       sortDir,
       page,
       search,
-    ]
+    ],
   );
 
   const [searchInput, setSearchInput] = useState(search ?? "");
@@ -162,7 +145,7 @@ const Customers: React.FC = () => {
     if (!sortBy || !sortDir) return null;
 
     const opt = m_tableSortData.options.find(
-      (o) => o.sortBy === sortBy && o.sortDir === sortDir
+      (o) => o.sortBy === sortBy && o.sortDir === sortDir,
     );
 
     return opt?.key ?? null;
@@ -205,7 +188,7 @@ const Customers: React.FC = () => {
         ]}
       />
     ),
-    [closeModal, handleDeleteCustomer]
+    [closeModal, handleDeleteCustomer],
   );
 
   const rows = useMemo(() => {
@@ -397,7 +380,6 @@ const Customers: React.FC = () => {
 
   return (
     <div>
-      {/* global search */}
       <div className="uk-margin-small-top uk-margin-small-bottom ">
         <Input
           {...customersData.searchInputData}
@@ -507,6 +489,7 @@ const Customers: React.FC = () => {
         rows={rows}
         resetTable={resetLocalSort}
         setSelectedCustomers={setSelectedCustomers}
+        resetSelection={resetSelection}
         onRowDelete={handleDeleteCustomer}
         renderActionModalChildren={renderDeleteCustomerDialog}
       />
