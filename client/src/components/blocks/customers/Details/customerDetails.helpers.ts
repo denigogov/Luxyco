@@ -13,7 +13,7 @@ import type {
  */
 export function mapOrdersToRows(
   customerOrders: CustomerOrderTypes[],
-  timeFormat: (v: any) => string
+  timeFormat: (v: any) => string,
 ) {
   return customerOrders.map((c) => {
     const hasUnmeasuredPieces = c?.measuredPieces !== c?.totalPieces;
@@ -45,9 +45,9 @@ export function buildNotesBoxSectionData(args: {
   notes: CustomerNotes[];
   timeFormat: (v: any) => string;
   onEditNote: (noteId: string) => void;
-  onDeleteNote: (noteId: string) => void;
+  buildDeleteModals: (noteId: string) => ModalTypes[];
 }): BoxSectionTypes {
-  const { notes, timeFormat, onEditNote, onDeleteNote } = args;
+  const { notes, timeFormat, onEditNote, buildDeleteModals } = args;
 
   return {
     noItemsMessage: "Корисникот нема забелешки",
@@ -72,18 +72,13 @@ export function buildNotesBoxSectionData(args: {
           `Креирано од: ${createdBy || "/"}`,
         ].join(" \n "),
         action: {
+          modals: buildDeleteModals(noteId),
           buttons: [
             {
               label: "Уреди",
               style: "link",
               role: "edit",
               onClick: () => onEditNote(noteId),
-            },
-            {
-              label: "Избриши",
-              style: "link",
-              role: "delete",
-              onClick: () => onDeleteNote(noteId),
             },
           ],
         },

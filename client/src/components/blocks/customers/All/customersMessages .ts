@@ -1,42 +1,29 @@
-import {
-  notifyDanger,
-  notifySuccess,
-} from "../../../../whitelabel/src/atoms/notification/Notification";
-import type { NotifyPos } from "../../../../whitelabel/src/atoms/notification/notification.types";
-
-type ToastPayload = {
-  title: string;
-  text: string;
-  pos?: NotifyPos;
-};
-
 export const customersMessages = {
   deleteOne: {
     success: {
-      title: "Успешно избришан клиент",
-      text: "Клиентот е успешно избришан.",
+      title: "Клиентот е успешно отстранет",
+      text: "Клиентот е отстранет од системот.",
     },
     error: {
-      title: "Неуспешно бришење",
-      text: "Се случи грешка при бришење на клиентот. Обидете се повторно.",
+      title: "Бришењето не беше успешно",
+      text: "Не можевме да го отстраниме клиентот во моментов. Ве молиме обидете се повторно.",
     },
   },
+
   deleteBulk: (count: number) => ({
     success: {
-      title: `Успешно избришани ${count > 1 ? "клиенти." : "клиент."}`,
-      text: `Избришани се ${count} ${count > 1 ? "клиенти." : "клиент."}`,
+      title:
+        count === 1
+          ? "Клиентот е успешно отстранет"
+          : `Успешно отстранети ${count} клиенти`,
+      text:
+        count === 1
+          ? "Клиентот е отстранет од системот."
+          : `Отстранети се ${count} клиенти од системот.`,
     },
     error: {
-      title: "Неуспешно бришење",
-      text: "Се случи грешка при бришење на клиентите. Обидете се повторно.",
+      title: "Бришењето не беше успешно",
+      text: "Не можевме да ги отстраниме клиентите во моментов. Ве молиме обидете се повторно.",
     },
   }),
 } as const;
-
-const DEFAULT_POS = "bottom-right" as const;
-
-export const notificationAlert = {
-  success: (m: ToastPayload) =>
-    notifySuccess({ ...m, pos: m.pos ?? DEFAULT_POS }),
-  error: (m: ToastPayload) => notifyDanger({ ...m, pos: m.pos ?? DEFAULT_POS }),
-};

@@ -9,6 +9,7 @@ import { CustomerAddressesModule } from './modules/customer-addresses/customer-a
 import { AuthModule } from './modules/auth/auth.module';
 import { CamelCaseResponseInterceptor } from './common/interceptors/camel-case-response.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CustomerNotesModule } from './modules/customer-notes/customer-notes.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     CustomersModule,
     CustomerAddressesModule,
     AuthModule,
+    CustomerNotesModule,
   ],
   controllers: [AppController],
   providers: [

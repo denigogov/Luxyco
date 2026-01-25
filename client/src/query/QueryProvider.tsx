@@ -15,6 +15,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
             const key0 = (query.queryKey as any[])?.[0];
+
+            console.log(key0);
             return key0 === "customers" && query.state.status === "success";
           },
         },

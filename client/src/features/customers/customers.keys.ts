@@ -4,7 +4,7 @@ import type {
 } from "./customers.types";
 
 export const normalizeCustomersListParams = (
-  p: CustomersListParams
+  p: CustomersListParams,
 ): NormalizedCustomersListParams => ({
   page: p.page ?? 1,
   limit: p.limit ?? 20,
@@ -44,4 +44,12 @@ export const customerAddressesKeys = {
     [...customerAddressesKeys.all, "detail", addressId] as const,
   listByCustomer: (customerId: number) =>
     [...customerAddressesKeys.all, "list", { customerId }] as const,
+};
+
+export const customerNotesKeys = {
+  all: ["customer-notes"] as const,
+  detail: (customerId: number) =>
+    [...customerNotesKeys.all, "detail", customerId] as const,
+  listByCustomer: (customerId: number) =>
+    [...customerNotesKeys.all, "list", { customerId }] as const,
 };

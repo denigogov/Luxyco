@@ -158,6 +158,25 @@ const confirmDeleteAddressDialog: ConfirmDialogTypes = {
   ],
 };
 
+const confirmDeleteNoteDialog: ConfirmDialogTypes = {
+  type: "danger",
+  title: "Избриши забелешка",
+  message:
+    "Оваа забелешка ќе биде отстранета од системот. Дали сакате да продолжите?",
+  buttons: [
+    {
+      label: "Откажи",
+      style: "default",
+      className: "uk-modal-close",
+    },
+    {
+      label: "Избриши",
+      style: "danger",
+      role: "cancel",
+    },
+  ],
+};
+
 export const customerDetailsData = {
   orderTable: CustomerOrderTable,
   customerHeader: {
@@ -167,4 +186,5 @@ export const customerDetailsData = {
   addressesBox,
   confirmDeleteAddressDialog,
   confirmDeleteCustomerDialog,
+  confirmDeleteNoteDialog,
 };

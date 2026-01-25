@@ -65,7 +65,7 @@ export function useDataFilters() {
         return prev;
       });
     },
-    [setSearchParams, current]
+    [setSearchParams, current],
   );
 
   return { ...current, setFilters };

@@ -39,9 +39,9 @@ import { useNavigate } from "react-router";
 import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
-
 import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
-import { customersMessages, notificationAlert } from "./customersMessages ";
+import { customersMessages } from "./customersMessages ";
+import { notificationAlert } from "../../../../utils/hooks/notify";
 
 const Customers: React.FC = () => {
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
@@ -65,8 +65,8 @@ const Customers: React.FC = () => {
       setSelectedCustomers([]);
       setResetSelection((v) => !v);
 
-      console.log("sss", selectedCustomers);
       closeModal();
+
       notificationAlert.success(messageData.success);
     } catch (err) {
       notificationAlert.error(messageData.error);

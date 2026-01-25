@@ -36,11 +36,10 @@ import {
   buildBreadcrumbsProps,
 } from "./customerDetails.helpers";
 
-import {
-  notifyDanger,
-  notifySuccess,
-} from "../../../../whitelabel/src/atoms/notification/Notification";
 import { useDeleteCustomerAddress } from "../../../../features/customers/customersAddresses.queries";
+import { notificationAlert } from "../../../../utils/hooks/notify";
+import { customersDetailsMessages } from "./CustomerDetails.messages";
+import { useDeleteCustomerNotes } from "../../../../features/customers/customerNotes.queries";
 
 type deleteType = "address" | "note" | "customer";
 
@@ -52,6 +51,7 @@ const CustomerDetails: React.FC = () => {
 
   const deleteMututation = useDeleteCustomer();
   const deleteAddress = useDeleteCustomerAddress();
+  const deleteNote = useDeleteCustomerNotes();
 
   const modalCloseRef = useRef<null | (() => void)>(null);
 
@@ -86,21 +86,13 @@ const CustomerDetails: React.FC = () => {
             customerId: Number(customerId),
             addressId: Number(id),
           });
-
-          notifySuccess({
-            title: "Успешно избришана адресата",
-            text: "Адресата на клиентот е успешно избришан.",
-            pos: "bottom-right",
-          });
+          notificationAlert.success(
+            customersDetailsMessages.deleteAddress.success,
+          );
           closeModal();
         } catch (error) {
-          notifyDanger({
-            title: "Неуспешно бришење",
-            text: "Се случи грешка при бришење на адресата. Обидете се повторно.",
-            pos: "bottom-right",
-          });
-
-          console.log(error);
+          notificationAlert.error(customersDetailsMessages.deleteAddress.error);
+          console.error(error);
         }
 
         break;
@@ -109,27 +101,33 @@ const CustomerDetails: React.FC = () => {
         {
           try {
             await deleteMututation.mutateAsync(Number(id));
-
-            notifySuccess({
-              title: "Успешно избришан клиент",
-              text: "Клиентот е успешно избришан.",
-              pos: "bottom-right",
-            });
-
             navigate("../");
+            notificationAlert.success(
+              customersDetailsMessages.deleteCustomer.success,
+            );
           } catch (err) {
-            notifyDanger({
-              title: "Неуспешно бришење",
-              text: "Се случи грешка при бришење на клиентот. Обидете се повторно.",
-              pos: "bottom-right",
-            });
+            notificationAlert.error(
+              customersDetailsMessages.deleteCustomer.error,
+            );
           }
         }
-
         break;
 
       case "note":
-        console.log("note deleted", id);
+        if (!customerId || !id) return;
+        try {
+          await deleteNote.mutateAsync({
+            noteId: Number(id),
+            customerId: Number(customerId),
+          });
+          notificationAlert.success(
+            customersDetailsMessages.deleteNote.success,
+          );
+          closeModal();
+        } catch (error) {
+          notificationAlert.error(customersDetailsMessages.deleteNote.error);
+          console.error(error);
+        }
         break;
 
       default:
@@ -140,7 +138,7 @@ const CustomerDetails: React.FC = () => {
 
   const buildConfirmButtons = (
     type: deleteType,
-    id?: string
+    id?: string,
   ): ButtonTypes[] => [
     {
       label: "Откажи",
@@ -167,7 +165,22 @@ const CustomerDetails: React.FC = () => {
       timeFormat,
       onEditNote: (noteId) =>
         navigate(`/customers/${cid}/notes/${noteId}/edit`),
-      onDeleteNote: (noteId) => handleSingleDelete("note", noteId),
+      buildDeleteModals: (noteId) => {
+        const noteID = String(noteId);
+        const modals: ModalTypes[] = [
+          {
+            openButton: { label: "избриши", style: "link" },
+            children: (
+              <ConfirmDialog
+                {...customerDetailsData.confirmDeleteNoteDialog}
+                buttons={buildConfirmButtons("note", noteID)}
+              />
+            ),
+            onClose: (close) => (modalCloseRef.current = close),
+          },
+        ];
+        return modals;
+      },
     });
   }, [customerNotes, customerId, navigate]);
 
@@ -284,7 +297,7 @@ const CustomerDetails: React.FC = () => {
         ],
       },
     }),
-    [rows, addressesBoxSectionData, notesBoxSectionData]
+    [rows, addressesBoxSectionData, notesBoxSectionData],
   );
 
   if (isLoading) return <h3>Loading</h3>;
