@@ -44,6 +44,11 @@ export const customerAddressesKeys = {
     [...customerAddressesKeys.all, "detail", addressId] as const,
   listByCustomer: (customerId: number) =>
     [...customerAddressesKeys.all, "list", { customerId }] as const,
+
+  mutations: {
+    update: (addressId: number) =>
+      ["customer-addresses", addressId, "update"] as const,
+  },
 };
 
 export const customerNotesKeys = {

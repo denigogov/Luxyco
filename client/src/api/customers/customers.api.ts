@@ -21,7 +21,7 @@ export type CustomersListResponse = {
 
 export function getCustomersList(
   params: NormalizedCustomersListParams,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<CustomersListResponse> {
   const sp = new URLSearchParams();
 
@@ -54,7 +54,7 @@ export function createCustomer(body: CreateCustomer, signal?: AbortSignal) {
 
 export function createCustomerAddress(
   customerId: number,
-  dto: CustomerAddressTypes
+  dto: CustomerAddressTypes,
 ) {
   return apiPost(`/customer-addresses/${customerId}`, dto);
 }
@@ -62,14 +62,6 @@ export function createCustomerAddress(
 export function updateCustomer(id: number, dto: Partial<Customer>) {
   return apiPatch<Customer>(`/customers/${id}`, dto);
 }
-
-// export function updateCustomer(
-//   id: number,
-//   body: UpdateCustomerDto,
-//   signal?: AbortSignal
-// ) {
-//   return apiPatch<Customer>(`/customers/${id}`, body, signal);
-// }
 
 export function deleteSingleCustomer(id: number, signal?: AbortSignal) {
   return apiDelete<void>(`/customers/${id}`, signal);

@@ -23,11 +23,11 @@ const EditNote: React.FC = () => {
       warnedRef.current = true;
 
       notificationAlert.warning({
-        title: "Линкот не може директно да се отвори",
-        text: "Овој екран бара податоци од претходната страница. Отворете го клиентот и избери 'Уреди' повторно.",
+        title: "Не може да се отвори преку споделен линк",
+        text: "За да се прикажат точни податоци, уредувањето на забелешката мора да се отвори од профилот на клиентот. Ќе бидете пренасочени до клиентот.",
       });
 
-      navigate("/customers", { replace: true });
+      navigate(`/customers/${customerId}`, { replace: true });
     }
   }, [noteText, navigate]);
 
