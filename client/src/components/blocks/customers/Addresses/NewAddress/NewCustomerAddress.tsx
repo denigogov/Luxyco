@@ -34,7 +34,6 @@ const NewCustomerAddress: React.FC = () => {
   const onSubmit = async (values: CustomerAddressTypes) => {
     if (!validId) return;
 
-    console.log(values);
     await createMut.mutateAsync({
       ...values,
       formattedAddress: `${values.street}, ${values.city} `,
@@ -93,7 +92,7 @@ const NewCustomerAddress: React.FC = () => {
             <p className="uk-text-danger uk-margin-small-top">
               {String(
                 (createMut.error as any)?.body ??
-                  (createMut.error as any)?.message
+                  (createMut.error as any)?.message,
               )}
             </p>
           ) : null}

@@ -44,7 +44,7 @@ export function mapOrdersToRows(
 export function buildNotesBoxSectionData(args: {
   notes: CustomerNotes[];
   timeFormat: (v: any) => string;
-  onEditNote: (noteId: string) => void;
+  onEditNote: (noteId: string, noteObj: CustomerNotes) => void;
   buildDeleteModals: (noteId: string) => ModalTypes[];
 }): BoxSectionTypes {
   const { notes, timeFormat, onEditNote, buildDeleteModals } = args;
@@ -66,7 +66,7 @@ export function buildNotesBoxSectionData(args: {
             style: "primary",
           },
         ],
-        title: note.noteText ?? "",
+        title: note?.noteText ?? "",
         content: [
           `Последно уредување: ${timeFormat(note.updatedAt)}`,
           `Креирано од: ${createdBy || "/"}`,
@@ -78,7 +78,7 @@ export function buildNotesBoxSectionData(args: {
               label: "Уреди",
               style: "link",
               role: "edit",
-              onClick: () => onEditNote(noteId),
+              onClick: () => onEditNote(noteId, note),
             },
           ],
         },

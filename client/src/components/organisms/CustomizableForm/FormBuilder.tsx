@@ -34,6 +34,10 @@ export function FormBuilder<T extends FieldValues>({
     reValidateMode: "onChange",
   });
 
+  const {
+    formState: { isDirty, isSubmitting },
+  } = methods;
+
   const handleSubmit = methods.handleSubmit(async (values) => {
     await onSubmit(values);
     methods.reset();
@@ -77,6 +81,7 @@ export function FormBuilder<T extends FieldValues>({
           <div>
             <Button
               {...submitButton}
+              disabled={!isDirty || isSubmitting || submitButton.disabled}
               type="submit"
               className="uk-width-1-1 uk-width-auto@m"
             />

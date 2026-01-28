@@ -62,7 +62,7 @@ export function useCreateCustomerAddress(customerId: number) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: customersKeys.mutations.createAddress(customerId),
+    mutationKey: ["customer-notes", customerId, "create"] as const,
     mutationFn: (dto: CustomerAddressTypes) =>
       createCustomerAddress(customerId, dto),
     onSuccess: () => {
@@ -109,7 +109,7 @@ export function useDeleteCustomersBulk() {
     mutationFn: (ids: number[]) => deleteMultiCustomers(ids),
     onSuccess: (_data, ids) => {
       ids.forEach((id) =>
-        qc.removeQueries({ queryKey: customersKeys.detail(id) })
+        qc.removeQueries({ queryKey: customersKeys.detail(id) }),
       );
 
       qc.invalidateQueries({ queryKey: customersKeys.lists() });

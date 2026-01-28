@@ -163,8 +163,8 @@ const CustomerDetails: React.FC = () => {
     return buildNotesBoxSectionData({
       notes: customerNotes,
       timeFormat,
-      onEditNote: (noteId) =>
-        navigate(`/customers/${cid}/notes/${noteId}/edit`),
+      onEditNote: (noteId, noteObj) =>
+        navigate(`/customers/${cid}/notes/${noteId}/edit`, { state: noteObj }),
       buildDeleteModals: (noteId) => {
         const noteID = String(noteId);
         const modals: ModalTypes[] = [
@@ -227,11 +227,10 @@ const CustomerDetails: React.FC = () => {
         return;
 
       case "newNote":
-        navigate(`/customers/${cid}/notes/add`, { state: stateData });
+        navigate(`/customers/${cid}/notes/add`);
         return;
 
       case "deactivateCustomer":
-        // your modal handles delete now; keep if you still want this action
         alert(`delete user ${data?.firstName ?? ""}`);
         return;
 

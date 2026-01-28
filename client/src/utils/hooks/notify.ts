@@ -1,6 +1,7 @@
 import {
   notifyDanger,
   notifySuccess,
+  notifyWarning,
 } from "../../whitelabel/src/atoms/notification/Notification";
 import type { NotifyPos } from "../../whitelabel/src/atoms/notification/notification.types";
 
@@ -23,6 +24,9 @@ export function createNotifier(opts?: NotifierOptions) {
 
     error: (message: ToastPayload) =>
       notifyDanger({ ...message, pos: message.pos ?? DEFAULT_POS }),
+
+    warning: (message: ToastPayload) =>
+      notifyWarning({ ...message, pos: message.pos ?? DEFAULT_POS }),
   };
 }
 

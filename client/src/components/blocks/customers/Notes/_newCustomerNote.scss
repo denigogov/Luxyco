@@ -1,0 +1,12 @@
+.b-newCustomerNote {
+  padding: 20px;
+
+  &-createInput {
+    input {
+      height: 140px;
+      padding: 12px 14px;
+      line-height: 1.4;
+      resize: vertical !important;
+    }
+  }
+}

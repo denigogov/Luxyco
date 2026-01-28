@@ -5,6 +5,7 @@ import {
   useFormContext,
   type FieldValues,
   type Path,
+  type RegisterOptions,
 } from "react-hook-form";
 import type { InputTypes } from "../../../whitelabel/src/atoms/input/a-input.types";
 import Input from "../../../whitelabel/src/atoms/input/a-input";
@@ -15,7 +16,7 @@ export type RHFInputProps<T extends FieldValues> = Omit<
 > & {
   name: Path<T>;
   defaultValue?: any;
-  rules?: any;
+  rules?: RegisterOptions<T, Path<T>>;
   width?: string | number;
 };
 
