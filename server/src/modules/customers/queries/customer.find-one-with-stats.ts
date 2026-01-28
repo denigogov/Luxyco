@@ -73,6 +73,7 @@ export async function getCustomerWithStats(
             },
           },
         },
+        orderBy: { created_at: 'desc' },
       },
     },
   });

@@ -11,18 +11,13 @@ import { PrismaService } from 'src/infrastructure/database/prisma.service';
 export class CustomerNotesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    customerId: number,
-    userId: number,
-    dto: CreateCustomerNoteDto,
-    test: any,
-  ) {
+  async create(customerId: number, userId: number, dto: CreateCustomerNoteDto) {
     return this.prisma.customer_notes.create({
       data: {
         customer_id: customerId,
         created_by_user_id: userId,
         related_order_id: dto.relatedOrderId ?? null,
-        note_text: dto.noteText + test.sub,
+        note_text: dto.noteText,
       },
     });
   }

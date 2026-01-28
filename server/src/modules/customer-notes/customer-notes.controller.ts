@@ -27,12 +27,7 @@ export class CustomerNotesController {
     @Body() dto: CreateCustomerNoteDto,
     @Req() req: Request & { user: JwtPayload },
   ) {
-    return this.customerNotesService.create(
-      customerId,
-      req.user.sub,
-      dto,
-      req.user,
-    );
+    return this.customerNotesService.create(customerId, req.user.sub, dto);
   }
 
   @Get()
