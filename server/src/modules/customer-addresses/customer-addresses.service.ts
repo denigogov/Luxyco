@@ -124,11 +124,7 @@ export class CustomerAddressesService {
     return customer;
   }
 
-  async update(
-    customerId: number,
-    addressId: number,
-    dto: UpdateCustomerAddressDto,
-  ) {
+  async update(addressId: number, dto: UpdateCustomerAddressDto) {
     if (Object.keys(dto).length === 0) {
       throw new BadRequestException('No fields provided to update');
     }
@@ -136,7 +132,6 @@ export class CustomerAddressesService {
     const address = await this.prisma.customer_addresses.findFirst({
       where: {
         id: addressId,
-        customer_id: customerId,
         is_active: true,
         customers: { is_active: true },
       },
@@ -144,16 +139,14 @@ export class CustomerAddressesService {
     });
 
     if (!address) {
-      throw new NotFoundException(
-        `Address ${addressId} not found for customer ${customerId}`,
-      );
+      throw new NotFoundException(`Address ${addressId} not found`);
     }
 
     return this.prisma.$transaction(async (tx) => {
       if (dto.isDefault === true) {
         await tx.customer_addresses.updateMany({
           where: {
-            customer_id: customerId,
+            customer_id: address.id,
             is_active: true,
             NOT: { id: addressId },
           },
