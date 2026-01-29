@@ -9,6 +9,7 @@ import NewNote from "../../../components/blocks/customers/Notes/NewNote";
 import EditNote from "../../../components/blocks/customers/Notes/EditNote";
 import AddCustomer from "../../../components/blocks/customers/AddCustomer/AddCustomer";
 import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
+import UpdateCustomer from "../../../components/blocks/customers/UpdateCustomer/UpdateCustomer";
 
 // test component here i don't create new components !
 
@@ -57,6 +58,15 @@ const customerDetailsSubRoutee = [
     element: (
       <Modal {...modalBase}>
         <NewNote />
+      </Modal>
+    ),
+  },
+  {
+    fullPath: "/customers/:customerId",
+    path: "edit",
+    element: (
+      <Modal {...modalBase}>
+        <UpdateCustomer />
       </Modal>
     ),
   },

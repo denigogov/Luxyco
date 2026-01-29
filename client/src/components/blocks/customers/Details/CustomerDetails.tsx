@@ -109,6 +109,7 @@ const CustomerDetails: React.FC = () => {
             notificationAlert.error(
               customersDetailsMessages.deleteCustomer.error,
             );
+            console.error(err);
           }
         }
         break;
@@ -219,7 +220,7 @@ const CustomerDetails: React.FC = () => {
 
     switch (name) {
       case "editCustomer":
-        navigate(`/customers/${cid}/edit`);
+        navigate(`/customers/${cid}/edit`, { state: stateData });
         return;
 
       case "newAddress":

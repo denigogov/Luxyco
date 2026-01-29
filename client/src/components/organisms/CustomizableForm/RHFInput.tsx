@@ -23,7 +23,6 @@ export type RHFInputProps<T extends FieldValues> = Omit<
 export function RHFInput<T extends FieldValues>({
   defaultValue,
   rules,
-  width,
   ...rest
 }: RHFInputProps<T>) {
   const { control } = useFormContext<T>();

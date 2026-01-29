@@ -53,7 +53,7 @@ const EditAddresses = () => {
       });
       navigate(`/customers/${customerId}`, { replace: true });
     }
-  }, [customerFromState, navigate]);
+  }, [customerFromState, navigate, customerId]);
 
   const onSubmit = async (values: CustomerAddressTypes) => {
     const customerID = Number(customerId);
