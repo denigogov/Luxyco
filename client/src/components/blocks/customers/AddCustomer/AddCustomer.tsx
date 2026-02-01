@@ -82,7 +82,7 @@ const AddCustomer: React.FC = () => {
           },
         },
       ] as const,
-    []
+    [],
   );
 
   const step2Fields = useMemo(
@@ -145,7 +145,7 @@ const AddCustomer: React.FC = () => {
           rules: { required: "Longitude is required" },
         },
       ] as const,
-    []
+    [],
   );
 
   const step3Fields = useMemo(
@@ -159,7 +159,7 @@ const AddCustomer: React.FC = () => {
           rules: {},
         },
       ] as const,
-    []
+    [],
   );
 
   // validate only fields from current step
@@ -168,8 +168,8 @@ const AddCustomer: React.FC = () => {
       step === 1
         ? (step1Fields.map((f) => f.name) as any)
         : step === 2
-        ? (step2Fields.map((f) => f.name) as any)
-        : (step3Fields.map((f) => f.name) as any);
+          ? (step2Fields.map((f) => f.name) as any)
+          : (step3Fields.map((f) => f.name) as any);
 
     const ok = await methods.trigger(names);
     if (!ok) return;
@@ -262,7 +262,7 @@ const AddCustomer: React.FC = () => {
             <p className="uk-text-danger uk-margin-small-top">
               {String(
                 (createMut.error as any)?.body ??
-                  (createMut.error as any)?.message
+                  (createMut.error as any)?.message,
               )}
             </p>
           ) : null}

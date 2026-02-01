@@ -73,16 +73,10 @@ export const CustomerAddressesUpdate: EditCustomerAddressesTypes = {
       width: "2",
     },
     {
-      name: "formattedAddress",
+      name: "isDefault",
       type: "text",
-      label: "Форматирена Адреса",
-      placeholder: "Климент Охридски 82, 2400 Струмица - Македонија",
-      rules: {
-        required: "Форматирена Адреса е задолжителна",
-        minLength: { value: 3, message: "Полето е премногу кратко" },
-        maxLength: { value: 255, message: "Полето е премногу долго" },
-      },
-      width: "1",
+      label: "Активна Адреса",
+      filedType: "checkbox",
     },
   ],
   notification: {

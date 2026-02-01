@@ -60,9 +60,13 @@ const EditAddresses = () => {
     const addressID = Number(addressId);
 
     try {
+      const valueData = {
+        ...values,
+        formattedAddress: `${values.street}, ${values.postalCode} ${values.city} - ${values.village}`,
+      };
       await updateMut.mutateAsync({
         addressId: addressID,
-        dto: values,
+        dto: valueData,
         customerId: customerID,
       });
 

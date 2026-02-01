@@ -8,6 +8,7 @@ export const CustomerNotesUpdate: CustomerNotesTypes = {
 
   filedsData: [
     {
+      filedType: "textarea",
       name: "noteText",
       type: "text",
       label: "Забелешка",
@@ -16,6 +17,7 @@ export const CustomerNotesUpdate: CustomerNotesTypes = {
         required: "Внесете забелешка",
         minLength: { value: 3, message: "Забелешката е премногу кратка" },
       },
+      textareaProps: { rows: 4, maxLength: 300 },
     },
   ],
   notification: {

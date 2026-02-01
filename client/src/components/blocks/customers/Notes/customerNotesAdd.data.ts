@@ -8,6 +8,7 @@ export const CustomerNotesAdd: CustomerNotesTypes = {
 
   filedsData: [
     {
+      filedType: "textarea",
       name: "noteText",
       type: "text",
       label: "Забелешка",
@@ -18,7 +19,7 @@ export const CustomerNotesAdd: CustomerNotesTypes = {
         maxLength: { value: 2000, message: "Забелешката е премногу долга" },
       },
       autoFocus: true,
-
+      textareaProps: { rows: 4, maxLength: 300 },
       className: "b-newCustomerNote-createInput",
     },
   ],
