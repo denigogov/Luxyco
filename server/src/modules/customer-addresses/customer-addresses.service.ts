@@ -146,7 +146,7 @@ export class CustomerAddressesService {
       if (dto.isDefault === true) {
         await tx.customer_addresses.updateMany({
           where: {
-            customer_id: address.id,
+            customer_id: address.customer_id,
             is_active: true,
             NOT: { id: addressId },
           },
