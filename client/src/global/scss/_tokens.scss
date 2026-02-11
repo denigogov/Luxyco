@@ -31,13 +31,14 @@ $colorMap: (
   textDark: #555,
   textBlack: #222222,
 
+  white: #ffffff,
+
   borderLight: #e5e7eb,
 
   backgroundWhite: #ffffff,
   backgroundBlack: #222222,
 
-  linearPrimaryHover:
-    linear-gradient(
+  linearPrimaryHover: linear-gradient(
       90deg,
       rgba(30, 135, 240, 0.15) 0%,
       rgba(30, 135, 240, 0) 30%

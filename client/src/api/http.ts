@@ -119,7 +119,7 @@ export function refreshAccessToken(): Promise<string> {
 async function requestWithAutoRefresh<T>(
   path: string,
   init: RequestInit = {},
-  options?: { allowRefresh?: boolean }
+  options?: { allowRefresh?: boolean },
 ): Promise<T> {
   const url = buildUrl(path);
   const allowRefresh = options?.allowRefresh ?? true;
@@ -174,7 +174,7 @@ export function apiPost<T>(path: string, body?: unknown, signal?: AbortSignal) {
     {
       allowRefresh:
         !path.includes("/auth/login") && !path.includes("/auth/refresh"),
-    }
+    },
   );
 }
 
@@ -189,7 +189,7 @@ export function apiPut<T>(path: string, body?: unknown, signal?: AbortSignal) {
 export function apiPatch<T>(
   path: string,
   body?: unknown,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) {
   return requestWithAutoRefresh<T>(path, {
     method: "PATCH",
@@ -201,7 +201,7 @@ export function apiPatch<T>(
 export function apiDelete<T>(
   path: string,
   body?: unknown,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) {
   return requestWithAutoRefresh<T>(
     path,
@@ -213,6 +213,6 @@ export function apiDelete<T>(
     {
       allowRefresh:
         !path.includes("/auth/login") && !path.includes("/auth/refresh"),
-    }
+    },
   );
 }

@@ -8,9 +8,11 @@ import {
   createCustomer,
   createCustomerAddress,
   deleteMultiCustomers,
+  deletePermanentlyCustomer,
   deleteSingleCustomer,
   getCustomerById,
   getCustomersList,
+  restoreInactiveCustomer,
   updateCustomer,
 } from "../../api/customers/customers.api";
 import type {
@@ -76,7 +78,7 @@ export function useUpdateCustomer(id: number) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: ["customers", id, "update"] as const, // you can also add to keys.mutations if you want
+    mutationKey: ["customers", id, "update"] as const,
     mutationFn: (dto: Partial<Customer>) => updateCustomer(id, dto),
     onSuccess: (updated) => {
       qc.setQueryData(customersKeys.detail(id), (old: any) => ({
@@ -113,6 +115,30 @@ export function useDeleteCustomersBulk() {
       );
 
       qc.invalidateQueries({ queryKey: customersKeys.lists() });
+    },
+  });
+}
+
+export function useRestoreInactiveCustomer() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["customers", "restore"] as const,
+    mutationFn: (id: number) => restoreInactiveCustomer(id),
+    onSuccess: (_data) => {
+      qc.invalidateQueries({ queryKey: customersKeys.restoreOne() });
+    },
+  });
+}
+
+export function useDeleteCustomerPermanently() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["customers", "permanently"] as const,
+    mutationFn: (id: number) => deletePermanentlyCustomer(id),
+    onSuccess: (_data) => {
+      qc.invalidateQueries({ queryKey: customersKeys.deletePermanently() });
     },
   });
 }

@@ -70,3 +70,11 @@ export function deleteSingleCustomer(id: number, signal?: AbortSignal) {
 export function deleteMultiCustomers(ids: number[], signal?: AbortSignal) {
   return apiDelete<void>("/customers/bulk", { ids }, signal);
 }
+
+export function restoreInactiveCustomer(id: number, signal?: AbortSignal) {
+  return apiDelete<void>(`/customers/restore/${id}`, undefined, signal);
+}
+
+export function deletePermanentlyCustomer(id: number, signal?: AbortSignal) {
+  return apiDelete<void>(`/customers/delete/${id}`, undefined, signal);
+}

@@ -36,6 +36,9 @@ export const customersKeys = {
   },
   deleteOne: () => ["customers", "delete"] as const,
   deleteMany: () => ["customers", "bulk-delete"] as const,
+
+  restoreOne: () => ["customers", "restore"] as const,
+  deletePermanently: () => ["customers", "permanently"] as const,
 };
 
 export const customerAddressesKeys = {
