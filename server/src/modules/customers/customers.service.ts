@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { CustomersQueryDto } from './dto/get-customers.dto';
 import { buildCustomersFindManyArgs } from './queries/customers.find-many.args';
 import { getCustomerWithStats } from './queries/customer.find-one-with-stats';
 import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CustomersService {
@@ -38,49 +40,102 @@ export class CustomersService {
       throw new BadRequestException(`Customer ${id} is not deleted`);
     return c;
   }
-  async create(dto: CreateCustomerFullDto) {
-    return this.prisma.customers.create({
-      data: {
-        first_name: dto.firstName,
-        last_name: dto.lastName,
-        phone_number: dto.phoneNumber,
+  async create(dto: CreateCustomerFullDto, userId: number) {
+    const phone = dto.phoneNumber.trim();
 
-        customer_addresses: dto.address
-          ? {
-              create: {
-                street: dto.address.street,
-                city: dto.address.city,
-                village: dto.address.village ?? null,
-                postal_code: dto.address.postalCode,
-                country: dto.address.country,
-                formatted_address: dto.address.formattedAddress,
-                latitude: dto.address.latitude as any,
-                longitude: dto.address.longitude as any,
-                is_default: dto.address.isDefault ?? true,
-                is_active: true,
-                is_verified_by_provider:
-                  dto.address.isVerifiedByProvider ?? false,
-              },
-            }
-          : undefined,
-
-        customer_notes: dto.noteText?.trim()
-          ? {
-              create: {
-                note_text: dto.noteText.trim(),
-                is_active: true,
-                created_by_user_id: 1,
-              },
-            }
-          : undefined,
-      },
-      include: {
-        customer_addresses: { select: this.customerAddressSelect },
-        customer_notes: {
-          select: { id: true, note_text: true, created_at: true },
+    const include = {
+      customer_addresses: {
+        select: {
+          formatted_address: true,
         },
+        where: { is_default: true },
       },
+    } as const;
+
+    const existing = await this.prisma.customers.findUnique({
+      where: { phone_number: phone },
+      include,
     });
+
+    if (existing) {
+      if (!existing.is_active) {
+        throw new ConflictException({
+          message: 'Постои деактивиран клиент со овој телефонски број.',
+          code: 'CUSTOMER_INACTIVE_WITH_PHONE',
+          customer: existing,
+        });
+      }
+
+      if (existing.is_active) {
+        throw new ConflictException({
+          message: 'Веќе постои активен клиент со овој телефонски број.',
+          code: 'CUSTOMER_ACTIVE_WITH_PHONE',
+          customer: existing,
+        });
+      }
+    }
+
+    try {
+      return await this.prisma.customers.create({
+        data: {
+          first_name: dto.firstName,
+          last_name: dto.lastName,
+          phone_number: phone,
+
+          customer_addresses: dto.address
+            ? {
+                create: {
+                  street: dto.address.street,
+                  city: dto.address.city,
+                  village: dto.address.village ?? null,
+                  postal_code: dto.address.postalCode,
+                  country: dto.address.country,
+                  formatted_address: dto.address.formattedAddress,
+                  latitude: dto.address.latitude as any,
+                  longitude: dto.address.longitude as any,
+                  is_default: dto.address.isDefault ?? true,
+                  is_active: true,
+                  is_verified_by_provider:
+                    dto.address.isVerifiedByProvider ?? false,
+                },
+              }
+            : undefined,
+
+          customer_notes: dto.noteText?.trim()
+            ? {
+                create: {
+                  note_text: dto.noteText.trim(),
+                  is_active: true,
+                  created_by_user_id: userId,
+                },
+              }
+            : undefined,
+        },
+        include,
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        const existingAfter = await this.prisma.customers.findUnique({
+          where: { phone_number: phone },
+          include,
+        });
+
+        throw new ConflictException({
+          message: existingAfter?.is_active
+            ? 'Веќе постои активен клиент со овој телефонски број.'
+            : 'Постои деактивиран клиент со овој телефонски број.',
+          code: existingAfter?.is_active
+            ? 'CUSTOMER_ACTIVE_WITH_PHONE'
+            : 'CUSTOMER_INACTIVE_WITH_PHONE',
+          customer: existingAfter ?? null,
+        });
+      }
+
+      throw e;
+    }
   }
 
   async findAll(query: CustomersQueryDto) {
@@ -203,33 +258,7 @@ export class CustomersService {
     };
   }
 
-  async hardDelete(id: number) {
-    await this.ensureDeleted(id);
-
-    await this.prisma.$transaction([
-      this.prisma.customer_addresses.deleteMany({ where: { customer_id: id } }),
-      this.prisma.customers.delete({ where: { id } }),
-    ]);
-
-    return { message: `Customer ${id} permanently deleted` };
-  }
-
-  async deleteAllPermanently() {
-    await this.prisma.customer_addresses.deleteMany({
-      where: { customers: { is_active: false } },
-    });
-
-    const result = await this.prisma.customers.deleteMany({
-      where: { is_active: false },
-    });
-
-    if (result.count === 0) {
-      throw new NotFoundException('No deleted customers to permanently delete');
-    }
-
-    return { message: `Permanently deleted ${result.count} customers` };
-  }
-
+  // in use need to be restricted which account can delete
   async softDeleteMany(ids: number[]) {
     if (!ids.length) throw new BadRequestException('No ids provided');
 
@@ -250,6 +279,17 @@ export class CustomersService {
     return { message: `Soft-deleted ${result.count} customers` };
   }
 
+  async hardDelete(id: number) {
+    await this.ensureDeleted(id);
+
+    await this.prisma.$transaction([
+      this.prisma.customer_addresses.deleteMany({ where: { customer_id: id } }),
+      this.prisma.customers.delete({ where: { id } }),
+    ]);
+
+    return { message: `Customer ${id} permanently deleted` };
+  }
+
   async hardDeleteMany(ids: number[]) {
     if (!ids.length) throw new BadRequestException('No ids provided');
 
@@ -264,5 +304,22 @@ export class CustomersService {
     });
 
     return { message: `Permanently deleted ${deleted.count} customers` };
+  }
+
+  // all inactive customer delete -- like empty trash in one move all delete
+  async deleteAllPermanently() {
+    await this.prisma.customer_addresses.deleteMany({
+      where: { customers: { is_active: false } },
+    });
+
+    const result = await this.prisma.customers.deleteMany({
+      where: { is_active: false },
+    });
+
+    if (result.count === 0) {
+      throw new NotFoundException('No deleted customers to permanently delete');
+    }
+
+    return { message: `Permanently deleted ${result.count} customers` };
   }
 }

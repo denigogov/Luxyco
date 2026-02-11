@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
+import { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('customers')
@@ -26,8 +28,11 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post()
-  create(@Body() dto: CreateCustomerFullDto) {
-    return this.customersService.create(dto);
+  create(
+    @Body() dto: CreateCustomerFullDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.customersService.create(dto, req.user.sub);
   }
 
   @Roles('SUPER_ADMIN', 'ADMIN')
@@ -36,7 +41,7 @@ export class CustomersController {
     return this.customersService.findDeleted(query);
   }
 
-  @Patch('deleted/:id')
+  @Delete('restore/:id')
   restoreDeleted(@Param('id', ParseIntPipe) id: number) {
     return this.customersService.restoreDeleted(id);
   }
@@ -56,7 +61,7 @@ export class CustomersController {
     return this.customersService.softDeleteMany(body.ids);
   }
 
-  @Delete('deleted/:id')
+  @Delete('delete/:id')
   hardDelete(@Param('id', ParseIntPipe) id: number) {
     return this.customersService.hardDelete(id);
   }
