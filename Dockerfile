@@ -27,14 +27,18 @@ RUN pnpm prisma generate
 RUN pnpm build
 
 
-# ---------- 3) Production runtime ----------
+# ---------- 3) Demo runtime (client + server + MySQL in same container) ----------
+# WARNING: demo only - DB is ephemeral and will reset on restart/deploy
 FROM node:22-alpine AS runner
 WORKDIR /app/server
 
 ENV NODE_ENV=production
 RUN corepack enable
 
-# Install prod deps only
+# Install MariaDB (MySQL-compatible) for demo DB inside the container
+RUN apk add --no-cache mariadb mariadb-client
+
+# Install prod deps only (Prisma CLI not included, but we run it via node path)
 COPY server/package.json server/pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile --prod
 
@@ -45,7 +49,10 @@ COPY --from=server_builder /app/server/prisma ./prisma
 # Copy React build into Nest public folder
 COPY --from=client_builder /app/client/dist ./public
 
+# Copy the demo start script (you must create this file at repo root)
+COPY start-demo.sh /start-demo.sh
+RUN chmod +x /start-demo.sh
+
 EXPOSE 4000
 
-# Run migrations then start
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node dist/main"]
+CMD ["/start-demo.sh"]
