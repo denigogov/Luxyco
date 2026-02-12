@@ -46,7 +46,6 @@ export const b_addCustomerData: FormGroup<CreateCustomerFullForm>[] = [
         type: "tel",
         label: "Телефонски број",
         placeholder: "+389 70 123 456",
-        defaultValue: "077777777",
         rules: {
           required: "Телефонскиот број е задолжителен.",
           minLength: {

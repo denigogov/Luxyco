@@ -8,6 +8,12 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+    },
   },
   css: {
     preprocessorOptions: {
@@ -24,7 +30,7 @@ export default defineConfig({
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react/jsx-runtime": path.resolve(
         __dirname,
-        "node_modules/react/jsx-runtime"
+        "node_modules/react/jsx-runtime",
       ),
     },
   },

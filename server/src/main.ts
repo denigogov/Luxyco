@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  //  app.set('trust proxy', 1); // VERY IMPORTANT for Render
 
   app.setGlobalPrefix('api'); // global prefix
 
