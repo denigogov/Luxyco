@@ -48,4 +48,4 @@ COPY --from=client_builder /app/client/dist ./public
 EXPOSE 4000
 
 # Run migrations then start
-CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node dist/main"]
