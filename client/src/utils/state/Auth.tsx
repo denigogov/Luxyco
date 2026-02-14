@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [user, setUser] = useState<AuthUser | null>(storedAuth?.user ?? null);
   const [accessToken, setAccessToken] = useState<string | null>(
-    storedAuth?.accessToken ?? null
+    storedAuth?.accessToken ?? null,
   );
   const [status, setStatus] = useState<AuthStatus>("checking");
 

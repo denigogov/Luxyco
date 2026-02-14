@@ -203,9 +203,17 @@ export function buildBreadcrumbsProps(args: {
   onDropdownClick: (name: string, data?: any) => void;
   modalChildren: ReactNode;
   setModalClose: (closeFn: () => void) => void;
+  allowDeleteCustomer: boolean;
 }) {
-  const { base, onBack, data, onDropdownClick, modalChildren, setModalClose } =
-    args;
+  const {
+    base,
+    onBack,
+    data,
+    onDropdownClick,
+    modalChildren,
+    setModalClose,
+    allowDeleteCustomer,
+  } = args;
 
   const buttons = base?.dropdown?.items?.buttons?.map((btn: any) => ({
     ...btn,
@@ -216,6 +224,7 @@ export function buildBreadcrumbsProps(args: {
     ...modalData,
     children: modalChildren,
     onClose: (close: () => void) => setModalClose(close),
+    openButton: allowDeleteCustomer ? modalData.openButton : {},
   }));
 
   return {
