@@ -1,7 +1,7 @@
-import brandLogoLight from "../../assets/logo/luxyCo-Light-logo.svg";
-import brandLogoDark from "../../assets/logo/luxyCo-Dark-logo.svg";
-import brandLogoDark_slogan from "../../assets/logo/luxyCo-Dark.svg";
-import brandLogoLight_slogan from "../../assets/logo/luxyCo-Light.svg";
+import brandLogoLight from "@/assets/logo/luxyCo-Light-logo.svg";
+import brandLogoDark from "@/assets/logo/luxyCo-Dark-logo.svg";
+import brandLogoDark_slogan from "@/assets/logo/luxyCo-Dark.svg";
+import brandLogoLight_slogan from "@/assets/logo/luxyCo-Light.svg";
 
 export const BRAND_BRANDB = {
   id: "brandB",

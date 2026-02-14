@@ -12,12 +12,15 @@ import {
   notifySuccess,
   notifyWarning,
 } from "../whitelabel/src/atoms/notification/Notification";
+import { hasRoleAccessToPath } from "../utils/routes/roleAccess";
+import ErrorWrapper from "../components/blocks/ErrorWrapper";
+import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole"; // ⬅️ NEW
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isNavOpen } = useUIState();
-  const { isAuthenticated, logout, status } = useAuth();
+  const { isAuthenticated, logout, status, user } = useAuth(); // user has role
   const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
 
   useEffect(() => {
@@ -85,10 +88,21 @@ const AppRoute: React.FC = () => {
     );
   }
 
+  const currentPath = location.pathname;
+  const role = user?.role ?? null;
+
+  const canAccess = hasRoleAccessToPath(currentPath, role);
+
+  if (!canAccess) {
+    return <ErrorWrapper />;
+  }
+
+  const navbarForRole = filterNavbarByRole(o_navbarData, role);
+
   const navbarConfig: NavbarTypes = {
-    ...o_navbarData,
+    ...navbarForRole,
     logoutButton: {
-      ...o_navbarData.logoutButton,
+      ...navbarForRole.logoutButton,
       onClick: (e) => handleLogoutUser(e),
     },
   };

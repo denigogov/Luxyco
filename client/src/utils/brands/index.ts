@@ -1,7 +1,7 @@
 import { flattenIncludePaths } from "../routes/routeFlattenPath";
-import { BRAND_BUBO } from "./bubo.config";
-import { BRAND_LUXYCO } from "./luxyco.config";
-import { BRAND_BRANDB } from "./testbrand.config";
+import { BRAND_BUBO } from "./bubo/bubo.config";
+import { BRAND_LUXYCO } from "./luxyco/luxyco.config";
+import { BRAND_BRANDB } from "./testBrand/testbrand.config";
 
 export const brands = {
   bubo: BRAND_BUBO,

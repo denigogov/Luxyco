@@ -40,6 +40,9 @@ import { useDeleteCustomerAddress } from "../../../../features/customers/custome
 import { notificationAlert } from "../../../../utils/hooks/notify";
 import { customersDetailsMessages } from "./CustomerDetails.messages";
 import { useDeleteCustomerNotes } from "../../../../features/customers/customerNotes.queries";
+import { hasRoleAccessToPath } from "../../../../utils/routes/roleAccess";
+import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
+import { useAuth } from "../../../../utils/hooks/useAuth";
 
 type deleteType = "address" | "note" | "customer";
 
@@ -48,6 +51,24 @@ const CustomerDetails: React.FC = () => {
   const { customerId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const role = user?.role ?? null;
+
+  const canDeleteAddresses = hasRoleAccessToPath(
+    PERMISSIONS.CUSTOMERS_ADDRESSES_DELETE,
+    role,
+  );
+
+  const canDeleteNotes = hasRoleAccessToPath(
+    PERMISSIONS.CUSTOMERS_NOTES_DELETE,
+    role,
+  );
+
+  const canDeleteCustomer = hasRoleAccessToPath(
+    PERMISSIONS.CUSTOMERS_DELETE,
+    role,
+  );
 
   const deleteMututation = useDeleteCustomer();
   const deleteAddress = useDeleteCustomerAddress();
@@ -79,7 +100,7 @@ const CustomerDetails: React.FC = () => {
   const handleSingleDelete = async (type: deleteType, id?: string) => {
     switch (type) {
       case "address":
-        if (!customerId || !id) return;
+        if (!customerId || !id || !canDeleteAddresses) return;
 
         try {
           await deleteAddress.mutateAsync({
@@ -98,6 +119,7 @@ const CustomerDetails: React.FC = () => {
         break;
 
       case "customer":
+        if (!customerId || !id || !canDeleteCustomer) return;
         {
           try {
             await deleteMututation.mutateAsync(Number(id));
@@ -115,7 +137,7 @@ const CustomerDetails: React.FC = () => {
         break;
 
       case "note":
-        if (!customerId || !id) return;
+        if (!customerId || !id || !canDeleteNotes) return;
         try {
           await deleteNote.mutateAsync({
             noteId: Number(id),
@@ -169,16 +191,18 @@ const CustomerDetails: React.FC = () => {
       buildDeleteModals: (noteId) => {
         const noteID = String(noteId);
         const modals: ModalTypes[] = [
-          {
-            openButton: { label: "избриши", style: "link" },
-            children: (
-              <ConfirmDialog
-                {...customerDetailsData.confirmDeleteNoteDialog}
-                buttons={buildConfirmButtons("note", noteID)}
-              />
-            ),
-            onClose: (close) => (modalCloseRef.current = close),
-          },
+          canDeleteNotes
+            ? {
+                openButton: { label: "избриши", style: "link" },
+                children: (
+                  <ConfirmDialog
+                    {...customerDetailsData.confirmDeleteNoteDialog}
+                    buttons={buildConfirmButtons("note", noteID)}
+                  />
+                ),
+                onClose: (close) => (modalCloseRef.current = close),
+              }
+            : {},
         ];
         return modals;
       },
@@ -198,16 +222,18 @@ const CustomerDetails: React.FC = () => {
       buildDeleteModals: (address) => {
         const addressId = String(address?.id ?? "");
         const modals: ModalTypes[] = [
-          {
-            openButton: { label: "избриши", style: "link" },
-            children: (
-              <ConfirmDialog
-                {...customerDetailsData.confirmDeleteAddressDialog}
-                buttons={buildConfirmButtons("address", addressId)}
-              />
-            ),
-            onClose: (close) => (modalCloseRef.current = close),
-          },
+          canDeleteAddresses
+            ? {
+                openButton: { label: "избриши", style: "link" },
+                children: (
+                  <ConfirmDialog
+                    {...customerDetailsData.confirmDeleteAddressDialog}
+                    buttons={buildConfirmButtons("address", addressId)}
+                  />
+                ),
+                onClose: (close) => (modalCloseRef.current = close),
+              }
+            : {},
         ];
         return modals;
       },
@@ -255,6 +281,7 @@ const CustomerDetails: React.FC = () => {
         />
       ),
       setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
+      allowDeleteCustomer: canDeleteCustomer,
     });
   }, [onBack, data, customerId]);
 

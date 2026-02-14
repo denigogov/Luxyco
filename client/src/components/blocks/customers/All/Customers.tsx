@@ -42,10 +42,20 @@ import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-
 import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 import { customersMessages } from "./customersMessages ";
 import { notificationAlert } from "../../../../utils/hooks/notify";
+import { useAuth } from "../../../../utils/hooks/useAuth";
+import { hasRoleAccessToPath } from "../../../../utils/routes/roleAccess";
+import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
 
 const Customers: React.FC = () => {
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const [resetSelection, setResetSelection] = useState(false);
+
+  const { user } = useAuth();
+  const role = user?.role ?? null;
+  const canDeleteCustomer = hasRoleAccessToPath(
+    PERMISSIONS.CUSTOMERS_DELETE,
+    role,
+  );
 
   const navigate = useNavigate();
 
@@ -76,7 +86,7 @@ const Customers: React.FC = () => {
 
   const handleDeleteCustomer = useEffectEvent(async (row: RowTypes) => {
     const id = Number(row.id);
-    if (!Number.isFinite(id) || id <= 0) return;
+    if (!Number.isFinite(id) || id <= 0 || !canDeleteCustomer) return;
 
     try {
       await deleteMut.mutateAsync(id);
@@ -404,7 +414,13 @@ const Customers: React.FC = () => {
             onClick={navigateCreateNewCustomer}
           />{" "}
         </div>
-        <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
+        <Activity
+          mode={
+            selectedCustomers.length > 0 && canDeleteCustomer
+              ? "visible"
+              : "hidden"
+          }
+        >
           <div className="uk-inline uk-hidden@s">
             {customersData.modalDeleteCustomerBulk && (
               <Modal
@@ -433,7 +449,13 @@ const Customers: React.FC = () => {
             className="uk-visible@m"
           />
 
-          <Activity mode={selectedCustomers.length > 0 ? "visible" : "hidden"}>
+          <Activity
+            mode={
+              selectedCustomers.length > 0 && canDeleteCustomer
+                ? "visible"
+                : "hidden"
+            }
+          >
             {customersData.modalDeleteCustomerBulk && (
               <Modal
                 {...customersData.modalDeleteCustomerBulk}
@@ -484,14 +506,15 @@ const Customers: React.FC = () => {
         {...m_tableData}
         actionButtons={{
           buttons: [...(m_tableData.actionButtons?.buttons ?? [])],
-          modals: [...(tableActionButton ?? [])],
+          modals: [...(canDeleteCustomer ? tableActionButton : [])],
         }}
         rows={rows}
         resetTable={resetLocalSort}
         setSelectedCustomers={setSelectedCustomers}
         resetSelection={resetSelection}
-        onRowDelete={handleDeleteCustomer}
+        onRowDelete={canDeleteCustomer ? handleDeleteCustomer : undefined}
         renderActionModalChildren={renderDeleteCustomerDialog}
+        enableMultiSelect={canDeleteCustomer || false}
       />
       {/* FILTER TABLE FOOTER   */}
       <TableFooterPagination
