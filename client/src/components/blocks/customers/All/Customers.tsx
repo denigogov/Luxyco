@@ -161,7 +161,7 @@ const Customers: React.FC = () => {
     return opt?.key ?? null;
   }, [sortBy, sortDir]);
 
-  const { data, isLoading, error } = useCustomersList(params);
+  const { data, isLoading, isFetching, error } = useCustomersList(params);
   const rawRows: RowWithAddress[] = (data as any)?.data ?? [];
 
   const tableActionButton: ModalTypes[] = [
@@ -515,6 +515,9 @@ const Customers: React.FC = () => {
         onRowDelete={canDeleteCustomer ? handleDeleteCustomer : undefined}
         renderActionModalChildren={renderDeleteCustomerDialog}
         enableMultiSelect={canDeleteCustomer || false}
+        loading={isFetching}
+        loadingVariant="bar+skeleton"
+        loadingRows={limit ?? 20}
       />
       {/* FILTER TABLE FOOTER   */}
       <TableFooterPagination

@@ -86,7 +86,7 @@ const CustomerDetails: React.FC = () => {
 
   const cid = Number(customerFromState?.id ?? customerId ?? 0);
 
-  const { data, isLoading, error } = useCustomer(cid);
+  const { data, isLoading, isFetching, error } = useCustomer(cid);
 
   const customerOrders: CustomerOrderTypes[] = data?.orders ?? [];
   const customerAddresses: CustomerAddressTypes[] =
@@ -310,7 +310,13 @@ const CustomerDetails: React.FC = () => {
             tabName: "Нарачки",
             active: true,
             component: (
-              <Table {...customerDetailsData.orderTable} rows={rows} />
+              <Table
+                {...customerDetailsData.orderTable}
+                rows={rows}
+                loading={isFetching && !data}
+                loadingVariant="bar+skeleton"
+                loadingRows={2}
+              />
             ),
           },
           {

@@ -18,36 +18,46 @@ type Filters = Pick<
 
 type SetFiltersArg = Partial<Filters> | ((prev: Filters) => Partial<Filters>);
 
+function readParam(sp: URLSearchParams, key: string) {
+  const v = sp.get(key);
+  return v && v.trim() ? v : undefined;
+}
+
+function toNumberOrUndefined(v?: string) {
+  if (!v) return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function readFilters(sp: URLSearchParams): Filters {
+  return {
+    name: readParam(sp, "name") as Filters["name"],
+    street: readParam(sp, "street") as Filters["street"],
+    city: readParam(sp, "city") as Filters["city"],
+    phoneNumber: readParam(sp, "phoneNumber") as Filters["phoneNumber"],
+    village: readParam(sp, "village") as Filters["village"],
+    sortBy: readParam(sp, "sortBy") as Filters["sortBy"],
+    sortDir: readParam(sp, "sortDir") as Filters["sortDir"],
+    search: readParam(sp, "search") as Filters["search"],
+
+    // Only do these two lines if Filters["page"/"limit"] are numbers:
+    limit: toNumberOrUndefined(readParam(sp, "limit")) as Filters["limit"],
+    page: toNumberOrUndefined(readParam(sp, "page")) as Filters["page"],
+  };
+}
+
 export function useDataFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const current = useMemo<Filters>(() => {
-    const read = (key: keyof Filters) => {
-      const v = searchParams.get(String(key));
-      // treat "" as undefined
-      return v && v.trim() ? (v as any) : undefined;
-    };
-
-    return {
-      name: read("name"),
-      street: read("street"),
-      city: read("city"),
-      phoneNumber: read("phoneNumber"),
-      limit: read("limit"),
-      village: read("village"),
-      sortBy: read("sortBy"),
-      sortDir: read("sortDir"),
-      page: read("page"),
-      search: read("search"),
-    };
-  }, [searchParams]);
+  const current = useMemo(() => readFilters(searchParams), [searchParams]);
 
   const setFilters = useCallback(
     (arg: SetFiltersArg) => {
       setSearchParams((prevSp) => {
-        const prev = new URLSearchParams(prevSp);
+        const next = new URLSearchParams(prevSp);
+        const prevFilters = readFilters(prevSp);
 
-        const patch = typeof arg === "function" ? arg(current) : arg;
+        const patch = typeof arg === "function" ? arg(prevFilters) : arg;
 
         (Object.keys(patch) as (keyof Filters)[]).forEach((key) => {
           const value = patch[key];
@@ -56,16 +66,16 @@ export function useDataFilters() {
             value === null ||
             String(value).trim() === ""
           ) {
-            prev.delete(String(key));
+            next.delete(String(key));
           } else {
-            prev.set(String(key), String(value));
+            next.set(String(key), String(value));
           }
         });
 
-        return prev;
+        return next;
       });
     },
-    [setSearchParams, current],
+    [setSearchParams],
   );
 
   return { ...current, setFilters };
