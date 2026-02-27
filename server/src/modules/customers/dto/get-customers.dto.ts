@@ -29,7 +29,8 @@ export class CustomersQueryDto extends PaginationQueryDto {
   street?: string;
 
   @IsOptional()
-  @IsPhoneNumber('MK')
+  @MaxLength(20)
+  @IsString()
   phoneNumber?: string;
 
   @IsOptional()

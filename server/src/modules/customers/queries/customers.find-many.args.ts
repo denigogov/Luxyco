@@ -13,25 +13,35 @@ export function buildCustomersFindManyArgs(
   const where: any = { is_active: isActive };
   const AND: any[] = [];
 
-  // Global search
-  if (search) {
-    where.OR = [
-      { first_name: { contains: search } },
-      { last_name: { contains: search } },
-      { phone_number: { contains: search } },
-      {
-        customer_addresses: {
-          some: {
-            is_active: true,
-            OR: [
-              { city: { contains: search } },
-              { street: { contains: search } },
-              { village: { contains: search } },
-            ],
+  if (search && search.trim().length > 0) {
+    const tokens = search
+      .trim()
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    for (const token of tokens) {
+      AND.push({
+        OR: [
+          { first_name: { contains: token } },
+          { last_name: { contains: token } },
+          { phone_number: { contains: token } },
+          {
+            customer_addresses: {
+              some: {
+                is_active: true,
+                OR: [
+                  { city: { contains: token } },
+                  { street: { contains: token } },
+                  { village: { contains: token } },
+                  { formatted_address: { contains: token } },
+                ],
+              },
+            },
           },
-        },
-      },
-    ];
+        ],
+      });
+    }
   }
 
   // Name filter
@@ -51,6 +61,7 @@ export function buildCustomersFindManyArgs(
     });
   }
 
+  // Address filters (structured)
   if (city || street || village) {
     AND.push({
       customer_addresses: {

@@ -12,11 +12,21 @@ import { CustomersQueryDto } from './dto/get-customers.dto';
 import { buildCustomersFindManyArgs } from './queries/customers.find-many.args';
 import { getCustomerWithStats } from './queries/customer.find-one-with-stats';
 import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
-import { Prisma } from '@prisma/client';
+import { customers, Prisma } from '@prisma/client';
+import { RedisService } from 'src/infrastructure/cache/redis.service';
+import { PaginatedResult } from 'src/common/types/pagination.types';
+import {
+  buildCacheKey,
+  buildCustomerDetailCacheKey,
+  buildCustomersListCacheKey,
+} from 'src/infrastructure/cache/cache-keys';
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   private readonly customerAddressSelect = {
     id: true,
@@ -32,6 +42,21 @@ export class CustomersService {
     longitude: true,
     is_verified_by_provider: true,
   } as const;
+
+  private async invalidateCustomerCache(id: number) {
+    await this.redis.delByPrefix('luxyco:customers:list:v1:');
+
+    const activeDetailKey = buildCustomerDetailCacheKey({
+      id,
+      isActive: true,
+    });
+    const inactiveDetailKey = buildCustomerDetailCacheKey({
+      id,
+      isActive: false,
+    });
+
+    await this.redis.del([activeDetailKey, inactiveDetailKey]);
+  }
 
   private async ensureDeleted(id: number) {
     const c = await this.prisma.customers.findUnique({ where: { id } });
@@ -76,7 +101,7 @@ export class CustomersService {
     }
 
     try {
-      return await this.prisma.customers.create({
+      const created = await this.prisma.customers.create({
         data: {
           first_name: dto.firstName,
           last_name: dto.lastName,
@@ -113,6 +138,10 @@ export class CustomersService {
         },
         include,
       });
+
+      await this.invalidateCustomerCache(created.id);
+
+      return created;
     } catch (e) {
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
@@ -139,12 +168,28 @@ export class CustomersService {
   }
 
   async findAll(query: CustomersQueryDto) {
+    const cacheKey = buildCustomersListCacheKey(query);
+
+    const cached = await this.redis.get<PaginatedResult<customers>>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
     const baseArgs = buildCustomersFindManyArgs(
       query,
       this.customerAddressSelect,
       true,
     );
-    return paginate(this.prisma.customers as any, baseArgs, query);
+
+    const result = await paginate(
+      this.prisma.customers as any,
+      baseArgs,
+      query,
+    );
+
+    await this.redis.set(cacheKey, result, 300);
+
+    return result;
   }
 
   async findOne(
@@ -176,13 +221,23 @@ export class CustomersService {
       return customer;
     }
 
-    // return with all details
-    return getCustomerWithStats(
+    const cacheKey = buildCustomerDetailCacheKey({ id, isActive });
+
+    const cached = await this.redis.get<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const result = await getCustomerWithStats(
       this.prisma,
       id,
       this.customerAddressSelect,
       isActive,
     );
+
+    await this.redis.set(cacheKey, result, 300);
+
+    return result;
   }
 
   async update(id: number, dto: UpdateCustomerDto) {
@@ -202,10 +257,14 @@ export class CustomersService {
       throw new BadRequestException('No valid fields provided to update');
     }
 
-    return this.prisma.customers.update({
+    const updated = await this.prisma.customers.update({
       where: { id },
       data,
     });
+
+    await this.invalidateCustomerCache(id);
+
+    return updated;
   }
 
   async remove(id: number) {
@@ -221,6 +280,8 @@ export class CustomersService {
         data: { is_active: false },
       }),
     ]);
+
+    await this.invalidateCustomerCache(customer.id);
 
     return { message: `Customer ${id} deleted` };
   }
@@ -251,6 +312,8 @@ export class CustomersService {
 
       return { addressRestored: true };
     });
+
+    await this.invalidateCustomerCache(id);
 
     return {
       message: `Customer ${id} restored`,

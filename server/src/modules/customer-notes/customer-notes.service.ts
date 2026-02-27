@@ -6,13 +6,35 @@ import {
 import { CreateCustomerNoteDto } from './dto/create-customer-note.dto';
 import { UpdateCustomerNoteDto } from './dto/update-customer-note.dto';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
+import { RedisService } from 'src/infrastructure/cache/redis.service';
+import { buildCustomerDetailCacheKey } from 'src/infrastructure/cache/cache-keys';
 
 @Injectable()
 export class CustomerNotesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private redis: RedisService,
+  ) {}
+
+  private async invalidateCustomerCache(customerId: number) {
+    // clear ALL customers list caches
+    await this.redis.delByPrefix('luxyco:customers:list:v1:');
+
+    // clear this customer's detail cache (active + inactive)
+    const activeDetailKey = buildCustomerDetailCacheKey({
+      id: customerId,
+      isActive: true,
+    });
+    const inactiveDetailKey = buildCustomerDetailCacheKey({
+      id: customerId,
+      isActive: false,
+    });
+
+    await this.redis.del([activeDetailKey, inactiveDetailKey]);
+  }
 
   async create(customerId: number, userId: number, dto: CreateCustomerNoteDto) {
-    return this.prisma.customer_notes.create({
+    const createdNote = this.prisma.customer_notes.create({
       data: {
         customer_id: customerId,
         created_by_user_id: userId,
@@ -20,6 +42,10 @@ export class CustomerNotesService {
         note_text: dto.noteText,
       },
     });
+
+    await this.invalidateCustomerCache(customerId);
+
+    return createdNote;
   }
 
   findAll() {
@@ -58,13 +84,15 @@ export class CustomerNotesService {
       },
     });
 
+    await this.invalidateCustomerCache(existing.customer_id);
+
     return updateUser;
   }
 
   async remove(id: number) {
     const existing = await this.prisma.customer_notes.findUnique({
       where: { id },
-      select: { id: true, is_active: true },
+      select: { id: true, is_active: true, customer_id: true },
     });
 
     if (!existing || !existing.is_active) {
@@ -77,6 +105,7 @@ export class CustomerNotesService {
       where: { id },
       data: { is_active: false },
     });
+    await this.invalidateCustomerCache(existing.customer_id);
 
     return {
       success: true,

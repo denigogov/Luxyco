@@ -7,10 +7,15 @@ import { CreateCustomerAddressDto } from './dto/create-customer-address.dto';
 import { UpdateCustomerAddressDto } from './dto/update-customer-address.dto';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
 import { Prisma } from '@prisma/client';
+import { RedisService } from 'src/infrastructure/cache/redis.service';
+import { buildCustomerDetailCacheKey } from 'src/infrastructure/cache/cache-keys';
 
 @Injectable()
 export class CustomerAddressesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   private readonly customerAddressSelect = {
     id: true,
@@ -25,6 +30,21 @@ export class CustomerAddressesService {
     latitude: true,
     longitude: true,
   } as const;
+
+  private async invalidateCustomerCache(customerId: number) {
+    await this.redis.delByPrefix('luxyco:customers:list:v1:');
+
+    const activeDetailKey = buildCustomerDetailCacheKey({
+      id: customerId,
+      isActive: true,
+    });
+    const inactiveDetailKey = buildCustomerDetailCacheKey({
+      id: customerId,
+      isActive: false,
+    });
+
+    await this.redis.del([activeDetailKey, inactiveDetailKey]);
+  }
 
   private async ensureActiveAddress(
     tx: Prisma.TransactionClient,
@@ -54,7 +74,7 @@ export class CustomerAddressesService {
       throw new NotFoundException(`Customer with id ${customerId} not found`);
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx) => {
       const activeCount = await tx.customer_addresses.count({
         where: { customer_id: customerId, is_active: true },
       });
@@ -86,6 +106,10 @@ export class CustomerAddressesService {
         select: this.customerAddressSelect,
       });
     });
+
+    await this.invalidateCustomerCache(customerId);
+
+    return created;
   }
 
   async findAll() {
@@ -142,11 +166,13 @@ export class CustomerAddressesService {
       throw new NotFoundException(`Address ${addressId} not found`);
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const customerId = address.customer_id;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
       if (dto.isDefault === true) {
         await tx.customer_addresses.updateMany({
           where: {
-            customer_id: address.customer_id,
+            customer_id: customerId,
             is_active: true,
             NOT: { id: addressId },
           },
@@ -170,10 +196,14 @@ export class CustomerAddressesService {
         select: this.customerAddressSelect,
       });
     });
+
+    await this.invalidateCustomerCache(customerId);
+
+    return updated;
   }
 
   async remove(customerId: number, addressId: number) {
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const addr = await this.ensureActiveAddress(tx, customerId, addressId);
       if (!addr) throw new NotFoundException('Address not found');
 
@@ -199,5 +229,9 @@ export class CustomerAddressesService {
 
       return { success: true };
     });
+
+    await this.invalidateCustomerCache(customerId);
+
+    return result;
   }
 }
