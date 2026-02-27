@@ -15,4 +15,8 @@ export default () => ({
     jwtRefreshToken: process.env.JWT_REFRESH_SECRET || 'dev-super-secret',
     jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '1d',
   },
+
+  redis: {
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+  },
 });

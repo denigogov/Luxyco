@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CamelCaseResponseInterceptor } from './common/interceptors/camel-case-response.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomerNotesModule } from './modules/customer-notes/customer-notes.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { RedisModule } from './infrastructure/cache/redis.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { CustomerNotesModule } from './modules/customer-notes/customer-notes.mod
     CustomerAddressesModule,
     AuthModule,
     CustomerNotesModule,
+    OrdersModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { AppValidationPipe } from './common/pipes/app-validation.pipe';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(new AppValidationPipe()); // global validation
 
   app.useGlobalFilters(new HttpExceptionFilter()); // global error
+
+  app.use(compression());
 
   app.use(cookieParser());
 
