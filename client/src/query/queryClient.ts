@@ -6,7 +6,7 @@ export const queryClient = new QueryClient({
       networkMode: "offlineFirst",
 
       // good defaults for admin dashboards
-      staleTime: 30_000, // data fresh for 30s
+      staleTime: 60_000, // data fresh for 30s
       gcTime: 10 * 60_000, // cache kept for 10 min
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,

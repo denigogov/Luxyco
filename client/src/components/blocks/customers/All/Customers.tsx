@@ -161,7 +161,8 @@ const Customers: React.FC = () => {
     return opt?.key ?? null;
   }, [sortBy, sortDir]);
 
-  const { data, isLoading, isFetching, error } = useCustomersList(params);
+  const { data, isLoading, isFetching, refetch, error } =
+    useCustomersList(params);
   const rawRows: RowWithAddress[] = (data as any)?.data ?? [];
 
   const tableActionButton: ModalTypes[] = [
@@ -206,10 +207,6 @@ const Customers: React.FC = () => {
       ...c,
       formattedAddress: `${
         c.customerAddresses?.[0]?.formattedAddress ?? "Клиентот нема адреса"
-      }${
-        c.customerAddresses?.[0]?.village
-          ? "/" + c.customerAddresses?.[0]?.village
-          : ""
       }`,
     }));
   }, [rawRows]);
@@ -388,6 +385,19 @@ const Customers: React.FC = () => {
     navigate("new");
   };
 
+  const refreshDataButton: ButtonTypes = {
+    onlyIcon: true,
+    label: "освежи податоци",
+    disabled: isFetching,
+    style: "link",
+    size: "large",
+    onClick: () => refetch(),
+    icon: {
+      name: "refresh",
+    },
+    tooltip: "освежи податоци",
+  };
+
   return (
     <div>
       <div className="uk-margin-small-top uk-margin-small-bottom ">
@@ -437,18 +447,19 @@ const Customers: React.FC = () => {
         </Activity>
         {/* sort dropdown */}
         <div className="uk-grid-small@s" uk-grid="true">
+          {" "}
+          <Button {...refreshDataButton} className="uk-visible@m uk-flex" />
           <TableSort
             {...m_tableSortData}
             value={sortKey} // string | null
             onChange={handleSortValue}
           />
-
           <Button
             {...customersData.buttonAddCustomer}
             onClick={navigateCreateNewCustomer}
             className="uk-visible@m"
           />
-
+          <Button {...refreshDataButton} className="uk-hidden@m uk-flex" />
           <Activity
             mode={
               selectedCustomers.length > 0 && canDeleteCustomer
@@ -497,7 +508,7 @@ const Customers: React.FC = () => {
             values={filterValues}
             onSubmit={handleSubmit}
             onReset={handleFilterReset}
-            title="Филтери"
+            title="Детално Пребарување"
           />
         </div>
       </div>

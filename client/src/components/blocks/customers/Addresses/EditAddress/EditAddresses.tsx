@@ -62,7 +62,7 @@ const EditAddresses = () => {
     try {
       const valueData = {
         ...values,
-        formattedAddress: `${values.street}, ${values.postalCode} ${values.city} - ${values.village}`,
+        formattedAddress: `${values.street}, ${values.postalCode} ${values.city} ${values.village ? "-" : ""} ${values.village}`,
       };
       await updateMut.mutateAsync({
         addressId: addressID,
