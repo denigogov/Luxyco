@@ -171,9 +171,9 @@ export function FormBuilderAccordion<T extends FieldValues>({
 
                   <div className="uk-accordion-content m-accordion__content">
                     <div className="uk-grid-small" data-uk-grid>
-                      {group.fields.map((f) => (
+                      {group.fields.map((f, i) => (
                         <div
-                          key={String(f.name)}
+                          key={i}
                           className={
                             f.width ? `uk-width-1-${f.width}` : "uk-width-1-1"
                           }

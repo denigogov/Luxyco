@@ -104,6 +104,7 @@ export function RHFInput<T extends FieldValues>({
 
           {filedType === "select" && (
             <ASelect
+              {...rest}
               name={field.name}
               label={rest.label}
               className={rest.className}
@@ -111,7 +112,7 @@ export function RHFInput<T extends FieldValues>({
               required={rest.required}
               placeholder={rest.selectPlaceholder}
               options={options ?? []}
-              value={field.value ?? ""} // keep controlled
+              value={field.value ?? ""}
               onChange={(e) => {
                 const raw = e.target.value;
 
