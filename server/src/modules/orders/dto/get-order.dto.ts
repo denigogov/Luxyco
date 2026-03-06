@@ -20,6 +20,16 @@ export class OrdersQueryDto extends PaginationQueryDto {
   qrCode?: string;
 
   @IsOptional()
+  @MaxLength(20)
+  @IsString()
+  phoneNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  name?: string;
+
+  @IsOptional()
   @IsString()
   @MaxLength(50)
   city?: string;

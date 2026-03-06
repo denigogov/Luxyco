@@ -23,6 +23,8 @@ export function buildOrdersFindManyArgs(query: OrdersQueryDto) {
     createdTo,
     sortBy,
     sortDir,
+    phoneNumber,
+    name,
   } = query;
 
   const where: any = {};
@@ -78,6 +80,56 @@ export function buildOrdersFindManyArgs(query: OrdersQueryDto) {
             },
           },
         ],
+      });
+    }
+  }
+
+  // Phone filter
+  if (phoneNumber?.trim()) {
+    AND.push({
+      customers: {
+        is: {
+          phone_number: {
+            contains: phoneNumber.trim(),
+          },
+        },
+      },
+    });
+  }
+
+  // customer name & lastName
+  if (name?.trim()) {
+    const tokens = name
+      .trim()
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 4);
+
+    if (tokens.length === 1) {
+      const t = tokens[0];
+      AND.push({
+        customers: {
+          is: {
+            OR: [
+              { first_name: { contains: t } },
+              { last_name: { contains: t } },
+            ],
+          },
+        },
+      });
+    } else {
+      AND.push({
+        customers: {
+          is: {
+            AND: tokens.map((t) => ({
+              OR: [
+                { first_name: { contains: t } },
+                { last_name: { contains: t } },
+              ],
+            })),
+          },
+        },
       });
     }
   }
