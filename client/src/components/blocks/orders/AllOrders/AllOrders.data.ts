@@ -1,4 +1,5 @@
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type { InputTypes } from "../../../../whitelabel/src/atoms/input/a-input.types";
 import type { TableFooterPaginationTypes } from "../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
@@ -549,7 +550,7 @@ const tablePaginationData: TableFooterPaginationTypes = {
     totalPages: 25,
   },
   role: "orders",
-  limitOptions: [10, 20, 30],
+  limitOptions: [5, 10, 20, 30, 50],
   customSelectButton: {
     label: "",
     style: "default",
@@ -617,9 +618,9 @@ const filterData: TableFilterTypes = {
       icon: { name: "user", position: "right" },
     },
 
-    { keyName: "street", label: "Улица", name: "street", type: "text" },
-
     { keyName: "city", label: "Град", name: "city", type: "text" },
+
+    { keyName: "street", label: "Улица", name: "street", type: "text" },
 
     { keyName: "village", label: "Село", name: "village", type: "text" },
 
@@ -638,6 +639,7 @@ const filterData: TableFilterTypes = {
       type: "select",
       placeholder: "одбери статус",
       options: [
+        { label: "сите", value: "" },
         {
           label: "Мерење",
           value: "messurment",
@@ -645,7 +647,7 @@ const filterData: TableFilterTypes = {
 
         {
           label: "На чекање",
-          value: "waiting",
+          value: "pending",
         },
         {
           label: "Се чека за достава",
@@ -673,6 +675,10 @@ const filterData: TableFilterTypes = {
       type: "select",
       placeholder: "тип",
       options: [
+        {
+          label: "сите",
+          value: "",
+        },
         {
           label: "Подигнување",
           value: "pickup",
@@ -706,13 +712,13 @@ const tags: ActiveTagItemTypes = {
   onClearAll: () => {},
   items: [
     {
-      key: "Град",
+      key: "пример-таг",
       value: "Струмица",
       onRemove: () => {},
     },
 
     {
-      key: "Клиент",
+      key: "пример-клиент",
       value: "Дејан Гогов",
       onRemove: () => {},
     },
@@ -726,7 +732,18 @@ const tags: ActiveTagItemTypes = {
       position: "right",
     },
     onlyIcon: true,
+    tooltip: "ресетирај сите филтери",
   },
+};
+
+const searchInputData: InputTypes = {
+  type: "search",
+  label: "Глобално Пребарувај Клиенти",
+  icon: {
+    name: "search",
+    position: "right",
+  },
+  placeholder: "Пребарај: име • презиме • улица • град • село • телефон",
 };
 
 export const allOrdersData: AllordersTypes = {
@@ -736,4 +753,5 @@ export const allOrdersData: AllordersTypes = {
   filterData: filterData,
   sortData: sortOpenButton,
   tags: tags,
+  searchInputData: searchInputData,
 };

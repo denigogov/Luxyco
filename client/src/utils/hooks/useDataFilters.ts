@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import type { CustomersListParams } from "../../features/customers/customers.types";
+import type { OrdersListParams } from "../../features/orders/orders.types";
 
-type Filters = Pick<
+type CustomersFilters = Pick<
   CustomersListParams,
   | "name"
   | "street"
@@ -15,6 +16,27 @@ type Filters = Pick<
   | "page"
   | "search"
 >;
+
+type OrdersFilters = Pick<
+  OrdersListParams,
+  | "page"
+  | "limit"
+  | "search"
+  | "qrCode"
+  | "city"
+  | "village"
+  | "status"
+  | "deliveryType"
+  | "scheduledFrom"
+  | "scheduledTo"
+  | "createdFrom"
+  | "createdTo"
+  | "sortBy"
+  | "sortDir"
+>;
+
+export type Filters = CustomersFilters &
+  Omit<OrdersFilters, keyof CustomersFilters>;
 
 type SetFiltersArg = Partial<Filters> | ((prev: Filters) => Partial<Filters>);
 
@@ -31,18 +53,28 @@ function toNumberOrUndefined(v?: string) {
 
 function readFilters(sp: URLSearchParams): Filters {
   return {
-    name: readParam(sp, "name") as Filters["name"],
-    street: readParam(sp, "street") as Filters["street"],
-    city: readParam(sp, "city") as Filters["city"],
-    phoneNumber: readParam(sp, "phoneNumber") as Filters["phoneNumber"],
-    village: readParam(sp, "village") as Filters["village"],
+    // customers
+    name: readParam(sp, "name"),
+    street: readParam(sp, "street"),
+
+    // shared
+    phoneNumber: readParam(sp, "phoneNumber"),
+    city: readParam(sp, "city"),
+    village: readParam(sp, "village"),
+    search: readParam(sp, "search"),
     sortBy: readParam(sp, "sortBy") as Filters["sortBy"],
     sortDir: readParam(sp, "sortDir") as Filters["sortDir"],
-    search: readParam(sp, "search") as Filters["search"],
+    limit: toNumberOrUndefined(readParam(sp, "limit")),
+    page: toNumberOrUndefined(readParam(sp, "page")),
 
-    // Only do these two lines if Filters["page"/"limit"] are numbers:
-    limit: toNumberOrUndefined(readParam(sp, "limit")) as Filters["limit"],
-    page: toNumberOrUndefined(readParam(sp, "page")) as Filters["page"],
+    // orders
+    qrCode: readParam(sp, "qrCode"),
+    status: readParam(sp, "status"),
+    deliveryType: readParam(sp, "deliveryType"),
+    scheduledFrom: readParam(sp, "scheduledFrom"),
+    scheduledTo: readParam(sp, "scheduledTo"),
+    createdFrom: readParam(sp, "createdFrom"),
+    createdTo: readParam(sp, "createdTo"),
   };
 }
 
