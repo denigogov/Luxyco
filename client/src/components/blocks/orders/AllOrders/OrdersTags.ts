@@ -3,10 +3,17 @@ import type { FilterValues } from "../../../../whitelabel/src/molecules/tableFil
 
 type SetFilters = (patch: Record<string, unknown>) => void;
 
+type DateRange = {
+  start: Date | null;
+  end: Date | null;
+};
+
 interface CreateOrderTagsArgs {
   setFilters: SetFilters;
   setSearchInput: (v: string) => void;
   setResetLocalSort: React.Dispatch<React.SetStateAction<boolean>>;
+  setRange: React.Dispatch<React.SetStateAction<DateRange>>;
+  setScheduleRange: React.Dispatch<React.SetStateAction<DateRange>>;
 
   name?: string;
   city?: string;
@@ -22,12 +29,19 @@ interface CreateOrderTagsArgs {
   page?: number;
   sortBy?: string;
   sortDir?: string;
+
+  createdTo?: string;
+  createdFrom?: string;
+  scheduledTo?: string;
+  scheduledFrom?: string;
 }
 
 export const CreateOrderTags = ({
   setFilters,
   setSearchInput,
   setResetLocalSort,
+  setRange,
+  setScheduleRange,
 
   name,
   city,
@@ -37,13 +51,51 @@ export const CreateOrderTags = ({
   deliveryType,
   village,
   searchInput,
+  status,
 
   limit,
   page,
   sortBy,
   sortDir,
+
+  createdTo,
+  createdFrom,
+  scheduledTo,
+  scheduledFrom,
 }: CreateOrderTagsArgs): ActiveTagItem[] => {
   return [
+    createdFrom || createdTo
+      ? {
+          key: "Период",
+          value: [createdFrom, createdTo].filter(Boolean).join(" - "),
+          onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.preventDefault();
+            setFilters({
+              createdFrom: undefined,
+              createdTo: undefined,
+              page: 1,
+            });
+            setRange({ start: null, end: null });
+          },
+        }
+      : null,
+
+    scheduledFrom || scheduledTo
+      ? {
+          key: "Закажано",
+          value: [scheduledFrom, scheduledTo].filter(Boolean).join(" - "),
+          onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.preventDefault();
+            setFilters({
+              scheduledFrom: undefined,
+              scheduledTo: undefined,
+              page: 1,
+            });
+            setScheduleRange({ start: null, end: null });
+          },
+        }
+      : null,
+
     name
       ? {
           key: "Име",
@@ -168,7 +220,7 @@ export const CreateOrderTags = ({
 
     sortBy && sortDir
       ? {
-          key: "Сорирај",
+          key: "Сортирај",
           value: sortBy || sortDir,
           onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             e.preventDefault();

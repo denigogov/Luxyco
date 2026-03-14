@@ -1,11 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  Activity,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useOrdersList } from "../../../../features/orders/orders.queries";
 import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
 import TableFilter from "../../../../whitelabel/src/molecules/tableFilter/M_tableFilter";
 import TableSort from "../../../../whitelabel/src/molecules/tableSort/M_tableSort";
-import { allOrdersData } from "./AllOrders.data";
+import {
+  allOrdersData,
+  cancelButtonModalGeneral,
+  deleteButtonModalGeneral,
+} from "./AllOrders.data";
 import ErrorWrapper from "../../ErrorWrapper";
 import {
   mapOrderToRow,
@@ -20,11 +31,56 @@ import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-butt
 import { m_tableFilterData } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFilter.data";
 import { CreateOrderTags, setFilterValues } from "./OrdersTags";
 import ActiveTag from "../../../../whitelabel/src/molecules/activeTag/ActiveTag";
+import Datepicker from "../../../../whitelabel/src/atoms/datepicker/Datepicker";
+import { daterangeData } from "../../../../whitelabel/src/atoms/datepicker/a-daterange.data";
+import type { DaterangeTypes } from "../../../../whitelabel/src/atoms/datepicker/a-daterange.types";
+import { useNavigate } from "react-router";
+import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
+import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
+import "./allOrders.styles.scss";
+import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
+
+const toApiDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const parseApiDate = (value?: string) => {
+  if (!value) return null;
+
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+
+  return new Date(year, month - 1, day);
+};
 
 const AllOrders: React.FC = () => {
   // const [resetSelection, setResetSelection] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
+  const navigate = useNavigate();
 
+  const canDeleteOrder = true;
+
+  const modalCloseRef = useRef<null | (() => void)>(null);
+
+  const closeDeleteOrderModal = () => {
+    modalCloseRef.current?.();
+  };
+
+  const handleDeleteOrder = (row: RowTypes) => {
+    console.log(row?.id);
+    closeDeleteOrderModal();
+  };
+
+  const handleDeleteBulkOrders = () => {
+    console.log("selected orders ID for builk delete", selectedOrders);
+    closeDeleteOrderModal();
+  };
   const {
     setFilters,
     page,
@@ -88,8 +144,36 @@ const AllOrders: React.FC = () => {
     ],
   );
 
+  const [range, setRange] = useState<DaterangeTypes["range"]>({
+    start: parseApiDate(createdFrom),
+    end: parseApiDate(createdTo),
+  });
+
+  const [scheduleRange, setScheduleRange] = useState<DaterangeTypes["range"]>({
+    start: parseApiDate(scheduledFrom),
+    end: parseApiDate(scheduledTo),
+  });
+
   const [searchInput, setSearchInput] = useState(search ?? "");
   const debouncedSearch = useDebouncer<string>(searchInput, 400);
+
+  const handleCreatedRangeChange = (next: DaterangeTypes["range"]) => {
+    setRange(next);
+    setFilters({
+      createdFrom: next.start ? toApiDate(next.start) : undefined,
+      createdTo: next.end ? toApiDate(next.end) : undefined,
+      page: 1,
+    });
+  };
+
+  const handleScheduledRangeChange = (next: DaterangeTypes["range"]) => {
+    setScheduleRange(next);
+    setFilters({
+      scheduledFrom: next.start ? toApiDate(next.start) : undefined,
+      scheduledTo: next.end ? toApiDate(next.end) : undefined,
+      page: 1,
+    });
+  };
 
   useEffect(() => {
     setFilters({
@@ -107,6 +191,43 @@ const AllOrders: React.FC = () => {
 
     return opt?.key ?? null;
   }, [sortBy, sortDir]);
+
+  // cancel button on modal when delete diaolog is open
+  const tableActionButton: ModalTypes[] = [
+    {
+      openButton: { label: "Избриши", style: "link" },
+      onClose: (close) => (modalCloseRef.current = close),
+    },
+  ];
+
+  // table delete button
+  const renderDeleteOrderDialog = useCallback(
+    (row: RowTypes) => (
+      <ConfirmDialog
+        {...allOrdersData.confirmationDeleteDialog}
+        buttons={[
+          { ...cancelButtonModalGeneral, onClick: closeDeleteOrderModal },
+          {
+            ...deleteButtonModalGeneral,
+            onClick: () => {
+              handleDeleteOrder(row);
+            },
+          },
+        ]}
+      />
+    ),
+    [closeDeleteOrderModal, handleDeleteOrder],
+  );
+
+  const confirmDeleteBulklButtons: ButtonTypes[] = [
+    { ...cancelButtonModalGeneral, onClick: closeDeleteOrderModal },
+    {
+      ...deleteButtonModalGeneral,
+      onClick: () => {
+        handleDeleteBulkOrders();
+      },
+    },
+  ];
 
   const { data, isLoading, error, isFetching } = useOrdersList(params);
   const tableListData = data?.data ?? [];
@@ -154,6 +275,11 @@ const AllOrders: React.FC = () => {
   };
 
   const handleFilterReset = () => {
+    setResetLocalSort((prev) => !prev);
+    setSearchInput("");
+    setRange({ start: null, end: null });
+    setScheduleRange({ end: null, start: null });
+
     setFilters({
       name: undefined,
       city: undefined,
@@ -168,10 +294,11 @@ const AllOrders: React.FC = () => {
       limit: undefined,
       search: undefined,
       page: undefined,
+      createdFrom: undefined,
+      createdTo: undefined,
+      scheduledFrom: undefined,
+      scheduledTo: undefined,
     });
-
-    setResetLocalSort((prev) => !prev);
-    setSearchInput("");
   };
 
   const tableFilterActionButton: ButtonTypes[] =
@@ -184,7 +311,6 @@ const AllOrders: React.FC = () => {
           },
         };
       }
-
       return btn;
     }) ?? [];
 
@@ -209,6 +335,8 @@ const AllOrders: React.FC = () => {
     setFilters,
     setSearchInput,
     setResetLocalSort,
+    setRange,
+    setScheduleRange,
     name,
     city,
     street,
@@ -222,6 +350,10 @@ const AllOrders: React.FC = () => {
     page,
     sortBy,
     sortDir,
+    createdFrom,
+    createdTo,
+    scheduledFrom,
+    scheduledTo,
   });
 
   const clearAllFilterTags = (
@@ -231,15 +363,84 @@ const AllOrders: React.FC = () => {
     handleFilterReset();
   };
 
-  return (
-    <div>
-      <input type="date" />
+  const navigateToCreateNewOrder = () => {
+    navigate("new");
+  };
 
-      <Input
-        {...allOrdersData.searchInputData}
-        onChange={(e) => handleGlobalSearch(e)}
-        value={searchInput ?? ""}
-      />
+  return (
+    <div className="b-orders">
+      <div className="b-orders-toolbar">
+        <Input
+          {...allOrdersData.searchInputData}
+          onChange={(e) => handleGlobalSearch(e)}
+          value={searchInput ?? ""}
+          className="b-orders-search"
+        />
+
+        <Button
+          {...allOrdersData.newOrderButton}
+          onClick={navigateToCreateNewOrder}
+          className="b-orders-new"
+        />
+
+        <Button
+          {...allOrdersData.filterOpenButton}
+          className="b-orders-filter"
+        />
+
+        <div className="b-orders-created-date">
+          <Datepicker
+            {...daterangeData}
+            range={range}
+            onChange={handleCreatedRangeChange}
+            placeholder="креирани нарачки период"
+          />
+        </div>
+
+        <div className="b-orders-scheduled-date">
+          <Datepicker
+            {...allOrdersData.scheduledDate}
+            range={scheduleRange}
+            onChange={handleScheduledRangeChange}
+          />
+        </div>
+
+        <div className="b-orders-sort">
+          <TableSort
+            {...allOrdersData.sortData}
+            value={sortKey}
+            onChange={handleSortValue}
+          />
+        </div>
+
+        {selectedOrders.length > 0 && (
+          <div className="b-orders-delete">
+            <Activity mode="visible">
+              <Modal
+                {...allOrdersData.deleteOrderBtn}
+                onClose={(close) => (modalCloseRef.current = close)}
+              >
+                <ConfirmDialog
+                  {...allOrdersData.confirmationDeleteDialog}
+                  buttons={confirmDeleteBulklButtons}
+                  title={
+                    selectedOrders.length > 1
+                      ? `Избриши ${selectedOrders.length} Нарачки`
+                      : "Избриши Нарачка"
+                  }
+                />
+              </Modal>
+            </Activity>
+          </div>
+        )}
+
+        <ActiveTag
+          {...allOrdersData.tags}
+          items={tags}
+          onClearAll={clearAllFilterTags}
+          className="b-orders-tags"
+        />
+      </div>
 
       <div
         id="orders-filters"
@@ -261,24 +462,23 @@ const AllOrders: React.FC = () => {
         </div>
       </div>
 
-      <TableSort
-        {...allOrdersData.sortData}
-        value={sortKey}
-        onChange={handleSortValue}
-      />
-      <Button {...allOrdersData.filterOpenButton} />
-      <ActiveTag
-        {...allOrdersData.tags}
-        items={tags}
-        onClearAll={clearAllFilterTags}
-      />
-      <Table
-        {...allOrdersData.table}
-        rows={rows}
-        loading={isFetching}
-        loadingVariant="bar+skeleton"
-        loadingRows={limit ?? 20}
-      />
+      <div className="uk-overflow-auto uk-margin-small-top">
+        <Table
+          {...allOrdersData.table}
+          actionButtons={{
+            buttons: [...(allOrdersData.table.actionButtons?.buttons ?? [])],
+            modals: [...(canDeleteOrder ? tableActionButton : [])],
+          }}
+          rows={rows}
+          loading={isFetching}
+          loadingVariant="bar+skeleton"
+          loadingRows={limit ?? 20}
+          setSelectedCustomers={setSelectedOrders}
+          renderActionModalChildren={renderDeleteOrderDialog}
+          resetTable={resetLocalSort}
+        />
+      </div>
+
       <TableFooterPagination
         {...allOrdersData.pagination}
         meta={(data as any)?.meta}

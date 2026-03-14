@@ -14,7 +14,7 @@ import {
 } from "../whitelabel/src/atoms/notification/Notification";
 import { hasRoleAccessToPath } from "../utils/routes/roleAccess";
 import ErrorWrapper from "../components/blocks/ErrorWrapper";
-import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole"; // ⬅️ NEW
+import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();

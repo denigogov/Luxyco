@@ -1,11 +1,27 @@
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type { DaterangeTypes } from "../../../../whitelabel/src/atoms/datepicker/a-daterange.types";
 import type { InputTypes } from "../../../../whitelabel/src/atoms/input/a-input.types";
 import type { TableFooterPaginationTypes } from "../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { TableFilterTypes } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
 import type { TableSortTypes } from "../../../../whitelabel/src/molecules/tableSort/m-tableSort.types";
+import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 import type { AllordersTypes } from "./AllOrders.types";
+const startOfDay = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const addDays = (date: Date, amount: number) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+
+const startOfWeek = (date: Date, weekStartsOn = 1) => {
+  const day = startOfDay(date);
+  const currentDay = day.getDay();
+  const diff = (currentDay - weekStartsOn + 7) % 7;
+  return addDays(day, -diff);
+};
+
 const tableData: TableTypes = {
   type: "orders",
   classes: "",
@@ -607,7 +623,7 @@ const sortOpenButton: TableSortTypes = {
 };
 
 const filterData: TableFilterTypes = {
-  title: "Детално Пребарувањеи",
+  title: "Детално Пребарување",
   filters: [
     {
       keyName: "name",
@@ -738,12 +754,128 @@ const tags: ActiveTagItemTypes = {
 
 const searchInputData: InputTypes = {
   type: "search",
-  label: "Глобално Пребарувај Клиенти",
+  // label: "Глобално Пребарувај Клиенти",
   icon: {
     name: "search",
     position: "right",
   },
   placeholder: "Пребарај: име • презиме • улица • град • село • телефон",
+};
+
+const scheduledDate: DaterangeTypes = {
+  range: {
+    start: null,
+    end: null,
+  },
+  shortcutPosition: "top",
+  customShortcuts: [
+    {
+      id: "today",
+      label: "За денес",
+      getValue: ({ now }) => {
+        const day = startOfDay(now);
+        return { start: day, end: day };
+      },
+    },
+    {
+      id: "tomorrow",
+      label: "За утре",
+      getValue: ({ now }) => {
+        const day = addDays(startOfDay(now), 1);
+        return { start: day, end: day };
+      },
+    },
+    {
+      id: "next3",
+      label: "Следни 3 дена",
+      getValue: ({ now }) => {
+        const start = startOfDay(now);
+        const end = addDays(start, 2);
+        return { start, end };
+      },
+    },
+    {
+      id: "next7",
+      label: "Следни 7 дена",
+      getValue: ({ now }) => {
+        const start = startOfDay(now);
+        const end = addDays(start, 6);
+        return { start, end };
+      },
+    },
+    {
+      id: "thisWeek",
+      label: "Оваа недела",
+      getValue: ({ now, weekStartsOn }) => {
+        const start = startOfDay(now);
+        const end = addDays(startOfWeek(now, weekStartsOn), 6);
+        return { start, end };
+      },
+    },
+    {
+      id: "nextWeek",
+      label: "Следната недела",
+      getValue: ({ now, weekStartsOn }) => {
+        const thisWeekStart = startOfWeek(now, weekStartsOn);
+        const start = addDays(thisWeekStart, 7);
+        const end = addDays(thisWeekStart, 13);
+        return { start, end };
+      },
+    },
+  ],
+  numberOfMonths: 1,
+  placeholder: "закажени нарачки период",
+};
+
+const newOrderButton: ButtonTypes = {
+  label: "Нова Нарачка",
+  style: "secondary",
+  icon: {
+    name: "plus",
+    position: "right",
+  },
+};
+
+const deleteOrderBtn: ModalTypes = {
+  openButton: {
+    label: "Избриши",
+    style: "danger",
+    icon: {
+      name: "trash",
+      position: "right",
+    },
+  },
+};
+
+const confirmationDeleteDialog: ConfirmDialogTypes = {
+  buttons: [
+    {
+      label: "Откажи",
+      role: "cancel",
+      style: "default",
+    },
+    {
+      label: "Избриши",
+      role: "delete",
+      style: "danger",
+    },
+  ],
+  type: "danger",
+  title: "Избриши Нарачка",
+  message:
+    "Оваа акција ќе ја избрише нарачка и сите поврзани податоци. Дали сакате да продолжите?",
+};
+
+export const deleteButtonModalGeneral: ButtonTypes = {
+  label: "Избриши",
+  role: "delete",
+  style: "danger",
+};
+
+export const cancelButtonModalGeneral: ButtonTypes = {
+  label: "Откажи",
+  role: "cancel",
+  style: "default",
 };
 
 export const allOrdersData: AllordersTypes = {
@@ -754,4 +886,8 @@ export const allOrdersData: AllordersTypes = {
   sortData: sortOpenButton,
   tags: tags,
   searchInputData: searchInputData,
+  scheduledDate,
+  newOrderButton,
+  deleteOrderBtn,
+  confirmationDeleteDialog,
 };

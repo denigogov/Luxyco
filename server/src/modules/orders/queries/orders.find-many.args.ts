@@ -197,7 +197,7 @@ export function buildOrdersFindManyArgs(query: OrdersQueryDto) {
       qr_code: true,
       scheduled_date: true,
       created_at: true,
-      status: { select: { status_name: true } },
+      status: { select: { status_name: true, id: true } },
       delivery_type: { select: { type_name: true } },
       customers: {
         select: {

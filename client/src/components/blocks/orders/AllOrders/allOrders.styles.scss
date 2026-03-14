@@ -1,0 +1,85 @@
+.b-orders {
+  &-toolbar {
+    width: 100%;
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas:
+      "search search search search"
+      "filter filter new new"
+      "scheduledDate scheduledDate createdDate createdDate"
+      "sort sort sort delete"
+      "tags tags tags tags";
+
+    @include breakpoint(medium) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-areas:
+        "search search"
+        "new filter"
+        "createdDate scheduledDate"
+        "sort delete"
+        "tags tags";
+    }
+
+    @include breakpoint(large) {
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-areas:
+        "search search search search new"
+        "filter createdDate scheduledDate sort delete"
+        "tags tags tags tags tags";
+    }
+
+    .uk-button {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &-search {
+    grid-area: search;
+  }
+
+  &-new {
+    grid-area: new;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-filter {
+    grid-area: filter;
+  }
+
+  &-created-date {
+    grid-area: createdDate;
+  }
+
+  &-scheduled-date {
+    grid-area: scheduledDate;
+  }
+
+  &-sort {
+    grid-area: sort;
+  }
+
+  &-delete {
+    grid-area: delete;
+  }
+
+  &-tags {
+    grid-area: tags;
+  }
+
+  &-search > *,
+  &-new > *,
+  &-filter > *,
+  &-created-date > *,
+  &-scheduled-date > *,
+  &-sort > * {
+    width: 100%;
+  }
+}

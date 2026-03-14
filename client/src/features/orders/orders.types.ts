@@ -44,6 +44,7 @@ export type OrdersListResponse = {
 };
 
 export type OrderStatus = {
+  id: number;
   statusName: string;
 };
 
@@ -80,4 +81,7 @@ export type OrderListItem = {
   measuredPieces: number;
 
   measurementStatus: MeasurementStatus;
+
+  createdTo: string;
+  createdFrom: string;
 };
