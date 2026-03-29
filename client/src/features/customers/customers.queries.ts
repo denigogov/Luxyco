@@ -12,6 +12,7 @@ import {
   deleteSingleCustomer,
   getCustomerById,
   getCustomersList,
+  getCustomersOrderList,
   restoreInactiveCustomer,
   updateCustomer,
 } from "../../api/customers/customers.api";
@@ -23,13 +24,31 @@ import type {
 import { customersKeys, normalizeCustomersListParams } from "./customers.keys";
 import type { CustomerAddressTypes } from "../../components/blocks/customers/Details/customerDetails.types";
 
-export function useCustomersList(params?: CustomersListParams) {
+export function useCustomersList(
+  params?: CustomersListParams,
+  enabled: boolean = true,
+) {
   const normalized = normalizeCustomersListParams(params ?? {});
 
   return useQuery({
     queryKey: customersKeys.list(normalized),
     queryFn: ({ signal }) => getCustomersList(normalized, signal),
     placeholderData: keepPreviousData,
+    enabled,
+  });
+}
+
+export function useCustomersOrderList(
+  params?: CustomersListParams,
+  enabled: boolean = true,
+) {
+  const normalized = normalizeCustomersListParams(params ?? {});
+
+  return useQuery({
+    queryKey: customersKeys.listOrder(normalized),
+    queryFn: ({ signal }) => getCustomersOrderList(normalized, signal),
+    placeholderData: keepPreviousData,
+    enabled,
   });
 }
 

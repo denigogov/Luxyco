@@ -11,7 +11,7 @@ const CustomerOrderTable: TableTypes = {
   striped: false,
   responsive: false,
   hover: false,
-  type: "order",
+  type: "orders",
   columns: [
     {
       header: "Бр. нарачка",

@@ -35,6 +35,10 @@ const tableData: TableTypes = {
   loadingVariant: "bar+skeleton",
   columns: [
     {
+      header: "Креирано",
+      key: "createdAt",
+    },
+    {
       header: "Статус",
       key: "status",
     },
@@ -622,7 +626,7 @@ const sortOpenButton: TableSortTypes = {
   ],
 };
 
-const filterData: TableFilterTypes = {
+export const filterData: TableFilterTypes = {
   title: "Детално Пребарување",
   filters: [
     {
@@ -658,28 +662,27 @@ const filterData: TableFilterTypes = {
         { label: "сите", value: "" },
         {
           label: "Мерење",
-          value: "messurment",
+          value: "2",
         },
-
         {
-          label: "На чекање",
-          value: "pending",
+          label: "Во обработка",
+          value: "1",
         },
         {
           label: "Се чека за достава",
-          value: "waitingDelivery",
+          value: "3",
         },
         {
           label: "Се доставуват",
-          value: "deliverying",
+          value: "4",
         },
         {
           label: "Завршени",
-          value: "done",
+          value: "5",
         },
         {
           label: "Откажени",
-          value: "canceled",
+          value: "6",
         },
       ],
     },
@@ -697,12 +700,12 @@ const filterData: TableFilterTypes = {
         },
         {
           label: "Подигнување",
-          value: "pickup",
+          value: "1",
         },
 
         {
           label: "Достава",
-          value: "delivery",
+          value: "2",
         },
       ],
     },

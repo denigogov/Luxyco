@@ -10,6 +10,7 @@ export const queryClient = new QueryClient({
       gcTime: 10 * 60_000, // cache kept for 10 min
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
+      structuralSharing: true,
       retry: (failureCount, error: any) => {
         // don't retry 4xx (validation/auth)
         const status = error?.status ?? error?.response?.status;

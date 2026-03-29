@@ -1,8 +1,8 @@
 import { Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
 import AllOrders from "../../../components/blocks/orders/AllOrders/AllOrders";
+import CreateOrder from "../../../components/blocks/orders/CreateOrder/CreateOrder";
 
-const Neworder = () => <h1>Neworder page</h1>;
 const OrderDetail = () => <h1>Order details page</h1>;
 
 const orderSubRoutes = [
@@ -14,7 +14,7 @@ const orderSubRoutes = [
   {
     fullPath: "/orders/new",
     path: "new",
-    element: <Neworder />,
+    element: <CreateOrder />,
   },
 ];
 

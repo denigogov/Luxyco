@@ -5,6 +5,8 @@ import type {
   OrdersSortBy,
   OrdersSortDir,
 } from "../../../../features/orders/orders.types";
+import { phoneNumberFormat } from "../../../../utils/helpers/phoneNumberFormat";
+import { timeFormat } from "../../../../utils/helpers/timeFormat";
 import type {
   RowMarker,
   RowTypes,
@@ -62,15 +64,16 @@ export function getOrderRowMarker(id?: number): RowMarker | undefined {
 export function mapOrderToRow(o: OrderListItem): RowTypes {
   return {
     id: String(o.id),
+    createdAt: timeFormat(o.createdAt, { showTime: true }),
     status: o.status?.statusName ?? "-",
     messurmentProgress:
       o.measurementStatus?.progress ?? `${o.measuredPieces}/${o.totalPieces}`,
     firstName:
       `${o.customers?.firstName ?? ""} ${o.customers?.lastName ?? ""}`.trim() ||
       "-",
-    phoneNumber: o.customers?.phoneNumber ?? "-",
+    phoneNumber: phoneNumberFormat(o.customers?.phoneNumber ?? "-"),
     deliveryType: o.deliveryType?.typeName ?? "-",
-    scheduledDate: o.scheduledDate,
+    scheduledDate: timeFormat(o.scheduledDate),
     qrCode: o.qrCode,
     rowMarker: getOrderRowMarker(o.status?.id),
   };

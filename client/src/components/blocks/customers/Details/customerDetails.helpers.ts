@@ -7,20 +7,18 @@ import type {
   CustomerNotes,
   CustomerOrderTypes,
 } from "./customerDetails.types";
+import { timeFormat } from "../../../../utils/helpers/timeFormat";
 
 /**
  * Orders -> Table rows
  */
-export function mapOrdersToRows(
-  customerOrders: CustomerOrderTypes[],
-  timeFormat: (v: any) => string,
-) {
+export function mapOrdersToRows(customerOrders: CustomerOrderTypes[]) {
   return customerOrders.map((c) => {
     const hasUnmeasuredPieces = c?.measuredPieces !== c?.totalPieces;
 
     return {
       ...c,
-      createdAt: timeFormat(c?.createdAt),
+      createdAt: timeFormat(c?.createdAt, { showTime: true }),
       scheduledDate: timeFormat(c?.scheduledDate),
       deliveryType: c?.deliveryType ?? "не дефинирано",
       qrCode: c?.qrCode ?? 0,

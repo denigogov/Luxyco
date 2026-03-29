@@ -146,6 +146,7 @@ export const b_addCustomerData: FormGroup<CreateCustomerFullForm>[] = [
         label: "Активна Адреса",
         filedType: "checkbox",
         width: "1",
+        defaultValue: true,
       },
     ],
   },

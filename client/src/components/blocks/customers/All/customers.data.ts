@@ -38,7 +38,7 @@ export const customersData: CustomersTypes = {
     label: "Глобално Пребарувај Клиенти",
     icon: {
       name: "search",
-      position: "right",
+      position: "left",
     },
     placeholder: "Пребарај: име • презиме • улица • град • село • телефон",
   },

@@ -14,10 +14,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         buster: "v1",
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
+            const persistKeys = [
+              "customers",
+              "orders",
+              "status",
+              "delivery-type",
+            ];
             const key0 = (query.queryKey as any[])?.[0];
 
-            console.log(key0);
-            return key0 === "customers" && query.state.status === "success";
+            return (
+              persistKeys.includes(key0) && query.state.status === "success"
+            );
           },
         },
       }}

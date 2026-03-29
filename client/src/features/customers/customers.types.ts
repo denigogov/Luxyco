@@ -14,6 +14,8 @@ export type CustomersListParams = {
   city?: string;
   street?: string;
   village?: string;
+
+  id?: string;
 };
 
 export type NormalizedCustomersListParams = {
@@ -33,15 +35,17 @@ export type NormalizedCustomersListParams = {
   city?: string;
   street?: string;
   village?: string;
+
+  id?: string;
 };
 
 export interface CustomerAdress {
   id: number;
   street: string;
   city: string;
-  postal_code: number;
+  postalCode: number;
   country: string;
-  formatted_address: string;
+  formattedAddress: string;
   isDefault: boolean;
   isActive: boolean;
   latitude: number;

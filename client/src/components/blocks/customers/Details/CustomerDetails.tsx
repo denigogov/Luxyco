@@ -177,7 +177,7 @@ const CustomerDetails: React.FC = () => {
 
   // Orders rows
   const rows = useMemo(() => {
-    return mapOrdersToRows(customerOrders, timeFormat);
+    return mapOrdersToRows(customerOrders);
   }, [customerOrders]);
 
   // Notes section

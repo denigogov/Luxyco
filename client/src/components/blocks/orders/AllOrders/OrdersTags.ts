@@ -1,5 +1,9 @@
 import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import type { FilterValues } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
+import type {
+  FilterValues,
+  SelectFilter,
+} from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
+import { filterData } from "./AllOrders.data";
 
 type SetFilters = (patch: Record<string, unknown>) => void;
 
@@ -35,6 +39,16 @@ interface CreateOrderTagsArgs {
   scheduledTo?: string;
   scheduledFrom?: string;
 }
+
+// helper to get the labels instead of value for ActiveTags
+const getOptions = (keyName: string) =>
+  (filterData.filters.find((f) => f.keyName === keyName) as SelectFilter)
+    ?.options ?? [];
+export const getStatusLabel = (id?: string) =>
+  getOptions("status").find((o) => o.value === id)?.label ?? id;
+
+export const getDeliveryTypeLabel = (id?: string) =>
+  getOptions("deliveryType").find((o) => o.value === id)?.label ?? id;
 
 export const CreateOrderTags = ({
   setFilters,
@@ -154,7 +168,7 @@ export const CreateOrderTags = ({
     status
       ? {
           key: "Статус",
-          value: status,
+          value: getStatusLabel(status),
           onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             e.preventDefault();
             setFilters({ status: undefined });
@@ -165,7 +179,7 @@ export const CreateOrderTags = ({
     deliveryType
       ? {
           key: "Тип на Испорака",
-          value: deliveryType,
+          value: getDeliveryTypeLabel(deliveryType),
           onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             e.preventDefault();
             setFilters({ deliveryType: undefined });

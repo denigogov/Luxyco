@@ -19,12 +19,16 @@ export const normalizeCustomersListParams = (
 
   sortBy: p.sortBy?.trim() || undefined,
   sortDir: p.sortDir || undefined,
+
+  id: p.id?.trim() || undefined,
 });
 
 export const customersKeys = {
   all: ["customers"] as const,
   lists: () => [...customersKeys.all, "list"] as const,
   list: (params: NormalizedCustomersListParams) =>
+    [...customersKeys.lists(), params] as const,
+  listOrder: (params: NormalizedCustomersListParams) =>
     [...customersKeys.lists(), params] as const,
   details: () => [...customersKeys.all, "detail"] as const,
   detail: (id: number) => [...customersKeys.details(), id] as const,

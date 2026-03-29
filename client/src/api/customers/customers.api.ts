@@ -38,8 +38,28 @@ export function getCustomersList(
   if (params.sortBy) sp.set("sortBy", params.sortBy);
   if (params.sortDir) sp.set("sortDir", params.sortDir);
 
+  if (params.id) sp.set("id", params.id);
+
   const query = sp.toString();
   const path = query ? `/customers?${query}` : "/customers";
+
+  return apiGet<CustomersListResponse>(path, signal);
+}
+
+export function getCustomersOrderList(
+  params: NormalizedCustomersListParams,
+  signal?: AbortSignal,
+): Promise<CustomersListResponse> {
+  const sp = new URLSearchParams();
+
+  sp.set("page", String(params.page));
+  sp.set("limit", String(params.limit));
+
+  if (params.search) sp.set("search", params.search);
+  if (params.id) sp.set("id", params.id);
+
+  const query = sp.toString();
+  const path = query ? `/customers/order?${query}` : "/customers/order";
 
   return apiGet<CustomersListResponse>(path, signal);
 }
