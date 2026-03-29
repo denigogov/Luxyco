@@ -71,6 +71,11 @@ export class CustomersController {
     return this.customersService.findAll(query);
   }
 
+  @Get('order')
+  findAllForOrder(@Query() query: Pick<CustomersQueryDto, 'id' | 'search'>) {
+    return this.customersService.findAllForOrder(query);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.customersService.findOne(id);

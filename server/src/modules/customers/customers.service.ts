@@ -9,16 +9,19 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { paginate } from 'src/common/utils/pagination.util';
 import { CustomersQueryDto } from './dto/get-customers.dto';
-import { buildCustomersFindManyArgs } from './queries/customers.find-many.args';
+import {
+  buildCustomersFindManyArgs,
+  buildCustomersFindManyForOrderArgs,
+} from './queries/customers.find-many.args';
 import { getCustomerWithStats } from './queries/customer.find-one-with-stats';
 import { CreateCustomerFullDto } from './dto/create-customer-full.dto';
 import { customers, Prisma } from '@prisma/client';
 import { RedisService } from 'src/infrastructure/cache/redis.service';
 import { PaginatedResult } from 'src/common/types/pagination.types';
 import {
-  buildCacheKey,
   buildCustomerDetailCacheKey,
   buildCustomersListCacheKey,
+  buildCustomersOrderListCacheKey,
 } from 'src/infrastructure/cache/cache-keys';
 
 @Injectable()
@@ -45,6 +48,7 @@ export class CustomersService {
 
   private async invalidateCustomerCache(id: number) {
     await this.redis.delByPrefix('luxyco:customers:list:v1:');
+    await this.redis.delByPrefix('luxyco:customers:order-list:v1:');
 
     const activeDetailKey = buildCustomerDetailCacheKey({
       id,
@@ -165,6 +169,26 @@ export class CustomersService {
 
       throw e;
     }
+  }
+
+  async findAllForOrder(query: CustomersQueryDto) {
+    const cacheKey = buildCustomersOrderListCacheKey(query);
+    const cached = await this.redis.get<PaginatedResult<customers>>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+    const baseArgs = buildCustomersFindManyForOrderArgs(query, true);
+
+    const result = await paginate(
+      this.prisma.customers as any,
+      baseArgs,
+      query,
+    );
+
+    await this.redis.set(cacheKey, result, 300);
+
+    return result;
   }
 
   async findAll(query: CustomersQueryDto) {

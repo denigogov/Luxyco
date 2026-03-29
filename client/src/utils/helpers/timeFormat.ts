@@ -1,4 +1,4 @@
-type TimeFormatOptions = {
+export type TimeFormatOptions = {
   locale?: string;
   timeZone?: string;
   dateStyle?: Intl.DateTimeFormatOptions["dateStyle"];
@@ -9,7 +9,7 @@ type TimeFormatOptions = {
 export function timeFormat(
   createdAt: string | number | Date,
   opts: TimeFormatOptions = {},
-  localeCountry: string = "mk-MK"
+  localeCountry: string = "de-DE",
 ): string {
   const date = createdAt instanceof Date ? createdAt : new Date(createdAt);
   if (Number.isNaN(date.getTime())) return "";
@@ -33,6 +33,6 @@ export function timeFormat(
   };
 
   return new Intl.DateTimeFormat(localeCountry || locale, formatOptions).format(
-    date
+    date,
   );
 }

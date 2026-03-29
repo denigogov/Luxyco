@@ -17,10 +17,9 @@ export class CustomerNotesService {
   ) {}
 
   private async invalidateCustomerCache(customerId: number) {
-    // clear ALL customers list caches
     await this.redis.delByPrefix('luxyco:customers:list:v1:');
+    await this.redis.delByPrefix('luxyco:customers:order-list:v1:');
 
-    // clear this customer's detail cache (active + inactive)
     const activeDetailKey = buildCustomerDetailCacheKey({
       id: customerId,
       isActive: true,

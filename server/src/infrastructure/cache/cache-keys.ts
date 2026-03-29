@@ -101,11 +101,18 @@ export function buildCacheKey(args: {
   return `${namespace}:${module}:${scope}:${version}:${hash}`;
 }
 
-// Convenience wrappers (optional)
 export function buildCustomersListCacheKey(query: any) {
   return buildCacheKey({
     module: 'customers',
     scope: 'list',
+    query,
+  });
+}
+
+export function buildCustomersOrderListCacheKey(query: any) {
+  return buildCacheKey({
+    module: 'customers',
+    scope: 'order-list',
     query,
   });
 }
@@ -126,5 +133,19 @@ export function buildCustomerDetailCacheKey(args: {
     module: 'customers',
     scope: 'detail',
     query: args,
+  });
+}
+
+export function buildStatusListCacheKey() {
+  return buildCacheKey({
+    module: 'status',
+    scope: 'list',
+  });
+}
+
+export function buildDeliveryTypeListCacheKey() {
+  return buildCacheKey({
+    module: 'delivery-type',
+    scope: 'list',
   });
 }

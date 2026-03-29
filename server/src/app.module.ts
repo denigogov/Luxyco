@@ -12,6 +12,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomerNotesModule } from './modules/customer-notes/customer-notes.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { RedisModule } from './infrastructure/cache/redis.module';
+import { StatusModule } from './modules/status/status.module';
+import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { RedisModule } from './infrastructure/cache/redis.module';
     CustomerNotesModule,
     OrdersModule,
     RedisModule,
+    StatusModule,
+    DeliveryTypeModule,
   ],
   controllers: [AppController],
   providers: [

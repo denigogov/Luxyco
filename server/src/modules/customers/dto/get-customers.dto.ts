@@ -45,4 +45,9 @@ export class CustomersQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   sortDir?: 'asc' | 'desc';
+
+  @IsOptional()
+  @MaxLength(20)
+  @IsString()
+  id?: string;
 }

@@ -33,6 +33,7 @@ export class CustomerAddressesService {
 
   private async invalidateCustomerCache(customerId: number) {
     await this.redis.delByPrefix('luxyco:customers:list:v1:');
+    await this.redis.delByPrefix('luxyco:customers:order-list:v1:');
 
     const activeDetailKey = buildCustomerDetailCacheKey({
       id: customerId,

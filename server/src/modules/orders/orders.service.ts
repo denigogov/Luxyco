@@ -16,17 +16,35 @@ import {
   addMeasurementStats,
   buildOrdersFindManyArgs,
 } from './queries/orders.find-many.args';
-import { buildOrdersListCacheKey } from 'src/infrastructure/cache/cache-keys';
+import {
+  buildCustomerDetailCacheKey,
+  buildOrdersListCacheKey,
+} from 'src/infrastructure/cache/cache-keys';
+import { OrdersCreateService } from './order.create.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
+    private readonly ordersCreateService: OrdersCreateService,
   ) {}
 
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  async create(dto: CreateOrderDto, userId: number) {
+    const order = await this.ordersCreateService.create(dto, userId);
+
+    // invalidate after success
+    await Promise.all([
+      this.redis.delByPrefix('luxyco:orders:list:v1:'),
+      this.redis.delByPrefix('luxyco:orders:detail:v1:'),
+
+      this.redis.del([
+        buildCustomerDetailCacheKey({ id: dto.customerId, isActive: true }),
+        buildCustomerDetailCacheKey({ id: dto.customerId, isActive: false }),
+      ]),
+    ]);
+
+    return order;
   }
 
   async findAll(query: OrdersQueryDto) {

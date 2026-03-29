@@ -154,16 +154,16 @@ export function buildOrdersFindManyArgs(query: OrdersQueryDto) {
   }
 
   // Status name filter
-  if (status?.trim()) {
+  if (status) {
     AND.push({
-      status: { is: { status_name: { contains: status.trim() } } },
+      order_status_id: Number(status),
     });
   }
 
-  // Delivery type name filter
-  if (deliveryType?.trim()) {
+  // Delivery type filter by id
+  if (deliveryType) {
     AND.push({
-      delivery_type: { is: { type_name: { contains: deliveryType.trim() } } },
+      delivery_type_id: Number(deliveryType),
     });
   }
 

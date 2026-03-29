@@ -21,12 +21,16 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { OrdersQueryDto } from './dto/get-order.dto';
 
 @Controller('orders')
+@UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  create(
+    @Body() dto: CreateOrderDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.ordersService.create(dto, req.user.sub);
   }
 
   @Get()

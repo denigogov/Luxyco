@@ -41,12 +41,12 @@ export class OrdersQueryDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(50)
+  @MaxLength(3)
   status?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(50)
+  @MaxLength(3)
   deliveryType?: string;
 
   @IsOptional()

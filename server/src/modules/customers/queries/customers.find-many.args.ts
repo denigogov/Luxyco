@@ -103,3 +103,75 @@ export function buildCustomersFindManyArgs(
     orderBy,
   };
 }
+
+export function buildCustomersFindManyForOrderArgs(
+  query: Pick<CustomersQueryDto, 'id' | 'search'>,
+  isActive: boolean,
+) {
+  const { search, id } = query;
+
+  const where: any = { is_active: isActive };
+  const AND: any[] = [];
+
+  if (id) {
+    AND.push({ id: Number(id) });
+  }
+
+  if (search && search.trim().length > 0) {
+    const tokens = search
+      .trim()
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    for (const token of tokens) {
+      AND.push({
+        OR: [
+          { first_name: { contains: token } },
+          { last_name: { contains: token } },
+          { phone_number: { contains: token } },
+          {
+            customer_addresses: {
+              some: {
+                is_active: true,
+                OR: [
+                  { city: { contains: token } },
+                  { street: { contains: token } },
+                  { village: { contains: token } },
+                  { formatted_address: { contains: token } },
+                ],
+              },
+            },
+          },
+        ],
+      });
+    }
+  }
+
+  if (AND.length) where.AND = AND;
+  return {
+    where,
+    select: {
+      id: true,
+      first_name: true,
+      last_name: true,
+      phone_number: true,
+      customer_notes: {
+        where: { is_active: true, related_order_id: null },
+        select: {
+          note_text: true,
+        },
+      },
+      customer_addresses: {
+        where: { is_active: true },
+        select: {
+          id: true,
+          formatted_address: true,
+          is_default: true,
+          is_verified_by_provider: true,
+        },
+      },
+    },
+    orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+  };
+}
