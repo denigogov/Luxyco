@@ -39,6 +39,11 @@ export class OrdersController {
     return this.ordersService.findAll(query);
   }
 
+  @Get('references')
+  getReferences() {
+    return this.ordersService.getOrderReferences();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(+id);

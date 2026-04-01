@@ -48,6 +48,11 @@ export class CreateOrderDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  serviceTypeId: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   orderStatusId: number;
 
   @IsDateString()

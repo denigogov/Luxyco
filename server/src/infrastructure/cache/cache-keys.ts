@@ -149,3 +149,15 @@ export function buildDeliveryTypeListCacheKey() {
     scope: 'list',
   });
 }
+export function buildServiceTypeListCacheKey() {
+  return buildCacheKey({
+    module: 'service-type',
+    scope: 'list',
+  });
+}
+export function buildOrderReferencesListCacheKey() {
+  return buildCacheKey({
+    module: 'orders',
+    scope: 'references',
+  });
+}

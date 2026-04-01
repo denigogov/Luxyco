@@ -10,8 +10,10 @@ import { useDebouncer } from "../../../../utils/helpers/debouncer";
 import AddCustomer from "../../customers/AddCustomer/AddCustomer";
 import Autocomplate from "../../../../whitelabel/src/atoms/аutocomplete/Autocomplete";
 import { createOrderData } from "./CreateOrder.data";
-import SelectCard from "../../../../whitelabel/src/molecules/selectCard/SelectCard";
-import { phoneNumberFormat } from "../../../../utils/helpers/phoneNumberFormat";
+import CustomerSelectionPanel from "../../../organisms/customerSelectionPanel/CustomerSelectionPanel";
+import NewCustomerAddress from "../../customers/Addresses/NewAddress/NewCustomerAddress";
+import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
+import { useOrderReferencesList } from "../../../../features/orders/orders.queries";
 
 const customerContentMapper = (
   customer: Pick<
@@ -59,6 +61,15 @@ const CreateOrder = () => {
   const { data, isLoading, isFetching } = useCustomersOrderList(
     shouldSearch ? querySearch : {},
   );
+
+  const {
+    data: referencesData,
+    isLoading: referencesLoading,
+    isFetching: referencesFething,
+  } = useOrderReferencesList();
+
+  const deliveryTypesData = referencesData?.deliveryTypes ?? [];
+  const serviceTypesData = referencesData?.serviceTypes ?? [];
 
   const results = data?.data ?? [];
   const isSearching = isLoading || isFetching;
@@ -115,8 +126,6 @@ const CreateOrder = () => {
     );
   };
 
-  console.log(selectedCustomer);
-
   return (
     <div>
       {!selectedCustomer && (
@@ -139,34 +148,39 @@ const CreateOrder = () => {
       )}
 
       {selectedCustomer && (
-        <div className="uk-card-default uk-padding-small">
-          <span onClick={() => handleSearchChange("")} uk-icon="close"></span>
-
-          <div className="b-customerDetails__name">
-            <div className="uk-text-large uk-text-bold uk-margin-remove">
-              {`${selectedCustomer?.firstName ?? ""} ${selectedCustomer?.lastName ?? ""}`}
-            </div>
-
-            <div className="uk-margin-remove">
-              {phoneNumberFormat(selectedCustomer?.phoneNumber ?? "")}
-            </div>
-          </div>
-        </div>
+        <CustomerSelectionPanel
+          customer={selectedCustomer}
+          selectedAddressId={selectedAddressId}
+          onAddressChange={(id) => setSelectedAddressId(id)}
+          onRemoveCustomer={() => handleSearchChange("")}
+          createCustomer={{
+            ...createOrderData.createCustomerAddressModal,
+            children: <NewCustomerAddress />,
+          }}
+        />
       )}
 
-      <div className="uk-margin-small-top uk-text-muted">
-        {selectedCustomer?.customerNotes?.map((note, i: number) => (
-          <p key={i}>{note.noteText}</p>
-        ))}
-        {!selectedCustomer?.customerNotes.lenght && (
-          <p>Не се пронајдени забелешки</p>
-        )}
-      </div>
-      <SelectCard
-        addresses={selectedCustomer?.customerAddresses ?? []}
-        selectedId={selectedAddressId}
-        onChange={(id) => setSelectedAddressId(id)}
-      />
+      {referencesLoading ? (
+        <p>Вчитување...</p>
+      ) : (
+        <>
+          <ASelect
+            label="Тип на Услуга"
+            options={serviceTypesData.map((s) => ({
+              label: s.serviceName,
+              value: String(s.id),
+            }))}
+          />
+          <ASelect
+            label="Тип на Достава"
+            options={deliveryTypesData.map((d) => ({
+              label: d.typeName,
+              value: String(d.id),
+            }))}
+          />
+        </>
+      )}
+
       <SidebarSummary
         customerName={
           selectedCustomer

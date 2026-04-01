@@ -50,6 +50,11 @@ export class OrdersQueryDto extends PaginationQueryDto {
   deliveryType?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  serviceType?: string;
+
+  @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'scheduledFrom must be YYYY-MM-DD',
   })

@@ -1,0 +1,185 @@
+.b-customerPanel {
+  padding: spacing(medium);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  &__header {
+    margin-bottom: spacing(small);
+    padding-bottom: spacing(small);
+    border-bottom: 1px solid color(borderLight);
+  }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: color(secondary);
+    color: color(white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: fontsize(medium);
+    font-weight: fontweight(bold);
+    margin-right: spacing(small);
+  }
+
+  &__name {
+    font-size: fontsize(medium);
+    font-weight: fontweight(bold);
+    color: color(textBlack);
+    line-height: 1.2;
+  }
+
+  &__phone {
+    font-size: fontsize(small);
+    color: color(textLight);
+    margin-top: 4px;
+  }
+
+  &__notes,
+  &__addresses {
+    margin-top: spacing(medium);
+  }
+
+  .b-sectionLabel {
+    font-size: fontsize(xsmall);
+    font-weight: fontweight(bold);
+    color: color(textLight);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: spacing(small);
+  }
+
+  .b-noteCard {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: spacing(small);
+    border-radius: 8px;
+    background: color(mutedHighlight);
+
+    border-left: 4px solid color(secondary);
+    margin-bottom: spacing(xsmall);
+
+    p {
+      margin: 0;
+      color: color(textBlack);
+      line-height: 1.4;
+    }
+
+    .uk-icon {
+      color: color(tertiary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+
+  .b-notesContainer {
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: spacing(xsmall);
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: color(borderLight);
+      border-radius: 6px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: color(textLight);
+    }
+  }
+
+  .b-addressCard {
+    padding: spacing(small);
+    border-radius: 10px;
+    border: 1px solid color(borderLight);
+    background: color(white);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    height: 100%;
+
+    &:hover {
+      border-color: color(secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    &__new {
+      display: flex;
+      gap: 10px;
+
+      .b-newCustomerAddress {
+        font-weight: 400;
+      }
+    }
+
+    &.is-active {
+      border: 1px solid color(secondary);
+      background: rgba(0, 0, 0, 0.01);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: fontweight(bold);
+      font-size: fontsize(small);
+      margin-bottom: 8px;
+      color: color(textBlack);
+
+      &-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .uk-icon {
+        color: color(primary);
+      }
+    }
+
+    &__badge {
+      font-size: 10px;
+      font-weight: fontweight(bold);
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+
+      &--default {
+        background: color(borderLight);
+        color: color(text);
+      }
+
+      &--verified {
+        background: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+      }
+    }
+
+    &__text {
+      font-size: fontsize(small);
+      color: color(text);
+      line-height: 1.4;
+    }
+
+    &__newAddress {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+
+      @include breakpoint(small) {
+        align-items: flex-start;
+      }
+    }
+  }
+}

@@ -60,17 +60,32 @@ export class OrdersCreateService {
     return deliveryType.id;
   }
 
+  private async validateServiceType(serviceTypeId: number): Promise<number> {
+    const serviceType = await this.prisma.service_type.findFirst({
+      where: { id: serviceTypeId, is_active: true },
+      select: { id: true },
+    });
+
+    if (!serviceType) {
+      throw new NotFoundException(
+        `Service type ${serviceTypeId} not found or inactive`,
+      );
+    }
+
+    return serviceType.id;
+  }
+
   private async validateAddress(
     deliveryAddressId: number | null | undefined,
     customerId: number,
-    isDelivery: boolean,
+    needsAddress: boolean,
+    reason: string,
   ): Promise<void> {
-    // No address needed for PICKUP
-    if (!isDelivery) return;
+    if (!needsAddress) return;
 
     if (!deliveryAddressId) {
       throw new BadRequestException(
-        'A delivery address is required for DELIVERY orders',
+        `A delivery address is required when ${reason}`,
       );
     }
 
@@ -126,37 +141,41 @@ export class OrdersCreateService {
     await this.validateCustomer(dto.customerId);
 
     const deliveryTypeId = await this.validateDeliveryType(dto.deliveryTypeId);
-    const isDelivery = deliveryTypeId !== 1;
+    const serviceTypeId = await this.validateServiceType(dto.serviceTypeId);
+
+    const isPickupByUs = serviceTypeId === 1;
+    const isDeliveryBack = deliveryTypeId !== 1;
+    const needsAddress = isPickupByUs || isDeliveryBack;
+
+    const reason = isPickupByUs
+      ? 'picking up from customer address'
+      : 'delivering back to customer';
 
     await this.validateAddress(
       dto.deliveryAddressId,
       dto.customerId,
-      isDelivery,
+      needsAddress,
+      reason,
     );
 
-    // 4) Validate product types (deduplicated)
     const productTypeIds = [
       ...new Set(dto.items.map((item) => item.productTypeId)),
     ];
     await this.validateProductTypes(productTypeIds);
 
-    // 5) Always start with PENDING — never trust the client for this
     const pendingStatusId = await this.getPendingStatusId();
 
-    // 6) Calculate total pieces
     const totalPieces = dto.items.reduce((sum, item) => sum + item.quantity, 0);
 
-    // 7) Generate unique QR code BEFORE the transaction
     const qrCode = await this.generateUniqueQrCode();
 
-    // 8) Build all piece rows in memory before the transaction
     let pieceIndex = 1;
     const piecesData: Prisma.order_piecesCreateManyInput[] = [];
 
     for (const item of dto.items) {
       for (let i = 0; i < item.quantity; i++) {
         piecesData.push({
-          order_id: 0, // will be overwritten after order is created
+          order_id: 0,
           piece_index: pieceIndex,
           label_code: this.generateLabelCode(qrCode, pieceIndex),
           product_type_id: item.productTypeId,
@@ -169,14 +188,14 @@ export class OrdersCreateService {
       }
     }
 
-    // 9) Create order + pieces in a single transaction (2 DB calls total)
     return this.prisma.$transaction(async (tx) => {
       const order = await tx.orders.create({
         data: {
           qr_code: qrCode,
           customer_id: dto.customerId,
-          delivery_address_id: isDelivery ? dto.deliveryAddressId : null,
+          delivery_address_id: needsAddress ? dto.deliveryAddressId : null, // ✅ CHANGED
           delivery_type_id: dto.deliveryTypeId,
+          service_type_id: dto.serviceTypeId,
           order_status_id: pendingStatusId,
           created_by_user_id: userId,
           scheduled_date: new Date(dto.scheduledDate),
@@ -187,7 +206,6 @@ export class OrdersCreateService {
         },
       });
 
-      // Single bulk insert — regardless of piece count
       await tx.order_pieces.createMany({
         data: piecesData.map((piece) => ({
           ...piece,
@@ -221,6 +239,12 @@ export class OrdersCreateService {
               id: true,
               type_name: true,
               price: true,
+            },
+          },
+          service_type: {
+            select: {
+              id: true,
+              service_name: true,
             },
           },
           status: {

@@ -14,6 +14,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RedisModule } from './infrastructure/cache/redis.module';
 import { StatusModule } from './modules/status/status.module';
 import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module';
+import { ServiceTypeModule } from './modules/service-type/service-type.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module
     RedisModule,
     StatusModule,
     DeliveryTypeModule,
+    ServiceTypeModule,
   ],
   controllers: [AppController],
   providers: [

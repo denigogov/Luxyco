@@ -85,3 +85,17 @@ export type OrderListItem = {
   createdTo: string;
   createdFrom: string;
 };
+
+export interface DeliveryType {
+  id: number;
+  typeName: string;
+  price: number;
+}
+export interface ServiceType {
+  id: number;
+  serviceName: string;
+}
+export interface OrderReferences {
+  deliveryTypes: DeliveryType[];
+  serviceTypes: ServiceType[];
+}

@@ -41,4 +41,5 @@ export const ordersKeys = {
   all: ["orders"] as const,
   lists: () => [...ordersKeys.all, "list"] as const,
   list: (params: OrdersListParams) => [...ordersKeys.lists(), params] as const,
+  references: () => [...ordersKeys.all, "references"],
 };

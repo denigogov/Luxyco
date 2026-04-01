@@ -62,6 +62,7 @@ export type Customer = {
   createdAt: string;
   updatedAt: string;
   customerAddresses: CustomerAdress[];
+  customerNotes?: { noteText: string }[];
 };
 
 export type CreateCustomer = Pick<

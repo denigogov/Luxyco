@@ -1,4 +1,5 @@
 import type {
+  OrderReferences,
   OrdersListParams,
   OrdersListResponse,
 } from "../../features/orders/orders.types";
@@ -40,4 +41,11 @@ export function getOrdersList(
   const path = query ? `/orders?${query}` : "/orders";
 
   return apiGet<OrdersListResponse>(path, signal);
+}
+
+export function getOrderReferencesList(
+  path: string,
+  signal?: AbortSignal,
+): Promise<OrderReferences> {
+  return apiGet<OrderReferences>(path, signal);
 }

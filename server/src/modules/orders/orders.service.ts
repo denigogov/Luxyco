@@ -18,6 +18,7 @@ import {
 } from './queries/orders.find-many.args';
 import {
   buildCustomerDetailCacheKey,
+  buildOrderReferencesListCacheKey,
   buildOrdersListCacheKey,
 } from 'src/infrastructure/cache/cache-keys';
 import { OrdersCreateService } from './order.create.service';
@@ -60,6 +61,39 @@ export class OrdersService {
 
     await this.redis.set(cacheKey, ordersWithMeasurementItems, 300);
     return ordersWithMeasurementItems;
+  }
+
+  async getOrderReferences() {
+    const cacheKey = buildOrderReferencesListCacheKey();
+    const cached = await this.redis.get<any>(cacheKey);
+    if (cached) return cached;
+
+    const [deliveryTypes, serviceTypes, productTypes] = await Promise.all([
+      this.prisma.delivery_type.findMany({
+        where: { is_active: true },
+        select: { id: true, type_name: true, price: true },
+        orderBy: { id: 'asc' },
+      }),
+      this.prisma.service_type.findMany({
+        where: { is_active: true },
+        select: { id: true, service_name: true },
+        orderBy: { id: 'asc' },
+      }),
+
+      this.prisma.product_types.findMany({
+        where: { is_active: true },
+        select: {
+          name: true,
+          base_price: true,
+        },
+      }),
+    ]);
+
+    const result = { deliveryTypes, serviceTypes, productTypes };
+
+    await this.redis.set(cacheKey, result, 1);
+
+    return result;
   }
 
   findOne(id: number) {

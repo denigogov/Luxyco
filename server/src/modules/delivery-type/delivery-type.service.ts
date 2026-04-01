@@ -29,8 +29,6 @@ export class DeliveryTypeService {
       where: { is_active: true },
     });
 
-    console.log(result);
-
     await this.redis.set(cacheKey, result);
 
     return result;

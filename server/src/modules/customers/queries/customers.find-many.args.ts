@@ -23,9 +23,9 @@ export function buildCustomersFindManyArgs(
     for (const token of tokens) {
       AND.push({
         OR: [
-          { first_name: { contains: token } },
-          { last_name: { contains: token } },
-          { phone_number: { contains: token } },
+          { first_name: { search: token } },
+          { last_name: { search: token } },
+          { phone_number: { startsWith: token } },
           {
             customer_addresses: {
               some: {
@@ -47,17 +47,14 @@ export function buildCustomersFindManyArgs(
   // Name filter
   if (name) {
     AND.push({
-      OR: [
-        { first_name: { contains: name } },
-        { last_name: { contains: name } },
-      ],
+      OR: [{ first_name: { search: name } }, { last_name: { search: name } }],
     });
   }
 
   // Phone filter
   if (phoneNumber) {
     AND.push({
-      phone_number: { contains: phoneNumber },
+      phone_number: { startsWith: phoneNumber },
     });
   }
 
@@ -127,9 +124,9 @@ export function buildCustomersFindManyForOrderArgs(
     for (const token of tokens) {
       AND.push({
         OR: [
-          { first_name: { contains: token } },
-          { last_name: { contains: token } },
-          { phone_number: { contains: token } },
+          { first_name: { search: token } },
+          { last_name: { search: token } },
+          { phone_number: { startsWith: token } },
           {
             customer_addresses: {
               some: {
@@ -151,6 +148,7 @@ export function buildCustomersFindManyForOrderArgs(
   if (AND.length) where.AND = AND;
   return {
     where,
+    take: 8,
     select: {
       id: true,
       first_name: true,
