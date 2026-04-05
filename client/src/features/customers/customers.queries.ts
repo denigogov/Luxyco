@@ -144,7 +144,7 @@ export function useRestoreInactiveCustomer() {
   return useMutation({
     mutationKey: ["customers", "restore"] as const,
     mutationFn: (id: number) => restoreInactiveCustomer(id),
-    onSuccess: (_data) => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: customersKeys.restoreOne() });
     },
   });
@@ -156,7 +156,7 @@ export function useDeleteCustomerPermanently() {
   return useMutation({
     mutationKey: ["customers", "permanently"] as const,
     mutationFn: (id: number) => deletePermanentlyCustomer(id),
-    onSuccess: (_data) => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: customersKeys.deletePermanently() });
     },
   });

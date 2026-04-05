@@ -1,5 +1,5 @@
 // src/components/FormBuilderAccordion.types.ts
-import type { FieldValues, Path, RegisterOptions } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import type { RHFInputProps } from "../CustomizableForm/RHFInput";
 
 export type GroupSummaryFn<T extends FieldValues> = (values: T) => string;
