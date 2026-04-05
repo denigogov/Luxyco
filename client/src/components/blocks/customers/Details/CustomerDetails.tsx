@@ -184,6 +184,7 @@ const CustomerDetails: React.FC = () => {
   const notesBoxSectionData = useMemo<BoxSectionTypes>(() => {
     const cid = String(customerId ?? "");
     return buildNotesBoxSectionData({
+      onCreateNewNote: () => navigate("notes/add"),
       notes: customerNotes,
       timeFormat,
       onEditNote: (noteId, noteObj) =>
@@ -214,7 +215,7 @@ const CustomerDetails: React.FC = () => {
     const cid = String(customerId ?? "");
     return buildAddressesBoxSectionData({
       addresses: customerAddresses,
-      customerId: cid,
+      onCreateNewAddress: () => navigate("addresses/new"),
       onEditAddress: (address) =>
         navigate(`/customers/${cid}/addresses/${address.id}/edit`, {
           state: address,

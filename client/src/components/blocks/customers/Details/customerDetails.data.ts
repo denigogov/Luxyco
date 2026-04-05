@@ -116,7 +116,17 @@ const newOrderBtn: ButtonTypes = {
 };
 
 const addressesBox: BoxSectionTypes = {
-  noItemsMessage: "Корисникот нема додадено адреса",
+  noItemsMessage: {
+    text: "Корисникот нема додадено адреса",
+    button: {
+      label: "Додади Нов",
+      icon: {
+        name: "plus",
+      },
+      style: "link",
+      href: "addresses/new",
+    },
+  },
   items: [],
 };
 

@@ -40,15 +40,27 @@ export function mapOrdersToRows(customerOrders: CustomerOrderTypes[]) {
  * Notes -> BoxSection props
  */
 export function buildNotesBoxSectionData(args: {
+  onCreateNewNote: () => void;
   notes: CustomerNotes[];
   timeFormat: (v: any) => string;
   onEditNote: (noteId: string, noteObj: CustomerNotes) => void;
   buildDeleteModals: (noteId: string) => ModalTypes[];
 }): BoxSectionTypes {
-  const { notes, timeFormat, onEditNote, buildDeleteModals } = args;
+  const { notes, timeFormat, onEditNote, buildDeleteModals, onCreateNewNote } =
+    args;
 
   return {
-    noItemsMessage: "Корисникот нема забелешки",
+    noItemsMessage: {
+      text: "Корисникот нема забелешки",
+      button: {
+        label: "Додади Новa",
+        icon: {
+          name: "file-text",
+        },
+        style: "tertiary",
+        onClick: () => onCreateNewNote(),
+      },
+    },
     items: notes.map((note) => {
       const createdBy = [note?.users?.firstName, note?.users?.lastName]
         .filter(Boolean)
@@ -89,19 +101,30 @@ export function buildNotesBoxSectionData(args: {
  * Addresses -> BoxSection props
  */
 export function buildAddressesBoxSectionData(args: {
+  onCreateNewAddress: () => void;
   addresses: CustomerAddressTypes[];
-  customerId: string;
   onEditAddress: (address: CustomerAddressTypes) => void;
   buildDeleteModals: (address: CustomerAddressTypes) => ModalTypes[];
 }): BoxSectionTypes {
-  const { addresses, onEditAddress, buildDeleteModals } = args;
+  const { addresses, onEditAddress, buildDeleteModals, onCreateNewAddress } =
+    args;
 
   const activeSorted = (addresses ?? [])
     .filter((a) => a.isActive)
     .sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 
   return {
-    noItemsMessage: "Корисникот нема додадено адреса",
+    noItemsMessage: {
+      text: "Корисникот нема додадено адреса",
+      button: {
+        label: "Додади Новa",
+        icon: {
+          name: "location",
+        },
+        style: "tertiary",
+        onClick: () => onCreateNewAddress(),
+      },
+    },
     items: activeSorted.map((a) => {
       const marker = [
         ...(a.isVerifiedByProvider
