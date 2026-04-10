@@ -1,9 +1,10 @@
+import type { CreateOrderQueryType } from "../../components/blocks/orders/CreateOrder/createOrder.types";
 import type {
   OrderReferences,
   OrdersListParams,
   OrdersListResponse,
 } from "../../features/orders/orders.types";
-import { apiGet } from "../http";
+import { apiGet, apiPost } from "../http";
 
 export function getOrdersList(
   params: OrdersListParams,
@@ -48,4 +49,8 @@ export function getOrderReferencesList(
   signal?: AbortSignal,
 ): Promise<OrderReferences> {
   return apiGet<OrderReferences>(path, signal);
+}
+
+export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
+  return apiPost("/orders", body, signal);
 }

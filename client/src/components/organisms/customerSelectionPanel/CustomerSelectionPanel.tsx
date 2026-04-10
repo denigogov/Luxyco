@@ -43,8 +43,8 @@ const CustomerSelectionPanel = ({
           <div className="b-sectionLabel">Забелешки за Клиентот</div>
 
           <div className="b-notesContainer">
-            {customer.customerNotes.map((note) => (
-              <div key={note.id} className="b-noteCard">
+            {customer.customerNotes.map((note, i) => (
+              <div key={i} className="b-noteCard">
                 <span uk-icon="warning" className="uk-icon" />
                 <p>{note.noteText}</p>
               </div>

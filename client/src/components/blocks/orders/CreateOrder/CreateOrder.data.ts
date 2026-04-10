@@ -28,9 +28,23 @@ export const createOrderData: CreateOrderTyeps = {
       returnBack: false,
     },
   },
-
-  selectOptionData: {
-    label: "Избери Превоз",
+  selectServiceTypeOpt: {
+    label: "Тип на Услуга",
+    placeholder: "Изберете Услуга",
+    options: [
+      {
+        label: "За Подигнување",
+        value: "1",
+      },
+      {
+        label: "За Достава",
+        value: "1",
+      },
+    ],
+  },
+  selecetDeliveryOpt: {
+    label: "Тип на Достава",
+    placeholder: "Изберете Достава",
     options: [
       {
         label: "За Подигнување",

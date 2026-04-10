@@ -1,0 +1,123 @@
+.b-createOrder {
+  display: flex;
+  flex-direction: column;
+  gap: spacing(medium);
+
+  &__card {
+    background: color(backgroundWhite);
+    padding: spacing(medium);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  &__sectionLabel {
+    font-size: fontsize(xsmall);
+    font-weight: fontweight(bold);
+    color: color(textLight);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: spacing(small);
+  }
+
+  &__optionsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: spacing(medium);
+
+    @media (min-width: 640px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__itemRow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: spacing(medium);
+    padding-bottom: spacing(medium);
+    border-bottom: 1px dashed color(borderLight);
+
+    @include breakpoint(small) {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr auto;
+      align-items: flex-end;
+      margin-bottom: spacing(small);
+      padding-bottom: spacing(small);
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    &-deleteButton {
+      .uk-button {
+        display: block !important;
+        @include breakpoint(small, true) {
+          width: 100%;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  &__addButton {
+    border: 2px dashed color(borderLight);
+    background: transparent;
+    color: color(textLight);
+    border-radius: 8px;
+    padding: spacing(small);
+    transition: all 0.2s ease;
+    font-weight: fontweight(semiBold);
+    cursor: pointer;
+
+    &:hover {
+      border-color: color(secondary);
+      color: color(secondary);
+      background: rgba(0, 0, 0, 0.02);
+    }
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    font-size: fontsize(small);
+    color: color(textLight);
+    margin-top: spacing(medium);
+    padding-top: spacing(medium);
+    border-top: 1px solid color(borderLight);
+
+    &-row {
+      display: flex;
+      align-items: center;
+      &--note {
+        font-size: fontsize(xsmall);
+        color: color(secondary);
+      }
+    }
+
+    strong {
+      color: color(textBlack);
+      margin-left: 8px;
+      font-size: fontsize(medium);
+    }
+
+    .is-total {
+      font-size: fontsize(medium);
+      color: color(textBlack);
+
+      strong {
+        font-size: fontsize(large);
+        color: color(tertiary);
+      }
+    }
+  }
+
+  &__scheduleDate {
+    padding-top: spacing(medium);
+  }
+}

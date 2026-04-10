@@ -43,19 +43,23 @@ export class CreateOrderDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @IsOptional()
   deliveryTypeId: number;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @IsOptional()
   serviceTypeId: number;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @IsOptional()
   orderStatusId: number;
 
   @IsDateString()
+  @IsOptional()
   scheduledDate: string;
 
   @IsOptional()

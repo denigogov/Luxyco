@@ -47,7 +47,7 @@ export class CreateCustomerAddressDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
-  formattedAddress: string;
+  formattedAddress!: string;
 
   @IsLatitude()
   @IsNotEmpty()

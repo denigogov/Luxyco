@@ -45,7 +45,11 @@ export class OrdersCreateService {
     }
   }
 
-  private async validateDeliveryType(deliveryTypeId: number): Promise<number> {
+  private async validateDeliveryType(
+    deliveryTypeId: number | null | undefined,
+  ): Promise<number | null> {
+    if (!deliveryTypeId) return null;
+
     const deliveryType = await this.prisma.delivery_type.findFirst({
       where: { id: deliveryTypeId, is_active: true },
       select: { id: true },
@@ -60,7 +64,10 @@ export class OrdersCreateService {
     return deliveryType.id;
   }
 
-  private async validateServiceType(serviceTypeId: number): Promise<number> {
+  private async validateServiceType(
+    serviceTypeId: number | null | undefined,
+  ): Promise<number | null> {
+    if (!serviceTypeId) return null;
     const serviceType = await this.prisma.service_type.findFirst({
       where: { id: serviceTypeId, is_active: true },
       select: { id: true },
@@ -196,7 +203,7 @@ export class OrdersCreateService {
           delivery_address_id: needsAddress ? dto.deliveryAddressId : null, // ✅ CHANGED
           delivery_type_id: dto.deliveryTypeId,
           service_type_id: dto.serviceTypeId,
-          order_status_id: pendingStatusId,
+          order_status_id: pendingStatusId ? 1 : null,
           created_by_user_id: userId,
           scheduled_date: new Date(dto.scheduledDate),
           total_pieces: totalPieces,

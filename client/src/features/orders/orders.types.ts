@@ -95,7 +95,16 @@ export interface ServiceType {
   id: number;
   serviceName: string;
 }
+
+export interface ProductType {
+  id: number;
+  name: string;
+  basePrice: string;
+  priceModelId: 1 | 2;
+  priceMOdelName: "PER_PIECE" | "PER_M2";
+}
 export interface OrderReferences {
   deliveryTypes: DeliveryType[];
   serviceTypes: ServiceType[];
+  productTypes: ProductType[];
 }
