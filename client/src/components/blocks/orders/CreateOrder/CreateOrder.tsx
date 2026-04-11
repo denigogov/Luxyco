@@ -27,6 +27,8 @@ import {
 import { createOrderData } from "./CreateOrder.data";
 import "./createOrder.styles.scss";
 import type { CreateOrderQueryType } from "./createOrder.types";
+import { useReactToPrint } from "react-to-print";
+import { OrderPrintTemplate } from "../../../organisms/orderPrintTemplates/OrderPrintTemplates";
 
 const CreateOrder = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +42,12 @@ const CreateOrder = () => {
   const customerIdNum = Number(searchParams.get("customerId"));
   const validPreselectedCustomer =
     Number.isFinite(customerIdNum) && customerIdNum > 0;
+
+  const [lastCreatedOrder, setLastCreatedOrder] = useState<any>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+  });
 
   // --- React Hook Form Setup ---
   const {
@@ -176,6 +184,12 @@ const CreateOrder = () => {
       };
       const response = await createMut.mutateAsync(payload);
       console.log("Order Created!", response);
+      setLastCreatedOrder(response);
+
+      // We need to wait for the hidden component to render with the new data
+      setTimeout(() => {
+        handlePrint();
+      }, 500);
     } catch (error) {
       console.error("Failed to create order", error);
     }
@@ -288,9 +302,17 @@ const CreateOrder = () => {
             <div className="b-createOrder__sectionLabel">
               Забелешка за Нарачката
             </div>
-            <ATextarea
-              {...register("orderNote")}
-              placeholder="напишете забелжка поврзена со нарачката"
+            <Controller
+              name="orderNote"
+              control={control}
+              render={({ field: { onChange, value, name } }) => (
+                <ATextarea
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="напишете забелжка поврзена со нарачката"
+                />
+              )}
             />
           </div>
 
@@ -372,6 +394,9 @@ const CreateOrder = () => {
           watchedScheduledDate + "T00:00:00",
         ).toLocaleDateString("mk-MK")}
       />
+      <div>
+        <OrderPrintTemplate ref={printRef} order={lastCreatedOrder} />
+      </div>
     </form>
   );
 };

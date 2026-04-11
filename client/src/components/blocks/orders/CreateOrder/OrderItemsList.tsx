@@ -86,12 +86,23 @@ const OrderItemsList = ({
                 </div>
 
                 {/* 3. Piece Note */}
-                <Input
-                  type="text"
-                  label={index === 0 ? "Забелешка" : undefined}
-                  placeholder="опционално..."
-                  {...register(`items.${index}.pieceNote` as const)}
-                />
+                <div className="uk-width-expand">
+                  <Controller
+                    control={control}
+                    name={`items.${index}.pieceNote` as const}
+                    render={({ field: { onChange, onBlur, value, name } }) => (
+                      <Input
+                        type="text"
+                        label={index === 0 ? "Забелешка" : undefined}
+                        placeholder="опционално..."
+                        name={name}
+                        value={value || ""}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </div>
 
                 <Button
                   label="deleteIcon"

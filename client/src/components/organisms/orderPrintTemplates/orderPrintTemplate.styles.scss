@@ -1,0 +1,286 @@
+.print-wrapper {
+  display: none;
+}
+
+@media print {
+  body > * {
+    display: none !important;
+  }
+
+  .print-wrapper {
+    display: block !important;
+  }
+
+  @page {
+    margin: 0;
+    size: 80mm auto;
+  }
+
+  // ─── Wrapper ───────────────────────────────────────────────────────────────
+
+  .print-wrapper {
+    width: 76mm;
+    padding: 2mm 3mm;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    color: #000;
+    background: #fff;
+  }
+
+  .page-break {
+    page-break-after: always;
+    display: block;
+    height: 0;
+    clear: both;
+  }
+
+  // ─── Header ────────────────────────────────────────────────────────────────
+
+  .t-header {
+    text-align: center;
+    margin-bottom: 3mm;
+  }
+
+  .t-header__company {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .t-header__tagline {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #555;
+    margin: 1mm 0 0;
+  }
+
+  // ─── Divider ───────────────────────────────────────────────────────────────
+
+  .t-divider {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #888;
+    margin: 2mm 0;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  // ─── QR ────────────────────────────────────────────────────────────────────
+
+  .t-qr {
+    text-align: center;
+    margin: 2mm 0;
+  }
+
+  .t-qr__code {
+    font-size: 8px;
+    margin: 1.5mm 0 0;
+    letter-spacing: 0.5px;
+    word-break: break-all;
+    color: #333;
+  }
+
+  // ─── Section ───────────────────────────────────────────────────────────────
+
+  .t-section {
+    margin: 1.5mm 0;
+  }
+
+  .t-section__title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #333;
+    margin: 0 0 1.5mm;
+    text-align: center;
+  }
+
+  // ─── Row ───────────────────────────────────────────────────────────────────
+
+  .t-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 3mm;
+    margin-bottom: 1mm;
+    line-height: 1.3;
+  }
+
+  .t-row__label {
+    font-size: 10px;
+    color: #666;
+    flex-shrink: 0;
+    min-width: 20mm;
+  }
+
+  .t-row__value {
+    font-size: 10px;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+  }
+
+  // ─── Table ─────────────────────────────────────────────────────────────────
+
+  .t-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    margin: 1mm 0;
+
+    thead tr {
+      border-bottom: 1px solid #000;
+    }
+
+    th {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 1mm 0 1.5mm;
+      text-align: left;
+      color: #333;
+    }
+
+    td {
+      padding: 1.5mm 0;
+      border-bottom: 1px dashed #ccc;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .t-table__th--num,
+  .t-table__td--num {
+    width: 10mm;
+    font-weight: 700;
+    color: #000;
+    white-space: nowrap;
+  }
+
+  .t-table__th--note,
+  .t-table__td--note {
+    text-align: right;
+    font-size: 9px;
+    color: #555;
+    font-style: italic;
+    max-width: 22mm;
+    word-break: break-word;
+  }
+
+  // ─── Total ─────────────────────────────────────────────────────────────────
+
+  .t-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 2mm 0;
+    letter-spacing: 0.5px;
+  }
+
+  // ─── Note ──────────────────────────────────────────────────────────────────
+
+  .t-note {
+    margin: 1mm 0;
+  }
+
+  .t-note__text {
+    font-size: 10px;
+    font-style: italic;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  // ─── Footer ────────────────────────────────────────────────────────────────
+
+  .t-footer {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #888;
+    margin: 2mm 0;
+  }
+
+  // ─── Label ─────────────────────────────────────────────────────────────────
+
+  .t-label {
+    padding: 2mm 0;
+    min-height: 36mm;
+  }
+
+  .t-label__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #000;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2mm;
+  }
+
+  .t-label__company {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  .t-label__counter {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .t-label__body {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+
+  .t-label__qr {
+    flex-shrink: 0;
+  }
+
+  .t-label__info {
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .t-label__customer {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 0.5mm;
+  }
+
+  .t-label__phone {
+    font-size: 10px;
+    color: #444;
+    margin: 0 0 1mm;
+  }
+
+  .t-label__product {
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0 0 0.5mm;
+  }
+
+  .t-label__code {
+    font-size: 8px;
+    color: #666;
+    margin: 0;
+    word-break: break-all;
+  }
+
+  .t-label__note {
+    font-size: 9px;
+    font-style: italic;
+    color: #333;
+    margin: 1mm 0 0;
+    font-weight: 600;
+  }
+}
