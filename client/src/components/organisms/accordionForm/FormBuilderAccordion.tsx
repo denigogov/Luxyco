@@ -21,6 +21,8 @@ type Props<T extends FieldValues> = {
 
   /** if true: you can only move away from current group when it's valid */
   gated?: boolean;
+  // when i use modal inside of nestedForm example in order create new customer or new address
+  noFormTag?: boolean;
 };
 
 function pickInitialOpenId<T extends FieldValues>(groups: FormGroup<T>[]) {
@@ -34,6 +36,7 @@ export function FormBuilderAccordion<T extends FieldValues>({
   cancelButton,
   className,
   gated = true,
+  noFormTag,
 }: Props<T>) {
   const [openGroupId, setOpenGroupId] = useState<string>(() =>
     pickInitialOpenId(groups),
@@ -115,10 +118,12 @@ export function FormBuilderAccordion<T extends FieldValues>({
     setOpenGroupId(pickInitialOpenId(groups));
   });
 
+  const Wrapper = noFormTag ? "div" : "form";
+
   return (
     <div className={`m-accordion ${className ?? ""}`}>
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit}>
+        <Wrapper {...(!noFormTag && { onSubmit: handleSubmit })}>
           <ul
             className="m-accordion__list"
             uk-accordion="collapsible: true; multiple: false"
@@ -193,10 +198,11 @@ export function FormBuilderAccordion<T extends FieldValues>({
             <Button
               {...submitButton}
               disabled={!isDirty || isSubmitting || submitButton.disabled}
-              type="submit"
+              type={noFormTag ? "button" : "submit"}
+              onClick={noFormTag ? handleSubmit : undefined}
             />
           </div>
-        </form>
+        </Wrapper>
       </FormProvider>
     </div>
   );

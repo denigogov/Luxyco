@@ -11,8 +11,15 @@ import { customerAddressAdd } from "./customerAddressAdd.data";
 import Breadcrumbs from "../../../../../whitelabel/src/molecules/Breadcrumbs/M-Breadcrumbs";
 import "./_newCustomerAddress.scss";
 import { phoneNumberFormat } from "../../../../../utils/helpers/phoneNumberFormat";
+interface NewCustomerAddressProps {
+  customerId?: number;
+  noFormTag?: boolean;
+}
 
-const NewCustomerAddress: React.FC = () => {
+const NewCustomerAddress: React.FC<NewCustomerAddressProps> = ({
+  customerId: customerIdProp,
+  noFormTag = false,
+}) => {
   const location = useLocation();
   const customerFromState = location.state as CustomerDetailsTypes | undefined;
   const customerName = [
@@ -22,8 +29,9 @@ const NewCustomerAddress: React.FC = () => {
     .filter(Boolean)
     .join(" ");
 
-  const { customerId } = useParams();
-  const customerIdNum = Number(customerId);
+  const { customerId: customerIdParam } = useParams();
+
+  const customerIdNum = customerIdProp ?? Number(customerIdParam);
   const validId = Number.isFinite(customerIdNum) && customerIdNum > 0;
 
   const createMut = useCreateCustomerAddress(customerIdNum);
@@ -70,6 +78,7 @@ const NewCustomerAddress: React.FC = () => {
           <FormBuilder<CustomerAddressTypes>
             fields={fields}
             onSubmit={onSubmit}
+            noFormTag={noFormTag}
             submitButton={{
               ...customerAddressAdd.submitButton,
               label:

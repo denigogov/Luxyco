@@ -20,8 +20,11 @@ import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import ATextarea from "../../../../whitelabel/src/atoms/formComponents/textarea/A-textarea";
 import OrderItemsList from "./OrderItemsList";
 import {
+  buildOrderPayload,
   calculateTotalPieces,
   calculateTotalPrice,
+  createOrderDefaultValues,
+  customerContentMapper,
   getCustomerDefaultAddress,
 } from "./createOrder.helpers";
 import { createOrderData } from "./CreateOrder.data";
@@ -29,25 +32,37 @@ import "./createOrder.styles.scss";
 import type { CreateOrderQueryType } from "./createOrder.types";
 import { useReactToPrint } from "react-to-print";
 import { OrderPrintTemplate } from "../../../organisms/orderPrintTemplates/OrderPrintTemplates";
+import { brandConfig } from "../../../../utils/brands";
+import { notificationAlert } from "../../../../utils/hooks/notify";
 
 const CreateOrder = () => {
+  const BRAND_PRINT_MODE = brandConfig.printMode;
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
-
   const isManuallyCleared = useRef(false);
   const customerIdNum = Number(searchParams.get("customerId"));
   const validPreselectedCustomer =
     Number.isFinite(customerIdNum) && customerIdNum > 0;
-
   const [lastCreatedOrder, setLastCreatedOrder] = useState<any>(null);
+
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: printRef,
   });
+
+  const brandPrintMode = String(brandConfig.printMode ?? "remote")
+    .trim()
+    .toLowerCase();
+  const isManualPrintMode = ["manual", "manuel", "local"].includes(
+    brandPrintMode,
+  );
+  const isPrintPreviewMode =
+    isManualPrintMode && searchParams.get("printPreview") === "1";
 
   // --- React Hook Form Setup ---
   const {
@@ -56,17 +71,15 @@ const CreateOrder = () => {
     watch,
     setValue,
     register,
+    reset,
     formState: { errors },
   } = useForm<CreateOrderQueryType>({
-    defaultValues: {
-      customerId: customerIdNum || null,
-      deliveryAddressId: null,
-      deliveryTypeId: "",
-      serviceTypeId: "",
-      scheduledDate: new Date().toISOString().split("T")[0],
-      orderNote: "",
-      items: [{ productTypeId: "", quantity: 1, pieceNote: "" }],
-    },
+    defaultValues: createOrderDefaultValues,
+
+    shouldFocusError: true,
+    criteriaMode: "all",
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   const watchedItems = watch("items");
@@ -101,6 +114,21 @@ const CreateOrder = () => {
   const { data: referencesData, isLoading: referencesLoading } =
     useOrderReferencesList();
   const createMut = useCreateOrder();
+
+  // separate query when new customer address is added the list to be updated !
+  const { data: selectedCustomerFreshData } = useCustomersOrderList(
+    selectedCustomer ? { id: String(selectedCustomer.id), limit: 1 } : {},
+    !!selectedCustomer,
+  );
+  useEffect(() => {
+    if (
+      selectedCustomer &&
+      selectedCustomerFreshData?.data?.length &&
+      selectedCustomerFreshData.data[0].id === selectedCustomer.id
+    ) {
+      setSelectedCustomer(selectedCustomerFreshData.data[0]);
+    }
+  }, [selectedCustomerFreshData]);
 
   const deliveryTypesData = referencesData?.deliveryTypes ?? [];
   const serviceTypesData = referencesData?.serviceTypes ?? [];
@@ -170,28 +198,48 @@ const CreateOrder = () => {
 
   const onSubmit = async (formData: any) => {
     try {
-      const payload = {
-        ...formData,
-        deliveryTypeId: formData.deliveryTypeId
-          ? Number(formData.deliveryTypeId)
-          : null,
-        serviceTypeId: formData.serviceTypeId
-          ? Number(formData.serviceTypeId)
-          : null,
-
-        customerId: Number(formData.customerId),
-        deliveryAddressId: Number(formData.deliveryAddressId),
-      };
-      const response = await createMut.mutateAsync(payload);
-      console.log("Order Created!", response);
+      const payload = buildOrderPayload(formData);
+      const response = (await createMut.mutateAsync(payload)) as any;
       setLastCreatedOrder(response);
 
-      // We need to wait for the hidden component to render with the new data
-      setTimeout(() => {
-        handlePrint();
-      }, 500);
-    } catch (error) {
-      console.error("Failed to create order", error);
+      if (BRAND_PRINT_MODE === "manual") {
+        setTimeout(() => {
+          handlePrint();
+
+          setTimeout(() => {
+            reset({
+              ...createOrderDefaultValues,
+            });
+            setSelectedCustomer(null);
+            setSearchInput("");
+            setSearchParams(new URLSearchParams());
+            isManuallyCleared.current = false;
+          }, 800);
+        }, 500);
+      } else {
+        reset({
+          ...createOrderDefaultValues,
+        });
+        setSelectedCustomer(null);
+        setSearchInput("");
+        setSearchParams(new URLSearchParams());
+        isManuallyCleared.current = false;
+      }
+
+      notificationAlert.success({
+        title: "Нарачката е креирана",
+        text: `Нарачка за ${response?.customers?.firstName ?? ""} ${response?.customers?.lastName ?? ""} е успешно внесена во системот.`,
+      });
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ??
+        error?.message ??
+        "Се случи грешка. Обидете се повторно.";
+
+      notificationAlert.error({
+        title: "Грешка при креирање",
+        text: message,
+      });
     }
   };
 
@@ -214,14 +262,10 @@ const CreateOrder = () => {
               (customersData?.data ?? []).length === 0
             }
             notFoundMessage="Корисникот не е пронајден"
-            contentMapper={(customer) => ({
-              title: `${customer.firstName} ${customer.lastName}`,
-              subtitle: customer.phoneNumber,
-              footer: customer.customerAddresses[0]?.formattedAddress,
-            })}
+            contentMapper={customerContentMapper}
             notFoundActionModal={{
               ...createOrderData.createCustomerModal,
-              children: <AddCustomer />,
+              children: <AddCustomer noFormTag={true} />,
             }}
           />
         ) : (
@@ -232,7 +276,12 @@ const CreateOrder = () => {
             onRemoveCustomer={() => handleSearchChange("")}
             createCustomer={{
               ...createOrderData.createCustomerAddressModal,
-              children: <NewCustomerAddress />,
+              children: (
+                <NewCustomerAddress
+                  customerId={selectedCustomer?.id}
+                  noFormTag={true}
+                />
+              ),
             }}
           />
         )}
@@ -394,9 +443,11 @@ const CreateOrder = () => {
           watchedScheduledDate + "T00:00:00",
         ).toLocaleDateString("mk-MK")}
       />
-      <div>
-        <OrderPrintTemplate ref={printRef} order={lastCreatedOrder} />
-      </div>
+      {BRAND_PRINT_MODE === "manual" && (
+        <div>
+          <OrderPrintTemplate ref={printRef} order={lastCreatedOrder} />
+        </div>
+      )}
     </form>
   );
 };

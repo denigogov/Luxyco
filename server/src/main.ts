@@ -5,10 +5,11 @@ import { AppValidationPipe } from './common/pipes/app-validation.pipe';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.useWebSocketAdapter(new WsAdapter(app));
   app.setGlobalPrefix('api'); // global prefix
 
   app.useGlobalPipes(new AppValidationPipe()); // global validation

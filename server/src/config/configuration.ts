@@ -19,4 +19,7 @@ export default () => ({
   redis: {
     url: process.env.REDIS_URL || 'redis://localhost:6379',
   },
+  printing: {
+    mode: process.env.PRINT_MODE || 'manual',
+  },
 });

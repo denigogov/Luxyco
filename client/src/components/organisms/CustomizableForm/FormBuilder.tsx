@@ -11,6 +11,7 @@ type FormBuilderProps<T extends FieldValues> = {
   submitButton: ButtonTypes;
   cancelButton?: ButtonTypes;
   className?: string;
+  noFormTag?: boolean;
 };
 
 export function FormBuilder<T extends FieldValues>({
@@ -19,6 +20,7 @@ export function FormBuilder<T extends FieldValues>({
   submitButton,
   cancelButton,
   className,
+  noFormTag,
 }: FormBuilderProps<T>) {
   const defaultValues = useMemo(() => {
     const dv: any = {};
@@ -38,6 +40,8 @@ export function FormBuilder<T extends FieldValues>({
     formState: { isDirty, isSubmitting },
   } = methods;
 
+  const Wrapper = noFormTag ? "div" : "form";
+
   const handleSubmit = methods.handleSubmit(async (values) => {
     await onSubmit(values);
     methods.reset();
@@ -45,10 +49,10 @@ export function FormBuilder<T extends FieldValues>({
 
   return (
     <FormProvider {...methods}>
-      <form
+      <Wrapper
         className={`uk-grid-small ${className ?? ""}`}
         data-uk-grid
-        onSubmit={handleSubmit}
+        {...(!noFormTag && { onSubmit: handleSubmit })}
       >
         {fields.map((f) => (
           <div
@@ -82,12 +86,13 @@ export function FormBuilder<T extends FieldValues>({
             <Button
               {...submitButton}
               disabled={!isDirty || isSubmitting || submitButton.disabled}
-              type="submit"
+              type={noFormTag ? "button" : "submit"}
+              onClick={noFormTag ? handleSubmit : undefined}
               className="uk-width-1-1 uk-width-auto@m"
             />
           </div>
         </div>
-      </form>
+      </Wrapper>
     </FormProvider>
   );
 }

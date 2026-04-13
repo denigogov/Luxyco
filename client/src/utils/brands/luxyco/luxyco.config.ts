@@ -15,6 +15,7 @@ export const BRAND_LUXYCO = {
     logoFull_dark: brandLogoDark_slogan,
     logoFull_light: brandLogoLight_slogan,
   },
+  printMode: "manual", // manual /remote
 
   routes: {
     ...BRAND_LUXYCO_ROUTE_CONFIG,

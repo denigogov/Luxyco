@@ -15,6 +15,7 @@ import { RedisModule } from './infrastructure/cache/redis.module';
 import { StatusModule } from './modules/status/status.module';
 import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module';
 import { ServiceTypeModule } from './modules/service-type/service-type.module';
+import { PrintModule } from './infrastructure/printing/print.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ServiceTypeModule } from './modules/service-type/service-type.module';
     StatusModule,
     DeliveryTypeModule,
     ServiceTypeModule,
+    PrintModule,
   ],
   controllers: [AppController],
   providers: [

@@ -7,7 +7,11 @@ import M_Heading from "../../../../whitelabel/src/molecules/heading/m-heading";
 import InactiveCustomerNotice from "../../../../whitelabel/src/molecules/InactiveCustomerNotice/InactiveCustomerNotice";
 import { useAddCustomerPage } from "../../../../utils/hooks/useAddCustomerPage";
 
-const AddCustomer: React.FC = () => {
+interface AddCustomerProps {
+  noFormTag?: boolean;
+}
+
+const AddCustomer: React.FC<AddCustomerProps> = ({ noFormTag }) => {
   const {
     createMut,
     inactiveConflict,
@@ -24,6 +28,7 @@ const AddCustomer: React.FC = () => {
         <FormBuilderAccordion<CreateCustomerFullForm>
           groups={b_addCustomerData}
           gated={true}
+          noFormTag={noFormTag}
           onSubmit={onSubmit}
           submitButton={{
             label: createMut.isPending ? "Се Креира..." : "Креирај",

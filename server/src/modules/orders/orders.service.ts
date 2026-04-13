@@ -16,6 +16,7 @@ import {
   buildOrdersListCacheKey,
 } from 'src/infrastructure/cache/cache-keys';
 import { OrdersCreateService } from './order.create.service';
+import { PrintEventsService } from 'src/infrastructure/printing/print-events.service';
 
 @Injectable()
 export class OrdersService {
@@ -23,6 +24,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly ordersCreateService: OrdersCreateService,
+    private readonly printEvents: PrintEventsService,
   ) {}
 
   async create(dto: CreateOrderDto, userId: number) {
@@ -38,7 +40,7 @@ export class OrdersService {
         buildCustomerDetailCacheKey({ id: dto.customerId, isActive: false }),
       ]),
     ]);
-
+    this.printEvents.emitOrderCreated(order);
     return order;
   }
 

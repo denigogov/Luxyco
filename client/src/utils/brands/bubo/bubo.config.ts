@@ -23,6 +23,7 @@ export const BRAND_BUBO = {
     logoFull_dark: brandLogoDark_slogan,
     logoFull_light: brandLogoLight_slogan,
   },
+  printMode: "manual", // manual /remote
 
   routes: {
     includeGroups: ["/", "dashboard", "orders", "settings", "customers"],

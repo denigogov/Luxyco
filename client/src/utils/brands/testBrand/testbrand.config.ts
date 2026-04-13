@@ -13,6 +13,7 @@ export const BRAND_BRANDB = {
     logoFull_dark: brandLogoDark_slogan,
     logoFull_light: brandLogoLight_slogan,
   },
+  printMode: "remote", // manual /remote
   routes: {
     includeGroups: ["settings", "dashboard", "order"],
     includePaths: {
