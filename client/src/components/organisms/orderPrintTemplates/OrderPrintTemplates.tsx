@@ -1,59 +1,10 @@
 import { forwardRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import "./orderPrintTemplate.styles.scss";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface OrderPiece {
-  id: number;
-  pieceIndex: number;
-  labelCode: string;
-  width: number | null;
-  height: number | null;
-  price: number;
-  pieceNote: string | null;
-  productTypes: {
-    id: number;
-    name: string;
-    basePrice: number;
-  };
-}
-
-interface OrderData {
-  id: number;
-  qrCode: string;
-  scheduledDate: string;
-  createdAt?: string;
-  totalPieces: number;
-  totalPrice: number;
-  orderNote: string | null;
-  customers: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-  };
-  customerAddresses: {
-    formattedAddress: string;
-  } | null;
-  deliveryType: {
-    id: number;
-    typeName: string;
-    price: number;
-  };
-  serviceType: {
-    id: number;
-    serviceName?: string;
-  };
-  status: {
-    id: number;
-    statusName: string;
-  };
-  orderPieces: OrderPiece[];
-}
+import type { OrderPostResponse } from "../../../features/orders/orders.types";
 
 interface PrintProps {
-  order: OrderData | null;
+  order: OrderPostResponse | null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

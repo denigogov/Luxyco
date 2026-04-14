@@ -1,5 +1,6 @@
 import type { CreateOrderQueryType } from "../../components/blocks/orders/CreateOrder/createOrder.types";
 import type {
+  OrderPostResponse,
   OrderReferences,
   OrdersListParams,
   OrdersListResponse,
@@ -52,5 +53,5 @@ export function getOrderReferencesList(
 }
 
 export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
-  return apiPost("/orders", body, signal);
+  return apiPost<OrderPostResponse>("/orders", body, signal);
 }

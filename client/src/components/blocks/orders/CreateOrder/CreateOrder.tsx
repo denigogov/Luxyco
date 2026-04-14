@@ -34,6 +34,8 @@ import { useReactToPrint } from "react-to-print";
 import { OrderPrintTemplate } from "../../../organisms/orderPrintTemplates/OrderPrintTemplates";
 import { brandConfig } from "../../../../utils/brands";
 import { notificationAlert } from "../../../../utils/hooks/notify";
+import OrderItemsPrintTemplate from "../../../organisms/orderPrintTemplates/orderItemsPrint/OrderItemsPrintTemplate";
+import type { OrderPostResponse } from "../../../../features/orders/orders.types";
 
 const CreateOrder = () => {
   const BRAND_PRINT_MODE = brandConfig.printMode;
@@ -54,15 +56,6 @@ const CreateOrder = () => {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
   });
-
-  const brandPrintMode = String(brandConfig.printMode ?? "remote")
-    .trim()
-    .toLowerCase();
-  const isManualPrintMode = ["manual", "manuel", "local"].includes(
-    brandPrintMode,
-  );
-  const isPrintPreviewMode =
-    isManualPrintMode && searchParams.get("printPreview") === "1";
 
   // --- React Hook Form Setup ---
   const {
@@ -199,7 +192,9 @@ const CreateOrder = () => {
   const onSubmit = async (formData: any) => {
     try {
       const payload = buildOrderPayload(formData);
-      const response = (await createMut.mutateAsync(payload)) as any;
+      const response = (await createMut.mutateAsync(
+        payload,
+      )) as OrderPostResponse;
       setLastCreatedOrder(response);
 
       if (BRAND_PRINT_MODE === "manual") {
@@ -448,6 +443,8 @@ const CreateOrder = () => {
           <OrderPrintTemplate ref={printRef} order={lastCreatedOrder} />
         </div>
       )}
+
+      <OrderItemsPrintTemplate />
     </form>
   );
 };

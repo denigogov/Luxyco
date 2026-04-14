@@ -108,3 +108,33 @@ export interface OrderReferences {
   serviceTypes: ServiceType[];
   productTypes: ProductType[];
 }
+
+interface OrderPiece {
+  id: number;
+  pieceIndex: number;
+  labelCode: string;
+  width: number | null;
+  height: number | null;
+  price: number;
+  pieceNote: string | null;
+  productTypes: Pick<ProductType, "id" | "name" | "basePrice">;
+}
+export interface OrderPostResponse {
+  id: number;
+  qrCode: string;
+  scheduledDate: string;
+  createdAt?: string;
+  totalPieces: number;
+  totalPrice: number;
+  orderNote: string | null;
+  customers: OrderCustomer & {
+    id: number;
+  };
+  customerAddresses: {
+    formattedAddress: string;
+  } | null;
+  deliveryType: DeliveryType;
+  serviceType: ServiceType;
+  status: OrderStatus;
+  orderPieces: OrderPiece[];
+}
