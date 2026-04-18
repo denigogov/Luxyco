@@ -1,6 +1,6 @@
 // CreateOrder.tsx
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useForm, Controller } from "react-hook-form";
 import SidebarSummary from "../../../../whitelabel/src/organisms/SidebarSummary/SidebarSummary";
 import { useCustomersOrderList } from "../../../../features/customers/customers.queries";
@@ -36,6 +36,7 @@ import { brandConfig } from "../../../../utils/brands";
 import { notificationAlert } from "../../../../utils/hooks/notify";
 import OrderItemsPrintTemplate from "../../../organisms/orderPrintTemplates/orderItemsPrint/OrderItemsPrintTemplate";
 import type { OrderPostResponse } from "../../../../features/orders/orders.types";
+import PrintActionGroup from "../../../../whitelabel/src/molecules/printActionGroup/PrintActionGroup";
 
 const CreateOrder = () => {
   const BRAND_PRINT_MODE = brandConfig.printMode;
@@ -57,6 +58,7 @@ const CreateOrder = () => {
     contentRef: printRef,
   });
 
+  const navigate = useNavigate();
   // --- React Hook Form Setup ---
   const {
     control,
@@ -238,214 +240,277 @@ const CreateOrder = () => {
     }
   };
 
+  const mainTicketRef = useRef<HTMLDivElement>(null);
+  const itemLabelsRef = useRef<HTMLDivElement>(null);
+
+  const handlePrintMainTicket = useReactToPrint({
+    contentRef: mainTicketRef,
+  });
+
+  const handlePrintItemLabels = useReactToPrint({
+    contentRef: itemLabelsRef,
+  });
+
+  const navigateToAllOrders = () => navigate(0);
+
   return (
-    <form className="b-createOrder" onSubmit={handleSubmit(onSubmit)}>
-      {/* 1. CUSTOMER SECTION */}
-      <div>
-        {!selectedCustomer ? (
-          <Autocomplete
-            searchInput={searchInput}
-            onSearchChange={handleSearchChange}
-            results={customersData?.data ?? []}
-            isSearching={isSearching}
-            showDropdown={showDropdown}
-            onShowDropdown={setShowDropdown}
-            onSelectItem={handleSelectCustomer}
-            showNotFound={
-              !isSearching &&
-              shouldSearch &&
-              (customersData?.data ?? []).length === 0
-            }
-            notFoundMessage="Корисникот не е пронајден"
-            contentMapper={customerContentMapper}
-            notFoundActionModal={{
-              ...createOrderData.createCustomerModal,
-              children: <AddCustomer noFormTag={true} />,
-            }}
-          />
-        ) : (
-          <CustomerSelectionPanel
-            customer={selectedCustomer}
-            selectedAddressId={watchedAddressId}
-            onAddressChange={(id) => setValue("deliveryAddressId", id)}
-            onRemoveCustomer={() => handleSearchChange("")}
-            createCustomer={{
-              ...createOrderData.createCustomerAddressModal,
-              children: (
-                <NewCustomerAddress
-                  customerId={selectedCustomer?.id}
-                  noFormTag={true}
+    <>
+      {" "}
+      {!lastCreatedOrder && (
+        <form className="b-createOrder" onSubmit={handleSubmit(onSubmit)}>
+          {/* 1. CUSTOMER SECTION */}
+
+          <>
+            <div>
+              {!selectedCustomer ? (
+                <Autocomplete
+                  searchInput={searchInput}
+                  onSearchChange={handleSearchChange}
+                  results={customersData?.data ?? []}
+                  isSearching={isSearching}
+                  showDropdown={showDropdown}
+                  onShowDropdown={setShowDropdown}
+                  onSelectItem={handleSelectCustomer}
+                  showNotFound={
+                    !isSearching &&
+                    shouldSearch &&
+                    (customersData?.data ?? []).length === 0
+                  }
+                  notFoundMessage="Корисникот не е пронајден"
+                  contentMapper={customerContentMapper}
+                  notFoundActionModal={{
+                    ...createOrderData.createCustomerModal,
+                    children: <AddCustomer noFormTag={true} />,
+                  }}
                 />
-              ),
-            }}
-          />
-        )}
-      </div>
-
-      {selectedCustomer && (
-        <>
-          {/* 2. ORDER DETAILS CARD */}
-          <div className="b-createOrder__card">
-            <div className="b-createOrder__sectionLabel">
-              Детали за Нарачката
-            </div>
-            {referencesLoading ? (
-              <p>Вчитување...</p>
-            ) : (
-              <div className="b-createOrder__optionsGrid">
-                <div>
-                  <Controller
-                    name="serviceTypeId"
-                    control={control}
-                    render={({ field }) => (
-                      <ASelect
-                        {...createOrderData.selectServiceTypeOpt}
-                        {...field}
-                        options={serviceTypesData.map((s) => ({
-                          label: s.serviceName,
-                          value: String(s.id),
-                        }))}
+              ) : (
+                <CustomerSelectionPanel
+                  customer={selectedCustomer}
+                  selectedAddressId={watchedAddressId}
+                  onAddressChange={(id) => setValue("deliveryAddressId", id)}
+                  onRemoveCustomer={() => handleSearchChange("")}
+                  createCustomer={{
+                    ...createOrderData.createCustomerAddressModal,
+                    children: (
+                      <NewCustomerAddress
+                        customerId={selectedCustomer?.id}
+                        noFormTag={true}
                       />
-                    )}
-                  />
-                  {errors.serviceTypeId && (
-                    <span className="uk-text-danger uk-text-small">
-                      {errors.serviceTypeId.message as string}
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <Controller
-                    name="deliveryTypeId"
-                    control={control}
-                    rules={{ required: "Изберете тип на достава" }}
-                    render={({ field }) => (
-                      <ASelect
-                        {...createOrderData.selecetDeliveryOpt}
-                        {...field}
-                        options={deliveryTypesData.map((d) => ({
-                          label: d.typeName,
-                          value: String(d.id),
-                        }))}
-                      />
-                    )}
-                  />
-                  {errors.deliveryTypeId && (
-                    <span className="uk-text-danger uk-text-small">
-                      {errors.deliveryTypeId.message as string}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 3. ORDER NOTE CARD */}
-          <div className="b-createOrder__card">
-            <div className="b-createOrder__sectionLabel">
-              Забелешка за Нарачката
-            </div>
-            <Controller
-              name="orderNote"
-              control={control}
-              render={({ field: { onChange, value, name } }) => (
-                <ATextarea
-                  name={name}
-                  value={value || ""}
-                  onChange={onChange}
-                  placeholder="напишете забелжка поврзена со нарачката"
+                    ),
+                  }}
                 />
               )}
-            />
-          </div>
+            </div>
 
-          {/* 4. ITEMS LIST CARD */}
-          <div className="b-createOrder__card">
-            <div className="b-createOrder__sectionLabel">Ставки</div>
-            <OrderItemsList
-              control={control}
-              register={register}
-              productTypesData={productTypesData}
-              errors={errors}
-            />
+            {selectedCustomer && (
+              <>
+                {/* 2. ORDER DETAILS CARD */}
+                <div className="b-createOrder__card">
+                  <div className="b-createOrder__sectionLabel">
+                    Детали за Нарачката
+                  </div>
+                  {referencesLoading ? (
+                    <p>Вчитување...</p>
+                  ) : (
+                    <div className="b-createOrder__optionsGrid">
+                      <div>
+                        <Controller
+                          name="serviceTypeId"
+                          control={control}
+                          render={({ field }) => (
+                            <ASelect
+                              {...createOrderData.selectServiceTypeOpt}
+                              {...field}
+                              options={serviceTypesData.map((s) => ({
+                                label: s.serviceName,
+                                value: String(s.id),
+                              }))}
+                            />
+                          )}
+                        />
+                        {errors.serviceTypeId && (
+                          <span className="uk-text-danger uk-text-small">
+                            {errors.serviceTypeId.message as string}
+                          </span>
+                        )}
+                      </div>
 
-            <div className="b-createOrder__scheduleDate">
-              <Controller
-                name="scheduledDate"
-                control={control}
-                rules={{ required: "Изберете датум" }}
-                render={({ field }) => (
-                  <>
-                    <ScheduledDatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                    {errors.scheduledDate && (
-                      <span className="uk-text-danger uk-text-small">
-                        {errors.scheduledDate.message as string}
-                      </span>
+                      <div>
+                        <Controller
+                          name="deliveryTypeId"
+                          control={control}
+                          rules={{ required: "Изберете тип на достава" }}
+                          render={({ field }) => (
+                            <ASelect
+                              {...createOrderData.selecetDeliveryOpt}
+                              {...field}
+                              options={deliveryTypesData.map((d) => ({
+                                label: d.typeName,
+                                value: String(d.id),
+                              }))}
+                            />
+                          )}
+                        />
+                        {errors.deliveryTypeId && (
+                          <span className="uk-text-danger uk-text-small">
+                            {errors.deliveryTypeId.message as string}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. ORDER NOTE CARD */}
+                <div className="b-createOrder__card">
+                  <div className="b-createOrder__sectionLabel">
+                    Забелешка за Нарачката
+                  </div>
+                  <Controller
+                    name="orderNote"
+                    control={control}
+                    render={({ field: { onChange, value, name } }) => (
+                      <ATextarea
+                        name={name}
+                        value={value || ""}
+                        onChange={onChange}
+                        placeholder="напишете забелжка поврзена со нарачката"
+                      />
                     )}
-                  </>
-                )}
-              />
-            </div>
+                  />
+                </div>
 
-            <div className="b-createOrder__summary">
-              <div className="b-createOrder__summary-row">
-                Вкупно парчиња: <strong>{totalPieces}</strong>
-              </div>
-              <div className="b-createOrder__summary-row is-total">
-                Вкупна цена: <strong>{totalPrice} ден</strong>{" "}
-                <sup style={{ color: "#1e87f0" }}>*</sup>
-              </div>
-            </div>
+                {/* 4. ITEMS LIST CARD */}
+                <div className="b-createOrder__card">
+                  <div className="b-createOrder__sectionLabel">Ставки</div>
+                  <OrderItemsList
+                    control={control}
+                    register={register}
+                    productTypesData={productTypesData}
+                    errors={errors}
+                  />
 
-            <Button style="secondary" label="креирај нарачка" type="submit" />
-          </div>
-        </>
+                  <div className="b-createOrder__scheduleDate">
+                    <Controller
+                      name="scheduledDate"
+                      control={control}
+                      rules={{ required: "Изберете датум" }}
+                      render={({ field }) => (
+                        <>
+                          <ScheduledDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          {errors.scheduledDate && (
+                            <span className="uk-text-danger uk-text-small">
+                              {errors.scheduledDate.message as string}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    />
+                  </div>
+
+                  <div className="b-createOrder__summary">
+                    <div className="b-createOrder__summary-row">
+                      Вкупно парчиња: <strong>{totalPieces}</strong>
+                    </div>
+                    <div className="b-createOrder__summary-row is-total">
+                      Вкупна цена: <strong>{totalPrice} ден</strong>{" "}
+                      <sup style={{ color: "#1e87f0" }}>*</sup>
+                    </div>
+                  </div>
+
+                  <Button
+                    style="secondary"
+                    label="креирај нарачка"
+                    type="submit"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* 5. SIDEBAR SUMMARY */}
+            <SidebarSummary
+              totalPrice={totalPrice}
+              customerName={
+                selectedCustomer
+                  ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}`
+                  : undefined
+              }
+              serviceType={
+                serviceTypesData.find(
+                  (s) => String(s.id) === watchedServiceTypeId,
+                )?.serviceName
+              }
+              deliveryTypeName={
+                deliveryTypesData.find(
+                  (d) => String(d.id) === watchedDeliveryTypeId,
+                )?.typeName
+              }
+              deliveryAddress={
+                selectedCustomer?.customerAddresses.find(
+                  (a) => a.id === watchedAddressId,
+                )?.formattedAddress
+              }
+              customerPhone={selectedCustomer?.phoneNumber}
+              pieces={watchedItems.map((item) => ({
+                productTypeName:
+                  productTypesData.find(
+                    (p) => String(p.id) === item.productTypeId,
+                  )?.name ?? "",
+                quantity: Number(item.quantity) || 0,
+              }))}
+              scheduledDate={new Date(
+                watchedScheduledDate + "T00:00:00",
+              ).toLocaleDateString("mk-MK")}
+            />
+          </>
+
+          {/* Hidden print templates */}
+        </form>
       )}
+      {lastCreatedOrder && BRAND_PRINT_MODE === "manual" && (
+        <div className="b-createOrder__printButtons">
+          {createOrderData.printActionGroup && (
+            <PrintActionGroup
+              {...createOrderData.printActionGroup}
+              closeButton={{
+                ...createOrderData.printActionGroup.closeButton!,
+                onClick: () => navigateToAllOrders(),
+              }}
+              buttons={createOrderData.printActionGroup?.buttons?.map(
+                (btn) => ({
+                  ...btn,
 
-      {/* 5. SIDEBAR SUMMARY */}
-      <SidebarSummary
-        totalPrice={totalPrice}
-        customerName={
-          selectedCustomer
-            ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}`
-            : undefined
-        }
-        serviceType={
-          serviceTypesData.find((s) => String(s.id) === watchedServiceTypeId)
-            ?.serviceName
-        }
-        deliveryTypeName={
-          deliveryTypesData.find((d) => String(d.id) === watchedDeliveryTypeId)
-            ?.typeName
-        }
-        deliveryAddress={
-          selectedCustomer?.customerAddresses.find(
-            (a) => a.id === watchedAddressId,
-          )?.formattedAddress
-        }
-        customerPhone={selectedCustomer?.phoneNumber}
-        pieces={watchedItems.map((item) => ({
-          productTypeName:
-            productTypesData.find((p) => String(p.id) === item.productTypeId)
-              ?.name ?? "",
-          quantity: Number(item.quantity) || 0,
-        }))}
-        scheduledDate={new Date(
-          watchedScheduledDate + "T00:00:00",
-        ).toLocaleDateString("mk-MK")}
-      />
-      {BRAND_PRINT_MODE === "manual" && (
-        <div>
-          <OrderPrintTemplate ref={printRef} order={lastCreatedOrder} />
+                  onClick: () =>
+                    btn.role === "print"
+                      ? handlePrintMainTicket()
+                      : handlePrintItemLabels(),
+                }),
+              )}
+            />
+          )}
+
+          {BRAND_PRINT_MODE === "manual" && (
+            <>
+              <div style={{ display: "none" }}>
+                <OrderPrintTemplate
+                  ref={mainTicketRef}
+                  order={lastCreatedOrder}
+                />
+              </div>
+              <div style={{ display: "none" }}>
+                <OrderItemsPrintTemplate
+                  ref={itemLabelsRef}
+                  order={lastCreatedOrder}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
-
-      <OrderItemsPrintTemplate />
-    </form>
+    </>
   );
 };
 

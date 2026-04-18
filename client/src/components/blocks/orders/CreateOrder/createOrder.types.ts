@@ -1,4 +1,6 @@
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
+import type { HeadingTypes } from "../../../../whitelabel/src/molecules/heading/m-heading.types";
+import type { PrintActionGroupTypes } from "../../../../whitelabel/src/molecules/printActionGroup/printActionGroup.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 
 export interface CreateOrderTyeps {
@@ -6,6 +8,7 @@ export interface CreateOrderTyeps {
   createCustomerAddressModal: ModalTypes;
   selectServiceTypeOpt: SelectTypes;
   selecetDeliveryOpt: SelectTypes;
+  printActionGroup: PrintActionGroupTypes;
 }
 
 export type CreateOrderItemsType = {

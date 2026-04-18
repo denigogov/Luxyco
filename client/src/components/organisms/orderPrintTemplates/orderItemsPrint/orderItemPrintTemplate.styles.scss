@@ -1,0 +1,108 @@
+.print-wrapper {
+  display: none;
+}
+
+@media print {
+  body > * {
+    display: none !important;
+  }
+
+  .print-wrapper {
+    display: block !important;
+  }
+
+  @page {
+    margin: 0;
+    size: 80mm auto;
+  }
+
+  .print-wrapper {
+    width: 76mm;
+    padding: 2mm 3mm;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    color: #000;
+    background: #fff;
+  }
+
+  .page-break {
+    page-break-after: always;
+    display: block;
+    height: 0;
+    clear: both;
+  }
+
+  .t-label {
+    padding: 2mm 0;
+    min-height: 36mm;
+  }
+
+  .t-label__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #000;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2mm;
+  }
+
+  .t-label__company {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  .t-label__counter {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .t-label__body {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+
+  .t-label__qr {
+    flex-shrink: 0;
+  }
+
+  .t-label__info {
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .t-label__customer {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 0.5mm;
+  }
+
+  .t-label__phone {
+    font-size: 10px;
+    color: #444;
+    margin: 0 0 1mm;
+  }
+
+  .t-label__product {
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0 0 0.5mm;
+  }
+
+  .t-label__code {
+    font-size: 8px;
+    color: #666;
+    margin: 0;
+    word-break: break-all;
+  }
+
+  .t-label__note {
+    font-size: 9px;
+    font-style: italic;
+    color: #333;
+    margin: 1mm 0 0;
+    font-weight: 600;
+  }
+}

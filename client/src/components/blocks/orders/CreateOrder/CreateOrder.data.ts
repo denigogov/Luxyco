@@ -56,4 +56,43 @@ export const createOrderData: CreateOrderTyeps = {
       },
     ],
   },
+
+  printActionGroup: {
+    heading: {
+      headline: {
+        text: "Нарачката е успешна!",
+        size: "h2",
+        position: "center",
+      },
+      subline: {
+        text: "Одберете ги следните чекори за печатење",
+        position: "center",
+      },
+    },
+
+    closeButton: {
+      label: "Затвори и креирај нова нарачка",
+      type: "button",
+      role: "cancel",
+      style: "text",
+    },
+    buttons: [
+      {
+        label: "Печати Главен Тикет",
+        icon: {
+          name: "print",
+        },
+        type: "button",
+        role: "print",
+      },
+
+      {
+        label: "Печати Налепници",
+        type: "button",
+        icon: {
+          name: "tag",
+        },
+      },
+    ],
+  },
 };

@@ -2,12 +2,11 @@ import { forwardRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import "./orderPrintTemplate.styles.scss";
 import type { OrderPostResponse } from "../../../features/orders/orders.types";
+import { brandConfig } from "../../../utils/brands";
 
 interface PrintProps {
   order: OrderPostResponse | null;
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatDate = (isoDate: string): string =>
   new Date(isoDate).toLocaleDateString("mk-MK", {
@@ -27,29 +26,24 @@ const formatDateTime = (isoDate: string): string =>
 
 const Divider = () => <div className="t-divider">{"- ".repeat(21)}</div>;
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
   ({ order }, ref) => {
     if (!order) return null;
 
     const total = order.totalPieces;
+    const brandName = brandConfig.name;
+    const slogan = brandConfig.slogan;
 
     return (
       <div ref={ref} className="print-wrapper">
-        {/* ══════════════════════════════
-            MAIN TICKET
-        ══════════════════════════════ */}
         <section className="t-ticket">
-          {/* Header */}
           <div className="t-header">
-            <p className="t-header__company">L U X Y C O</p>
-            <p className="t-header__tagline">перачница на килими</p>
+            <p className="t-header__company">{brandName}</p>
+            <p className="t-header__tagline">{slogan}</p>
           </div>
 
           <Divider />
 
-          {/* QR */}
           <div className="t-qr">
             <QRCodeSVG
               value={order.qrCode}
@@ -62,7 +56,6 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
 
           <Divider />
 
-          {/* Order meta */}
           <div className="t-section">
             <div className="t-row">
               <span className="t-row__label">Статус</span>
@@ -86,7 +79,6 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
 
           <Divider />
 
-          {/* Customer */}
           <div className="t-section">
             <div className="t-row">
               <span className="t-row__label">Клиент</span>
@@ -104,12 +96,11 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
 
           <Divider />
 
-          {/* Delivery */}
           <div className="t-section">
             <div className="t-row">
               <span className="t-row__label">Услуга</span>
               <span className="t-row__value">
-                {order.serviceType?.serviceName ?? ""}
+                {order.serviceType?.serviceName ?? "—"}
               </span>
             </div>
             <div className="t-row">
@@ -130,7 +121,6 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
 
           <Divider />
 
-          {/* Pieces table — each piece as own row with counter + note */}
           <div className="t-section">
             <p className="t-section__title">С Т А В К И</p>
             <table className="t-table">
@@ -159,13 +149,11 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
 
           <Divider />
 
-          {/* Total */}
           <div className="t-total">
             <span>Вкупно парчиња</span>
             <strong>{total}</strong>
           </div>
 
-          {/* Order note */}
           {order.orderNote && (
             <>
               <Divider />
@@ -179,47 +167,7 @@ export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
           <Divider />
 
           <p className="t-footer">hvala · благодарам · thank you</p>
-
-          <div className="page-break" />
         </section>
-
-        {/* ══════════════════════════════
-            PIECE LABELS — one per piece
-        ══════════════════════════════ */}
-        {order.orderPieces.map((piece) => (
-          <section key={piece.id} className="t-label">
-            <div className="t-label__top">
-              <span className="t-label__company">LUXYCO</span>
-              <span className="t-label__counter">
-                {piece.pieceIndex}/{total}
-              </span>
-            </div>
-
-            <div className="t-label__body">
-              <div className="t-label__qr">
-                <QRCodeSVG
-                  value={piece.labelCode}
-                  size={70}
-                  level="M"
-                  style={{ display: "block" }}
-                />
-              </div>
-              <div className="t-label__info">
-                <p className="t-label__customer">
-                  {order.customers.firstName} {order.customers.lastName}
-                </p>
-                <p className="t-label__phone">{order.customers.phoneNumber}</p>
-                <p className="t-label__product">{piece.productTypes?.name}</p>
-                <p className="t-label__code">{piece.labelCode}</p>
-                {piece.pieceNote && (
-                  <p className="t-label__note">★ {piece.pieceNote}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="page-break" />
-          </section>
-        ))}
       </div>
     );
   },
