@@ -71,6 +71,10 @@ const tableData: TableTypes = {
     {
       header: "QR Код",
       key: "qrCode",
+      truncate: {
+        enabled: true,
+        length: 8,
+      },
     },
 
     {

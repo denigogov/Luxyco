@@ -17,6 +17,10 @@ const CustomerOrderTable: TableTypes = {
       header: "Бр. нарачка",
       key: "qrCode",
       enableSort: false,
+      truncate: {
+        enabled: true,
+        length: 12,
+      },
     },
 
     {

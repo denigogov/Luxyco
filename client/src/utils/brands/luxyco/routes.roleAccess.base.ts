@@ -17,10 +17,13 @@ const baseRouteAccess: BrandRouteAccess = {
   MANAGER: [
     "/",
     "/dashboard",
+
     "/orders",
     "/orders/new",
     "/orders/:id",
     "/orders/:id/edit",
+    "/orders/:id/details/:itemId",
+
     "/customers",
     "/customers/new",
     "/customers/:customerId",
@@ -28,6 +31,7 @@ const baseRouteAccess: BrandRouteAccess = {
     "/customers/:customerId/addresses/:addressId/edit",
     "/customers/:customerId/notes/add",
     "/customers/:customerId/notes/:noteId/edit",
+
     "/settings",
     "/settings/price",
   ],
@@ -37,6 +41,7 @@ const baseRouteAccess: BrandRouteAccess = {
     "/dashboard",
     "/orders",
     "/orders/:id",
+    "/orders/:id/details/:itemId",
     "/customers",
     "/customers/:customerId",
   ],
