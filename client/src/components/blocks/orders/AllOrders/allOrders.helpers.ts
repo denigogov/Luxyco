@@ -11,6 +11,7 @@ import type {
   RowMarker,
   RowTypes,
 } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { TableFilterTypes } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
 
 export function getOrderRowMarker(id?: number): RowMarker | undefined {
   switch (id) {
@@ -93,3 +94,92 @@ export function buildAllOrdersParams(
 ): OrdersListParams {
   return normalizeOrdersListParams(p);
 }
+
+export const buildOrdersFilterData = (params: {
+  deliveryTypes?: { id: number; typeName: string }[];
+}): TableFilterTypes => ({
+  title: "Детално Пребарување",
+  filters: [
+    {
+      keyName: "name",
+      label: "Име / Презиме",
+      name: "name",
+      type: "text",
+      placeholder: "ex: John",
+      icon: { name: "user", position: "right" },
+    },
+    { keyName: "city", label: "Град", name: "city", type: "text" },
+    { keyName: "street", label: "Улица", name: "street", type: "text" },
+    { keyName: "village", label: "Село", name: "village", type: "text" },
+    { keyName: "qrCode", label: "QR Код", name: "qrCode", type: "text" },
+    {
+      keyName: "phoneNumber",
+      label: "Телефонски Број",
+      name: "phoneNumber",
+      type: "tel",
+    },
+    {
+      keyName: "status",
+      label: "Статус",
+      name: "status",
+      type: "select",
+      placeholder: "одбери статус",
+      options: [
+        { label: "сите", value: "" },
+        {
+          label: "Мерење",
+          value: "2",
+        },
+        {
+          label: "Во обработка",
+          value: "1",
+        },
+        {
+          label: "Се чека за достава",
+          value: "3",
+        },
+        {
+          label: "Се доставуват",
+          value: "4",
+        },
+        {
+          label: "Завршени",
+          value: "5",
+        },
+        {
+          label: "Откажени",
+          value: "6",
+        },
+      ],
+    },
+    {
+      keyName: "deliveryType",
+      label: "Тип на Испорака",
+      name: "deliveryType",
+      type: "select",
+      placeholder: "тип",
+      options: [
+        { label: "сите", value: "" },
+        ...(params.deliveryTypes ?? []).map((d) => ({
+          label: d.typeName,
+          value: String(d.id),
+        })),
+      ],
+    },
+  ],
+  actionButton: [
+    {
+      label: "Барај",
+      style: "default",
+      type: "submit",
+      icon: { name: "search", position: "left" },
+    },
+    {
+      label: "Ресетирај",
+      style: "default",
+      role: "reset",
+      type: "reset",
+      icon: { name: "trash", position: "left" },
+    },
+  ],
+});

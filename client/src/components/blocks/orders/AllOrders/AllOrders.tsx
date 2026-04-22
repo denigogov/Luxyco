@@ -6,7 +6,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { useOrdersList } from "../../../../features/orders/orders.queries";
+import {
+  useOrderReferencesList,
+  useOrdersList,
+} from "../../../../features/orders/orders.queries";
 import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
@@ -19,6 +22,7 @@ import {
 } from "./AllOrders.data";
 import ErrorWrapper from "../../ErrorWrapper";
 import {
+  buildOrdersFilterData,
   mapOrderToRow,
   toOrdersSortBy,
   toOrdersSortDir,
@@ -81,6 +85,10 @@ const AllOrders: React.FC = () => {
     console.log("selected orders ID for builk delete", selectedOrders);
     closeDeleteOrderModal();
   };
+
+  const { data: referencesData, error: referencesError } =
+    useOrderReferencesList();
+
   const {
     setFilters,
     page,
@@ -234,8 +242,18 @@ const AllOrders: React.FC = () => {
 
   const rows = useMemo(() => tableListData.map(mapOrderToRow), [tableListData]);
 
+  const deliveryTypesData = referencesData?.deliveryTypes ?? [];
+
+  const filterData = useMemo(
+    () =>
+      buildOrdersFilterData({
+        deliveryTypes: deliveryTypesData,
+      }),
+    [referencesData],
+  );
+
   if (isLoading) return <h1>Loading</h1>;
-  if (error) return <ErrorWrapper />;
+  if (error || referencesError) return <ErrorWrapper />;
 
   // values that are selected and after refresh the inputs are still with value
   const filterValues = setFilterValues({
@@ -332,6 +350,7 @@ const AllOrders: React.FC = () => {
   };
 
   const tags = CreateOrderTags({
+    filterData,
     setFilters,
     setSearchInput,
     setResetLocalSort,
@@ -453,7 +472,7 @@ const AllOrders: React.FC = () => {
         ></button>
         <div className="uk-offcanvas-bar">
           <TableFilter
-            {...allOrdersData.filterData}
+            {...filterData}
             onSubmit={handleSubmit}
             actionButton={tableFilterActionButton}
             onReset={handleFilterReset}

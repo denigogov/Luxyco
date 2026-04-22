@@ -2,8 +2,8 @@ import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeT
 import type {
   FilterValues,
   SelectFilter,
+  TableFilterTypes,
 } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
-import { filterData } from "./AllOrders.data";
 
 type SetFilters = (patch: Record<string, unknown>) => void;
 
@@ -13,6 +13,7 @@ type DateRange = {
 };
 
 interface CreateOrderTagsArgs {
+  filterData: TableFilterTypes;
   setFilters: SetFilters;
   setSearchInput: (v: string) => void;
   setResetLocalSort: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,17 +41,22 @@ interface CreateOrderTagsArgs {
   scheduledFrom?: string;
 }
 
-// helper to get the labels instead of value for ActiveTags
-const getOptions = (keyName: string) =>
+const getOptions = (filterData: TableFilterTypes, keyName: string) =>
   (filterData.filters.find((f) => f.keyName === keyName) as SelectFilter)
     ?.options ?? [];
-export const getStatusLabel = (id?: string) =>
-  getOptions("status").find((o) => o.value === id)?.label ?? id;
 
-export const getDeliveryTypeLabel = (id?: string) =>
-  getOptions("deliveryType").find((o) => o.value === id)?.label ?? id;
+export const getStatusLabel = (filterData: TableFilterTypes, id?: string) =>
+  getOptions(filterData, "status").find((o) => o.value === id)?.label ?? id;
+
+export const getDeliveryTypeLabel = (
+  filterData: TableFilterTypes,
+  id?: string,
+) =>
+  getOptions(filterData, "deliveryType").find((o) => o.value === id)?.label ??
+  id;
 
 export const CreateOrderTags = ({
+  filterData,
   setFilters,
   setSearchInput,
   setResetLocalSort,
@@ -168,9 +174,8 @@ export const CreateOrderTags = ({
     status
       ? {
           key: "Статус",
-          value: getStatusLabel(status),
-          onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            e.preventDefault();
+          value: getStatusLabel(filterData, status),
+          onRemove: () => {
             setFilters({ status: undefined });
           },
         }
@@ -179,14 +184,12 @@ export const CreateOrderTags = ({
     deliveryType
       ? {
           key: "Тип на Испорака",
-          value: getDeliveryTypeLabel(deliveryType),
-          onRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            e.preventDefault();
+          value: getDeliveryTypeLabel(filterData, deliveryType),
+          onRemove: () => {
             setFilters({ deliveryType: undefined });
           },
         }
       : null,
-
     village
       ? {
           key: "Село",

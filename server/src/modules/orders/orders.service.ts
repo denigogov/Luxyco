@@ -63,7 +63,8 @@ export class OrdersService {
     // const cacheKey = buildOrderReferencesListCacheKey();
     // const cached = await this.redis.get<any>(cacheKey);
     // if (cached) return cached;
-    const [deliveryTypes, serviceTypes] = await Promise.all([
+
+    const [deliveryTypes, serviceTypes, priceModels] = await Promise.all([
       this.prisma.delivery_type.findMany({
         where: { is_active: true },
         select: { id: true, type_name: true, price: true },
@@ -74,38 +75,22 @@ export class OrdersService {
         select: { id: true, service_name: true },
         orderBy: { id: 'asc' },
       }),
-
       this.prisma.price_model.findMany({
         where: { is_active: true },
         select: {
-          name: true,
           id: true,
+          name: true,
           product_types: {
             where: { is_active: true },
             select: {
-              base_price: true,
+              id: true,
               name: true,
+              base_price: true,
             },
           },
         },
       }),
     ]);
-
-    const priceModels = await this.prisma.price_model.findMany({
-      where: { is_active: true },
-      select: {
-        id: true,
-        name: true,
-        product_types: {
-          where: { is_active: true },
-          select: {
-            id: true,
-            name: true,
-            base_price: true,
-          },
-        },
-      },
-    });
 
     const productTypes = priceModels.flatMap((pm) =>
       pm.product_types.map((pt) => ({
@@ -118,7 +103,8 @@ export class OrdersService {
     );
 
     const result = { deliveryTypes, serviceTypes, productTypes };
-    // await this.redis.set(cacheKey, result, 1);
+
+    // await this.redis.set(cacheKey, result, 300);
     return result;
   }
 
