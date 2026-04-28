@@ -17,6 +17,7 @@ import {
 } from 'src/infrastructure/cache/cache-keys';
 import { OrdersCreateService } from './order.create.service';
 import { PrintEventsService } from 'src/infrastructure/printing/print-events.service';
+import { OrdersDetailService } from './order.detail.service';
 
 @Injectable()
 export class OrdersService {
@@ -25,6 +26,7 @@ export class OrdersService {
     private readonly redis: RedisService,
     private readonly ordersCreateService: OrdersCreateService,
     private readonly printEvents: PrintEventsService,
+    private readonly OrdersDetailService: OrdersDetailService,
   ) {}
 
   async create(dto: CreateOrderDto, userId: number) {
@@ -108,8 +110,9 @@ export class OrdersService {
     return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number) {
+    const orderDetails = await this.OrdersDetailService.details(id);
+    return orderDetails;
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {

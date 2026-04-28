@@ -112,10 +112,18 @@ export class OrdersCreateService {
     }
   }
 
-  private async validateProductTypes(productTypeIds: number[]): Promise<void> {
+  private async getValidProductTypes(productTypeIds: number[]) {
     const productTypes = await this.prisma.product_types.findMany({
       where: { id: { in: productTypeIds }, is_active: true },
-      select: { id: true },
+      select: {
+        id: true,
+        base_price: true,
+        price_model: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (productTypes.length !== productTypeIds.length) {
@@ -123,6 +131,8 @@ export class OrdersCreateService {
         'One or more product types are missing or inactive',
       );
     }
+
+    return productTypes;
   }
 
   private async getPendingStatusId(): Promise<number> {
@@ -168,7 +178,9 @@ export class OrdersCreateService {
     const productTypeIds = [
       ...new Set(dto.items.map((item) => item.productTypeId)),
     ];
-    await this.validateProductTypes(productTypeIds);
+    const productTypes = await this.getValidProductTypes(productTypeIds);
+
+    const productTypeById = new Map(productTypes.map((p) => [p.id, p]));
 
     const pendingStatusId = await this.getPendingStatusId();
 
@@ -179,7 +191,23 @@ export class OrdersCreateService {
     let pieceIndex = 1;
     const piecesData: Prisma.order_piecesCreateManyInput[] = [];
 
+    let totalPrice = new Prisma.Decimal(0);
+
     for (const item of dto.items) {
+      const productType = productTypeById.get(item.productTypeId);
+
+      if (!productType) {
+        throw new BadRequestException(
+          `Invalid product type ${item.productTypeId}`,
+        );
+      }
+
+      const isPerPiece = productType.price_model.name === 'PER_PIECE';
+
+      const piecePrice = isPerPiece
+        ? new Prisma.Decimal(productType.base_price)
+        : new Prisma.Decimal(0);
+
       for (let i = 0; i < item.quantity; i++) {
         piecesData.push({
           order_id: 0,
@@ -188,9 +216,11 @@ export class OrdersCreateService {
           product_type_id: item.productTypeId,
           width: null,
           height: null,
-          price: new Prisma.Decimal(0),
+          price: piecePrice,
           piece_note: item.pieceNote?.trim() || null,
         });
+
+        totalPrice = totalPrice.plus(piecePrice);
         pieceIndex++;
       }
     }
@@ -208,7 +238,7 @@ export class OrdersCreateService {
           scheduled_date: new Date(dto.scheduledDate),
           total_pieces: totalPieces,
           measured_pieces: 0,
-          total_price: new Prisma.Decimal(0),
+          total_price: totalPrice,
           order_note: dto.orderNote?.trim() || null,
         },
       });
