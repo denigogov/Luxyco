@@ -1,4 +1,5 @@
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
+import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
 import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/buttonGroup/buttonGroup.types";
 import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
@@ -272,10 +273,42 @@ const printActionGroup: PrintActionGroupTypes = {
   ],
 };
 
+const orderStatusSelect: SelectTypes = {
+  name: "orderStatusId",
+  label: "Статус",
+  options: [
+    {
+      value: "1",
+      label: "Во Обработка",
+    },
+    {
+      value: "2",
+      label: "Се мери",
+    },
+    {
+      value: "3",
+      label: "Подготвено за достава",
+    },
+    {
+      value: "4",
+      label: "Се доставува",
+    },
+    {
+      value: "5",
+      label: "Завршено",
+    },
+    {
+      value: "6",
+      label: "Откажано",
+    },
+  ],
+};
+
 export const detailsOrderData: DetailsOrderTypes = {
   table,
   breadcrumps,
   confirmDeleteOrderDialog,
   buttonGroup,
   printActionGroup,
+  orderStatusSelect,
 };

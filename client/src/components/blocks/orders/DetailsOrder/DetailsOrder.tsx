@@ -7,7 +7,10 @@ import { useMemo, useRef, useState } from "react";
 import { buildOrderBreadcrumbsProps } from "./detailsOrder.helpers";
 import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
-import { useOrderDetail } from "../../../../features/orders/orders.queries";
+import {
+  useOrderDetail,
+  useOrderReferencesList,
+} from "../../../../features/orders/orders.queries";
 import ButtonGroup from "../../../../whitelabel/src/molecules/buttonGroup/ButtonGroup";
 import { OrderCard } from "../../../../whitelabel/src/organisms/orderCard/orderCard";
 import { QrScanner } from "../../../../whitelabel/src/molecules/qrScanner/QrScanner";
@@ -19,14 +22,23 @@ import PrintActionGroup from "../../../../whitelabel/src/molecules/printActionGr
 import { OrderPrintTemplate } from "../../../organisms/orderPrintTemplates/OrderPrintTemplates";
 import OrderItemsPrintTemplate from "../../../organisms/orderPrintTemplates/orderItemsPrint/OrderItemsPrintTemplate";
 import OrderCustomerBillPrintTemplate from "../../../organisms/orderPrintTemplates/orderCustomerBillPrintTemplate/OrderCustomerBillPrintTemplate";
+import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
+import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
-  const modalCloseRef = useRef<null | (() => void)>(null);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [selectedStatusId, setSelectedStatusId] = useState<string>("");
+
+  const modalCloseRef = useRef<null | (() => void)>(null);
+  const statusModalCloseRef = useRef<null | (() => void)>(null);
+  const mainTicketRef = useRef<HTMLDivElement>(null);
+  const itemLabelsRef = useRef<HTMLDivElement>(null);
+  const customerBillRef = useRef<HTMLDivElement>(null);
 
   const returnToPrevRoute = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -37,9 +49,6 @@ const DetailsOrder: React.FC = () => {
   const closeModal = () => {
     modalCloseRef.current?.();
   };
-  const mainTicketRef = useRef<HTMLDivElement>(null);
-  const itemLabelsRef = useRef<HTMLDivElement>(null);
-  const customerBillRef = useRef<HTMLDivElement>(null);
 
   const handlePrintMainTicket = useReactToPrint({
     contentRef: mainTicketRef,
@@ -112,7 +121,6 @@ const DetailsOrder: React.FC = () => {
   }, [id]);
 
   const { data, isLoading, error } = useOrderDetail(Number(id));
-
   const status = data?.status;
 
   const currentPrice = useMemo(() => {
@@ -210,6 +218,32 @@ const DetailsOrder: React.FC = () => {
     navigate(`/orders/scan/${encodeURIComponent(qrCode)}`);
   };
 
+  const handleUpdateOrderStatus = () => {
+    setSelectedStatusId(String(data?.status?.id ?? ""));
+    setIsStatusModalOpen(true);
+  };
+
+  const handleConfirmUpdateOrderStatus = async () => {
+    if (!data?.id || !selectedStatusId) return;
+
+    try {
+      console.log("update order status", {
+        orderId: data.id,
+        statusId: Number(selectedStatusId),
+      });
+
+      // await updateOrderStatusMut.mutateAsync({
+      //   orderId: data.id,
+      //   statusId: Number(selectedStatusId),
+      // });
+
+      statusModalCloseRef.current?.();
+      setIsStatusModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const createdDateFormatedString = `${timeFormat(data?.createdAt, { showTime: true })} / ${data?.users?.firstName}`;
 
   return (
@@ -250,6 +284,7 @@ const DetailsOrder: React.FC = () => {
           navigateToCustomer={() =>
             navigate(`/customers/${data?.customers?.id}`)
           }
+          updateOrderStatus={handleUpdateOrderStatus}
         />
       )}
       {data?.orderNote && (
@@ -311,6 +346,53 @@ const DetailsOrder: React.FC = () => {
             />
           </div>
         </>
+      )}
+
+      {isStatusModalOpen && (
+        <Modal
+          classes="detailsOrder__modal"
+          options={{
+            initialOpen: true,
+          }}
+          onClose={(close) => {
+            statusModalCloseRef.current = close;
+          }}
+          onAfterClose={() => {
+            setIsStatusModalOpen(false);
+          }}
+          actionButtons={[
+            {
+              label: "Откажи",
+              type: "button",
+              role: "cancel",
+              style: "default",
+              onClick: () => {
+                statusModalCloseRef.current?.();
+              },
+            },
+            {
+              label: "Промени статус",
+              type: "button",
+              role: "submit",
+              style: "tertiary",
+              disabled:
+                !selectedStatusId ||
+                selectedStatusId === String(data?.status?.id),
+              onClick: handleConfirmUpdateOrderStatus,
+            },
+          ]}
+        >
+          <div className="detailsOrder__statusModal">
+            <h3>Промени статус</h3>
+            <p>Изберете нов статус за оваа нарачка.</p>
+
+            <ASelect
+              {...detailsOrderData?.orderStatusSelect}
+              value={selectedStatusId}
+              onChange={(e) => setSelectedStatusId(e.target.value)}
+            />
+          </div>
+        </Modal>
       )}
       <Outlet />
     </div>

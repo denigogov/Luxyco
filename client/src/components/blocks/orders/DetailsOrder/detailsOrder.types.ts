@@ -1,3 +1,4 @@
+import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
 import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/buttonGroup/buttonGroup.types";
 import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
@@ -10,4 +11,5 @@ export interface DetailsOrderTypes {
   confirmDeleteOrderDialog: ConfirmDialogTypes;
   buttonGroup: ButtonGroupTypes;
   printActionGroup: PrintActionGroupTypes;
+  orderStatusSelect: SelectTypes;
 }

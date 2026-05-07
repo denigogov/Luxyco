@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { NavigateFunction } from "react-router";
 
 export function buildOrderBreadcrumbsProps(args: {
   base: any;
