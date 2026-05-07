@@ -47,12 +47,15 @@ export class OrdersCreateService {
 
   private async validateDeliveryType(
     deliveryTypeId: number | null | undefined,
-  ): Promise<number | null> {
+  ): Promise<{ id: number; price: Prisma.Decimal } | null> {
     if (!deliveryTypeId) return null;
 
     const deliveryType = await this.prisma.delivery_type.findFirst({
       where: { id: deliveryTypeId, is_active: true },
-      select: { id: true },
+      select: {
+        id: true,
+        price: true,
+      },
     });
 
     if (!deliveryType) {
@@ -61,7 +64,10 @@ export class OrdersCreateService {
       );
     }
 
-    return deliveryType.id;
+    return {
+      id: deliveryType.id,
+      price: new Prisma.Decimal(deliveryType.price ?? 0),
+    };
   }
 
   private async validateServiceType(
@@ -148,8 +154,6 @@ export class OrdersCreateService {
     return status.id;
   }
 
-  // ─── Main Create ─────────────────────────────────────────────────────────────
-
   async create(dto: CreateOrderDto, userId: number) {
     if (!dto.items?.length) {
       throw new BadRequestException('Order must contain at least one item');
@@ -157,7 +161,10 @@ export class OrdersCreateService {
 
     await this.validateCustomer(dto.customerId);
 
-    const deliveryTypeId = await this.validateDeliveryType(dto.deliveryTypeId);
+    const deliveryType = await this.validateDeliveryType(dto.deliveryTypeId);
+    const deliveryTypeId = deliveryType?.id ?? null;
+    const deliveryPrice = deliveryType?.price ?? new Prisma.Decimal(0);
+
     const serviceTypeId = await this.validateServiceType(dto.serviceTypeId);
 
     const isPickupByUs = serviceTypeId === 1;
@@ -179,7 +186,6 @@ export class OrdersCreateService {
       ...new Set(dto.items.map((item) => item.productTypeId)),
     ];
     const productTypes = await this.getValidProductTypes(productTypeIds);
-
     const productTypeById = new Map(productTypes.map((p) => [p.id, p]));
 
     const pendingStatusId = await this.getPendingStatusId();
@@ -189,9 +195,9 @@ export class OrdersCreateService {
     const qrCode = await this.generateUniqueQrCode();
 
     let pieceIndex = 1;
+    let piecesPrice = new Prisma.Decimal(0);
+    let measuredPieces = 0;
     const piecesData: Prisma.order_piecesCreateManyInput[] = [];
-
-    let totalPrice = new Prisma.Decimal(0);
 
     for (const item of dto.items) {
       const productType = productTypeById.get(item.productTypeId);
@@ -220,25 +226,31 @@ export class OrdersCreateService {
           piece_note: item.pieceNote?.trim() || null,
         });
 
-        totalPrice = totalPrice.plus(piecePrice);
+        if (isPerPiece) {
+          measuredPieces++;
+        }
+
+        piecesPrice = piecesPrice.plus(piecePrice);
         pieceIndex++;
       }
     }
+
+    const currentTotalPrice = piecesPrice.plus(deliveryPrice);
 
     return this.prisma.$transaction(async (tx) => {
       const order = await tx.orders.create({
         data: {
           qr_code: qrCode,
           customer_id: dto.customerId,
-          delivery_address_id: needsAddress ? dto.deliveryAddressId : null, // ✅ CHANGED
-          delivery_type_id: dto.deliveryTypeId,
-          service_type_id: dto.serviceTypeId,
-          order_status_id: pendingStatusId ? 1 : null,
+          delivery_address_id: needsAddress ? dto.deliveryAddressId : null,
+          delivery_type_id: deliveryTypeId,
+          service_type_id: serviceTypeId,
+          order_status_id: pendingStatusId,
           created_by_user_id: userId,
           scheduled_date: new Date(dto.scheduledDate),
           total_pieces: totalPieces,
-          measured_pieces: 0,
-          total_price: totalPrice,
+          measured_pieces: measuredPieces,
+          total_price: currentTotalPrice,
           order_note: dto.orderNote?.trim() || null,
         },
       });

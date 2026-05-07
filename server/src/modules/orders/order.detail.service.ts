@@ -19,8 +19,14 @@ export class OrdersDetailService {
         scheduled_date: true,
         created_at: true,
         updated_at: true,
+        users: {
+          select: {
+            first_name: true,
+          },
+        },
         customers: {
           select: {
+            id: true,
             first_name: true,
             last_name: true,
             phone_number: true,
@@ -36,6 +42,7 @@ export class OrdersDetailService {
         delivery_type: {
           select: {
             type_name: true,
+            price: true,
           },
         },
         status: {
@@ -60,6 +67,11 @@ export class OrdersDetailService {
             product_types: {
               select: {
                 name: true,
+                price_model: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
 
