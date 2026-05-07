@@ -11,6 +11,7 @@ const CustomerOrderTable: TableTypes = {
   striped: false,
   responsive: false,
   hover: false,
+  enableRowClick: true,
   type: "orders",
   columns: [
     {

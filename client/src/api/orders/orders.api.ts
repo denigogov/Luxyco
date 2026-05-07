@@ -55,3 +55,7 @@ export function getOrderReferencesList(
 export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
   return apiPost<OrderPostResponse>("/orders", body, signal);
 }
+
+export function getOrderById(id: number, signal?: AbortSignal) {
+  return apiGet<any>(`/orders/${id}`, signal);
+}

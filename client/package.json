@@ -14,6 +14,7 @@
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "@tanstack/react-query-persist-client": "^5.90.14",
+    "html5-qrcode": "^2.3.8",
     "idb-keyval": "^6.2.2",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.1",
@@ -32,6 +33,7 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@types/uikit": "^3.23.0",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react-swc": "^4.1.0",
     "add": "^2.0.6",
     "eslint": "^9.36.0",

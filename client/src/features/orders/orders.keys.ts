@@ -42,6 +42,8 @@ export const ordersKeys = {
   lists: () => [...ordersKeys.all, "list"] as const,
   list: (params: OrdersListParams) => [...ordersKeys.lists(), params] as const,
   references: () => [...ordersKeys.all, "references"],
+  details: () => [...ordersKeys.all, "detail"] as const,
+  detail: (id: number) => [...ordersKeys.details(), id] as const,
 
   mutations: {
     create: () => ["order", "create"] as const,

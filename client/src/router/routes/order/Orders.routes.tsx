@@ -3,9 +3,18 @@ import { allowedPaths } from "../../../utils/brands";
 import AllOrders from "../../../components/blocks/orders/AllOrders/AllOrders";
 import CreateOrder from "../../../components/blocks/orders/CreateOrder/CreateOrder";
 import DetailsOrder from "../../../components/blocks/orders/DetailsOrder/DetailsOrder";
+import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
+import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 
 const OrderItemDetail = () => <h1>AllOrder page</h1>;
 const EditOrder = () => <h1>EDIT ORDER</h1>;
+
+const modalBase: ModalTypes = {
+  options: {
+    initialOpen: true,
+    returnBack: true,
+  },
+};
 
 const orderSubRoutes = [
   {
@@ -19,7 +28,11 @@ const orderDetailsSubRoutee = [
   {
     fullPath: "/orders/:id/edit",
     path: "edit",
-    element: <EditOrder />,
+    element: (
+      <Modal {...modalBase}>
+        <EditOrder />
+      </Modal>
+    ),
   },
 ];
 

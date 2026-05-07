@@ -7,6 +7,7 @@ import {
 import type { OrdersListParams } from "./orders.types";
 import {
   createOrder,
+  getOrderById,
   getOrderReferencesList,
   getOrdersList,
 } from "../../api/orders/orders.api";
@@ -42,5 +43,13 @@ export function useCreateOrder() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ordersKeys.lists() });
     },
+  });
+}
+
+export function useOrderDetail(id: number) {
+  return useQuery({
+    queryKey: ordersKeys.detail(id),
+    queryFn: ({ signal }) => getOrderById(id, signal),
+    enabled: id > 0,
   });
 }

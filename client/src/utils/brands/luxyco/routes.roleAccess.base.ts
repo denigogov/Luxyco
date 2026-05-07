@@ -46,7 +46,15 @@ const baseRouteAccess: BrandRouteAccess = {
     "/customers/:customerId",
   ],
 
-  ADMIN: [],
+  ADMIN: [
+    "/",
+    "/dashboard",
+    "/orders",
+    "/orders/:id",
+    "/orders/:id/details/:itemId",
+    "/customers",
+    "/customers/:customerId",
+  ],
   RECEPTION: [],
   MACHINE_OPERATOR: [],
 };
