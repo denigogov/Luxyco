@@ -4,6 +4,7 @@ import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/butt
 import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { PrintActionGroupTypes } from "../../../../whitelabel/src/molecules/printActionGroup/printActionGroup.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { NotificationAlert } from "../../customers/Notes/customersNote.types";
 
 export interface DetailsOrderTypes {
   table: TableTypes;
@@ -12,4 +13,5 @@ export interface DetailsOrderTypes {
   buttonGroup: ButtonGroupTypes;
   printActionGroup: PrintActionGroupTypes;
   orderStatusSelect: SelectTypes;
+  notification: NotificationAlert;
 }

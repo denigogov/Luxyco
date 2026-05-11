@@ -10,9 +10,13 @@ import {
   getOrderById,
   getOrderReferencesList,
   getOrdersList,
+  updateOrder,
 } from "../../api/orders/orders.api";
 import { normalizeOrdersListParams, ordersKeys } from "./orders.keys";
-import type { CreateOrderQueryType } from "../../components/blocks/orders/CreateOrder/createOrder.types";
+import type {
+  CreateOrderQueryType,
+  UpdateOrderQueryType,
+} from "../../components/blocks/orders/CreateOrder/createOrder.types";
 
 export function useOrdersList(params?: OrdersListParams) {
   const normalized = normalizeOrdersListParams(params ?? {});
@@ -51,5 +55,20 @@ export function useOrderDetail(id: number) {
     queryKey: ordersKeys.detail(id),
     queryFn: ({ signal }) => getOrderById(id, signal),
     enabled: id > 0,
+  });
+}
+
+export function useUpdateOrder(id: number) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ordersKeys.mutations.update(id),
+    mutationFn: (dto: Partial<UpdateOrderQueryType>) => updateOrder(id, dto),
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ordersKeys.detail(id) }),
+        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+      ]);
+    },
   });
 }

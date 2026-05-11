@@ -9,7 +9,7 @@ import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import {
   useOrderDetail,
-  useOrderReferencesList,
+  useUpdateOrder,
 } from "../../../../features/orders/orders.queries";
 import ButtonGroup from "../../../../whitelabel/src/molecules/buttonGroup/ButtonGroup";
 import { OrderCard } from "../../../../whitelabel/src/organisms/orderCard/orderCard";
@@ -24,6 +24,7 @@ import OrderItemsPrintTemplate from "../../../organisms/orderPrintTemplates/orde
 import OrderCustomerBillPrintTemplate from "../../../organisms/orderPrintTemplates/orderCustomerBillPrintTemplate/OrderCustomerBillPrintTemplate";
 import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
+import { notificationAlert } from "../../../../utils/hooks/notify";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
@@ -83,14 +84,21 @@ const DetailsOrder: React.FC = () => {
     },
   ];
 
+  const handlePrintCustomerBill = useReactToPrint({
+    contentRef: customerBillRef,
+  });
+
+  const { data, isLoading, error } = useOrderDetail(Number(id));
+  const updateOrderMutattion = useUpdateOrder(data?.id);
+  const status = data?.status;
+
   const handleBreadCrumbNavigation = (name: string, orderData = {}) => {
     switch (name) {
       case "editOrder":
+        if (status.id === 5) {
+          return;
+        }
         navigate(`/orders/${id}/edit`, { state: orderData });
-        return;
-
-      case "addNote":
-        navigate(`/orders/${id}/notes/add`);
         return;
 
       default:
@@ -99,15 +107,11 @@ const DetailsOrder: React.FC = () => {
     }
   };
 
-  const handlePrintCustomerBill = useReactToPrint({
-    contentRef: customerBillRef,
-  });
-
   const breadcrumbsProps = useMemo(() => {
     return buildOrderBreadcrumbsProps({
       base: detailsOrderData.breadcrumps,
       returnToPrevRoute,
-      order: {},
+      order: data,
       onDropdownClick: handleBreadCrumbNavigation,
       modalChildren: (
         <ConfirmDialog
@@ -118,10 +122,7 @@ const DetailsOrder: React.FC = () => {
       setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
       allowDeleteOrder: true,
     });
-  }, [id]);
-
-  const { data, isLoading, error } = useOrderDetail(Number(id));
-  const status = data?.status;
+  }, [id, data]);
 
   const currentPrice = useMemo(() => {
     return Number(data?.totalPrice ?? 0);
@@ -161,7 +162,7 @@ const DetailsOrder: React.FC = () => {
           };
         }
 
-        if (button.role === "delete") {
+        if (button.role === "bill") {
           return {
             ...button,
             onClick: () => handlePrintCustomerBill(),
@@ -225,22 +226,16 @@ const DetailsOrder: React.FC = () => {
 
   const handleConfirmUpdateOrderStatus = async () => {
     if (!data?.id || !selectedStatusId) return;
-
     try {
-      console.log("update order status", {
-        orderId: data.id,
-        statusId: Number(selectedStatusId),
+      await updateOrderMutattion.mutateAsync({
+        orderStatusId: Number(selectedStatusId),
       });
-
-      // await updateOrderStatusMut.mutateAsync({
-      //   orderId: data.id,
-      //   statusId: Number(selectedStatusId),
-      // });
-
+      notificationAlert.success(detailsOrderData.notification.success);
       statusModalCloseRef.current?.();
       setIsStatusModalOpen(false);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      notificationAlert.error(detailsOrderData.notification.error);
+      console.error(err);
     }
   };
 

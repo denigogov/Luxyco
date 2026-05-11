@@ -1,5 +1,4 @@
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
-import type { HeadingTypes } from "../../../../whitelabel/src/molecules/heading/m-heading.types";
 import type { PrintActionGroupTypes } from "../../../../whitelabel/src/molecules/printActionGroup/printActionGroup.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 
@@ -25,4 +24,14 @@ export interface CreateOrderQueryType {
   scheduledDate: string;
   orderNote: string;
   items: CreateOrderItemsType[];
+}
+
+export interface UpdateOrderQueryType {
+  orderStatusId?: number;
+  customerId?: number;
+  deliveryAddressId?: number;
+  deliveryTypeId?: number;
+  serviceTypeId?: number;
+  scheduledDate?: string;
+  orderNote?: string | null;
 }

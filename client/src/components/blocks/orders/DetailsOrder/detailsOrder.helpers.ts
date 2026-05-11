@@ -18,10 +18,17 @@ export function buildOrderBreadcrumbsProps(args: {
     setModalClose,
     allowDeleteOrder,
   } = args;
+  const isFinished = order?.status?.id === 5;
 
   const buttons = base?.dropdown?.items?.buttons?.map((btn: any) => ({
     ...btn,
-    onClick: () => onDropdownClick(btn?.name ?? "", order),
+    tooltip: isFinished
+      ? "нарачка е веќе завршена и не може да се ажурира"
+      : "",
+    onClick: isFinished
+      ? undefined
+      : () => onDropdownClick(btn?.name ?? "", order),
+    disabled: isFinished,
   }));
 
   const modals = base?.dropdown?.items?.modals?.map((modalData: any) => ({

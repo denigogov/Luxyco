@@ -1,11 +1,14 @@
-import type { CreateOrderQueryType } from "../../components/blocks/orders/CreateOrder/createOrder.types";
+import type {
+  CreateOrderQueryType,
+  UpdateOrderQueryType,
+} from "../../components/blocks/orders/CreateOrder/createOrder.types";
 import type {
   OrderPostResponse,
   OrderReferences,
   OrdersListParams,
   OrdersListResponse,
 } from "../../features/orders/orders.types";
-import { apiGet, apiPost } from "../http";
+import { apiGet, apiPatch, apiPost } from "../http";
 
 export function getOrdersList(
   params: OrdersListParams,
@@ -58,4 +61,8 @@ export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
 
 export function getOrderById(id: number, signal?: AbortSignal) {
   return apiGet<any>(`/orders/${id}`, signal);
+}
+
+export function updateOrder(id: number, dto: Partial<UpdateOrderQueryType>) {
+  return apiPatch<void>(`/orders/${id}`, dto);
 }

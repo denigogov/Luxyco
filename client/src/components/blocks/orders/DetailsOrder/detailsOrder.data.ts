@@ -1,9 +1,7 @@
-import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
 import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/buttonGroup/buttonGroup.types";
 import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
-import type { HeadingTypes } from "../../../../whitelabel/src/molecules/heading/m-heading.types";
 import type { PrintActionGroupTypes } from "../../../../whitelabel/src/molecules/printActionGroup/printActionGroup.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { DetailsOrderTypes } from "./detailsOrder.types";
@@ -150,12 +148,6 @@ const breadcrumps: BreadcrumbsTypes = {
           style: "link",
           icon: { name: "pencil" },
         },
-        {
-          name: "addNote",
-          label: "Додати забелешка",
-          style: "link",
-          icon: { name: "commenting" },
-        },
       ],
       modals: [
         {
@@ -217,7 +209,7 @@ const buttonGroup: ButtonGroupTypes = {
       icon: {
         name: "print",
       },
-      role: "delete",
+      role: "bill",
       style: "default",
       className: "m-buttonGroup__item--bill",
     },
@@ -304,6 +296,17 @@ const orderStatusSelect: SelectTypes = {
   ],
 };
 
+const notification = {
+  success: {
+    title: "Ажурирањето е успешно",
+    text: "Нарачката е ажурирана со новиот статус.",
+  },
+  error: {
+    title: "Ажурирањето не беше успешно",
+    text: "Не можевме да го ажурираме статусот на нарачката. Обидете се повторно.",
+  },
+};
+
 export const detailsOrderData: DetailsOrderTypes = {
   table,
   breadcrumps,
@@ -311,4 +314,5 @@ export const detailsOrderData: DetailsOrderTypes = {
   buttonGroup,
   printActionGroup,
   orderStatusSelect,
+  notification,
 };
