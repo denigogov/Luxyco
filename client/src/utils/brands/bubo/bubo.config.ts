@@ -1,4 +1,3 @@
-import brandLogoLight from "@/assets/logo/brandBubo/bubo-full-logo.png";
 import brandLogoDark from "@/assets/logo/brandBubo/bubo-logo.png";
 import brandLogoDark_slogan from "@/assets/logo/brandBubo/bubo-full-logo.png";
 import brandLogoLight_slogan from "@/assets/logo/brandBubo/bubo-full-logo.png";
@@ -11,7 +10,7 @@ export const BRAND_BUBO = {
   slogan: "Тепих · Сервис · Бубо",
   logo: {
     default: brandLogoDark,
-    logo_mobile: brandLogoLight,
+    logo_mobile: brandLogoDark,
     logoFull_dark: brandLogoDark_slogan,
     logoFull_light: brandLogoLight_slogan,
   },
