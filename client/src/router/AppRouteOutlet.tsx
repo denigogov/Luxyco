@@ -15,10 +15,17 @@ import {
 import { hasRoleAccessToPath } from "../utils/routes/roleAccess";
 import ErrorWrapper from "../components/blocks/ErrorWrapper";
 import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole";
+import QuickContextMenu from "../whitelabel/src/molecules/QuickContextMenu/QuickContextMenu";
+import { quickMenuItems } from "../whitelabel/src/molecules/QuickContextMenu/quickContextMenu.data";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [quickMenu, setQuickMenu] = useState({
+    open: false,
+    x: 0,
+    y: 0,
+  });
   const { isNavOpen } = useUIState();
   const { isAuthenticated, logout, status, user } = useAuth(); // user has role
   const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
@@ -28,8 +35,6 @@ const AppRoute: React.FC = () => {
 
     if (allowedPaths.includes(path)) {
       setLastValidRoute(path);
-
-      console.log(path);
     }
   }, [location.pathname]);
 
@@ -107,10 +112,45 @@ const AppRoute: React.FC = () => {
     },
   };
 
+  const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("select") ||
+      target.closest("button") ||
+      target.closest("a")
+    ) {
+      return;
+    }
+    e.preventDefault();
+    setQuickMenu({
+      open: true,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
   return (
     <div className="app-layout">
       <Navbar {...navbarConfig} />
-      <main className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}>
+      <main
+        className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
+        onContextMenu={handleContextMenu}
+      >
+        <QuickContextMenu
+          open={quickMenu.open}
+          x={quickMenu.x}
+          y={quickMenu.y}
+          items={quickMenuItems}
+          onNavigate={(path) => navigate(path)}
+          onClose={() =>
+            setQuickMenu((prev) => ({
+              ...prev,
+              open: false,
+            }))
+          }
+        />
         {!isUserOnline && (
           <div
             className="uk-alert-warning"

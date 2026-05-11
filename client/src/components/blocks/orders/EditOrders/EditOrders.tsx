@@ -156,6 +156,7 @@ const EditOrders = () => {
         submitButton={{
           ...OrderUpdate.submitButton,
           disabled: updateMut.isPending || referencesLoading,
+          loading: updateMut.isPending || referencesLoading,
         }}
         className="uk-margin-small-top"
       />

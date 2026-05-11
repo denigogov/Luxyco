@@ -18,6 +18,7 @@ import {
 import { OrdersCreateService } from './order.create.service';
 import { PrintEventsService } from 'src/infrastructure/printing/print-events.service';
 import { OrdersDetailService } from './order.detail.service';
+import { OrdersUpdateService } from './order.update.services';
 
 @Injectable()
 export class OrdersService {
@@ -27,6 +28,7 @@ export class OrdersService {
     private readonly ordersCreateService: OrdersCreateService,
     private readonly printEvents: PrintEventsService,
     private readonly OrdersDetailService: OrdersDetailService,
+    private readonly ordersUpdateService: OrdersUpdateService,
   ) {}
 
   async create(dto: CreateOrderDto, userId: number) {
@@ -115,8 +117,44 @@ export class OrdersService {
     return orderDetails;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: number, dto: UpdateOrderDto) {
+    const result = await this.ordersUpdateService.update(id, dto);
+
+    await Promise.all([
+      this.redis.delByPrefix('luxyco:orders:list:v1:'),
+      this.redis.delByPrefix('luxyco:orders:detail:v1:'),
+
+      result.previousCustomerId
+        ? this.redis.del([
+            buildCustomerDetailCacheKey({
+              id: result.previousCustomerId,
+              isActive: true,
+            }),
+            buildCustomerDetailCacheKey({
+              id: result.previousCustomerId,
+              isActive: false,
+            }),
+          ])
+        : Promise.resolve(0),
+
+      result.currentCustomerId &&
+      result.currentCustomerId !== result.previousCustomerId
+        ? this.redis.del([
+            buildCustomerDetailCacheKey({
+              id: result.currentCustomerId,
+              isActive: true,
+            }),
+            buildCustomerDetailCacheKey({
+              id: result.currentCustomerId,
+              isActive: false,
+            }),
+          ])
+        : Promise.resolve(0),
+    ]);
+
+    return {
+      success: true,
+    };
   }
 
   remove(id: number) {
