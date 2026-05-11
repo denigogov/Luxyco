@@ -43,6 +43,7 @@ import { useDeleteCustomerNotes } from "../../../../features/customers/customerN
 import { hasRoleAccessToPath } from "../../../../utils/routes/roleAccess";
 import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
 import { useAuth } from "../../../../utils/hooks/useAuth";
+import ErrorWrapper from "../../ErrorWrapper";
 
 type deleteType = "address" | "note" | "customer";
 
@@ -335,7 +336,7 @@ const CustomerDetails: React.FC = () => {
   );
 
   if (isLoading) return <h3>Loading</h3>;
-  if (error) return <h3>error</h3>;
+  if (error || data === undefined) return <ErrorWrapper />;
 
   return (
     <div className="b-customerDetails">

@@ -25,6 +25,7 @@ import OrderCustomerBillPrintTemplate from "../../../organisms/orderPrintTemplat
 import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
 import { notificationAlert } from "../../../../utils/hooks/notify";
+import ErrorWrapper from "../../ErrorWrapper";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
@@ -212,8 +213,8 @@ const DetailsOrder: React.FC = () => {
   if (isLoading) {
     return <h1>Loading</h1>;
   }
-  if (error) {
-    return <h1>errortest</h1>;
+  if (error || data === undefined) {
+    return <ErrorWrapper />;
   }
   const handleScan = (qrCode: string) => {
     navigate(`/orders/scan/${encodeURIComponent(qrCode)}`);
