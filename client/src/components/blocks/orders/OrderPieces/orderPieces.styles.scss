@@ -1,0 +1,30 @@
+.order-piece-m2-preview {
+  padding: 8px 0;
+  border-bottom: 1px solid color(borderLight);
+
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.order-piece-index-preview {
+  font-weight: 500;
+  color: color(textBlack);
+}
+
+.order-piece-m2-preview__label {
+  color: color(text);
+  font-size: 13px;
+}
+
+.order-piece-m2-preview__value {
+  color: color(textBlack);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.order-piece-m2-preview__hint {
+  width: 100%;
+  color: #888;
+  font-size: 12px;
+}

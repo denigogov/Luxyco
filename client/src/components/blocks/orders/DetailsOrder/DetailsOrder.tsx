@@ -8,6 +8,8 @@ import { buildOrderBreadcrumbsProps } from "./detailsOrder.helpers";
 import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import {
+  useDeleteOrderPieces,
+  useDeletOrdersBulk,
   useOrderDetail,
   useUpdateOrder,
 } from "../../../../features/orders/orders.queries";
@@ -29,6 +31,7 @@ import ErrorWrapper from "../../ErrorWrapper";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
+  const isQrCodeParam = !/^\d+$/.test(String(id));
   const { state } = useLocation();
   const navigate = useNavigate();
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -41,6 +44,9 @@ const DetailsOrder: React.FC = () => {
   const mainTicketRef = useRef<HTMLDivElement>(null);
   const itemLabelsRef = useRef<HTMLDivElement>(null);
   const customerBillRef = useRef<HTMLDivElement>(null);
+
+  const deleteOrderPiecesMutation = useDeleteOrderPieces();
+  const deleteOrderMutation = useDeletOrdersBulk();
 
   const returnToPrevRoute = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -64,10 +70,37 @@ const DetailsOrder: React.FC = () => {
     if (!id) return;
 
     try {
-      // await deleteOrder.mutateAsync(Number(id));
+      await deleteOrderMutation.mutateAsync([Number(id)]);
       closeModal();
       navigate("/orders", { replace: true });
     } catch (error) {
+      console.error(error);
+      notificationAlert.error({
+        title: "Грешка",
+        text: "Нарачката не беше избришана. Обидете се повторно.",
+      });
+    }
+  };
+
+  const handleDeleteOrderPiece = async (item: any) => {
+    if (!id || !item?.qrCode) return;
+
+    try {
+      await deleteOrderPiecesMutation.mutateAsync({
+        orderId: id,
+        piecesId: item.qrCode,
+      });
+
+      notificationAlert.success({
+        title: "Парчето е избришано",
+        text: "Парчето е успешно отстрането од нарачката.",
+      });
+    } catch (error) {
+      notificationAlert.error({
+        title: "Грешка",
+        text: "Парчето не беше избришано. Обидете се повторно.",
+      });
+
       console.error(error);
     }
   };
@@ -89,7 +122,10 @@ const DetailsOrder: React.FC = () => {
     contentRef: customerBillRef,
   });
 
-  const { data, isLoading, error } = useOrderDetail(Number(id));
+  // enable to send or qr-code | the customer ID depend from where its scan
+  const { data, isLoading, error, isPending } = useOrderDetail(
+    isQrCodeParam ? id : Number(id),
+  );
   const updateOrderMutattion = useUpdateOrder(data?.id);
   const status = data?.status;
 
@@ -121,7 +157,7 @@ const DetailsOrder: React.FC = () => {
         />
       ),
       setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
-      allowDeleteOrder: true,
+      allowDeleteOrder: Boolean(status?.id !== 1 || status?.id === 6),
     });
   }, [id, data]);
 
@@ -142,7 +178,7 @@ const DetailsOrder: React.FC = () => {
     const buttons = detailsOrderData.buttonGroup.buttons
       .filter((button) => {
         // hide customer bill button until all prices are final
-        if (button.role === "delete") {
+        if (button.role === "bill") {
           return isTotalFinal;
         }
 
@@ -181,9 +217,13 @@ const DetailsOrder: React.FC = () => {
 
   const tableRows = useMemo(() => {
     return (data?.orderPieces ?? []).map((piece: any) => {
+      const customerData = piece?.orders?.customers;
+      const status = data?.status?.id;
+
       const priceModel = piece.productTypes?.priceModel?.name;
       const hasDimension = Boolean(piece.width && piece.height);
       const needsMeasurement = priceModel === "PER_M2" && !hasDimension;
+      const customer = `${customerData.firstName} ${customerData.lastName}`;
 
       const measuredBy = piece.users
         ? `${piece.users.firstName ?? ""} ${piece.users.lastName ?? ""}`.trim()
@@ -206,20 +246,31 @@ const DetailsOrder: React.FC = () => {
         index: `${piece.pieceIndex}/${data?.totalPieces ?? 0}`,
         isReady,
         needsMeasurement,
+        customer,
+        width: piece.width,
+        height: piece.height,
+        status,
       };
     });
   }, [data]);
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return <h1>Loading</h1>;
   }
-  if (error || data === undefined) {
+  if (error) {
     return <ErrorWrapper />;
   }
-  const handleScan = (qrCode: string) => {
-    navigate(`/orders/scan/${encodeURIComponent(qrCode)}`);
-  };
 
+  const handleScan = (qrCode: string) => {
+    const isPieceQr = /-P\d+$/.test(qrCode);
+
+    if (!isPieceQr) {
+      navigate(`/orders/${encodeURIComponent(qrCode)}`, { replace: true });
+      return;
+    }
+
+    navigate(`item/${encodeURIComponent(qrCode)}`);
+  };
   const handleUpdateOrderStatus = () => {
     setSelectedStatusId(String(data?.status?.id ?? ""));
     setIsStatusModalOpen(true);
@@ -292,7 +343,13 @@ const DetailsOrder: React.FC = () => {
 
       <OrderItemsDetails
         items={tableRows}
-        onDelete={() => console.log("test")}
+        onDelete={handleDeleteOrderPiece}
+        onMeasure={(pieces) =>
+          navigate(`item/${pieces.qrCode}`, { state: pieces })
+        }
+        onEditPiece={(pieces) =>
+          navigate(`item/${pieces.qrCode}`, { state: pieces })
+        }
       />
 
       {isPrintModalOpen && data && (
@@ -324,24 +381,6 @@ const DetailsOrder: React.FC = () => {
             )}
           </div>
         </div>
-      )}
-      {data && (
-        <>
-          <div style={{ display: "none" }}>
-            <OrderPrintTemplate ref={mainTicketRef} order={data} />
-          </div>
-
-          <div style={{ display: "none" }}>
-            <OrderItemsPrintTemplate ref={itemLabelsRef} order={data} />
-          </div>
-
-          <div style={{ display: "none" }}>
-            <OrderCustomerBillPrintTemplate
-              ref={customerBillRef}
-              order={data}
-            />
-          </div>
-        </>
       )}
 
       {isStatusModalOpen && (
@@ -389,6 +428,24 @@ const DetailsOrder: React.FC = () => {
             />
           </div>
         </Modal>
+      )}
+      {data && (
+        <>
+          <div style={{ display: "none" }}>
+            <OrderPrintTemplate ref={mainTicketRef} order={data} />
+          </div>
+
+          <div style={{ display: "none" }}>
+            <OrderItemsPrintTemplate ref={itemLabelsRef} order={data} />
+          </div>
+
+          <div style={{ display: "none" }}>
+            <OrderCustomerBillPrintTemplate
+              ref={customerBillRef}
+              order={data}
+            />
+          </div>
+        </>
       )}
       <Outlet />
     </div>

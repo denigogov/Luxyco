@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import {
+  useDeletOrdersBulk,
   useOrderReferencesList,
   useOrdersList,
 } from "../../../../features/orders/orders.queries";
@@ -23,6 +24,7 @@ import {
 import ErrorWrapper from "../../ErrorWrapper";
 import {
   buildOrdersFilterData,
+  canDeleteSelectedOrders,
   mapOrderToRow,
   toOrdersSortBy,
   toOrdersSortDir,
@@ -44,6 +46,7 @@ import ConfirmDialog from "../../../../whitelabel/src/molecules/confirmDialog/M-
 import "./allOrders.styles.scss";
 import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
+import { notificationAlert } from "../../../../utils/hooks/notify";
 
 const toApiDate = (date: Date) => {
   const year = date.getFullYear();
@@ -71,19 +74,44 @@ const AllOrders: React.FC = () => {
   const canDeleteOrder = true;
 
   const modalCloseRef = useRef<null | (() => void)>(null);
-
+  const deleteOrderMutation = useDeletOrdersBulk();
   const closeDeleteOrderModal = () => {
     modalCloseRef.current?.();
   };
 
-  const handleDeleteOrder = (row: RowTypes) => {
-    console.log(row?.id);
-    closeDeleteOrderModal();
+  const handleDeleteOrder = async (row: RowTypes) => {
+    if (!row.id) return;
+
+    try {
+      await deleteOrderMutation.mutateAsync([Number(row.id)]);
+      closeDeleteOrderModal();
+      notificationAlert.success({
+        title: "Успешно избришено",
+        text: `нарачка e успешно избришена}.`,
+      });
+    } catch (error) {
+      notificationAlert.error({
+        title: "Грешка",
+        text: "Неуспешен обид, Обидете се повторно.",
+      });
+    }
   };
 
-  const handleDeleteBulkOrders = () => {
-    console.log("selected orders ID for builk delete", selectedOrders);
-    closeDeleteOrderModal();
+  const handleDeleteBulkOrders = async () => {
+    try {
+      console.log("selected orders ID for builk delete", selectedOrders);
+      await deleteOrderMutation.mutateAsync(selectedOrders);
+      closeDeleteOrderModal();
+      notificationAlert.success({
+        title: "Успешно избришено",
+        text: `${selectedOrders.length} нарачк${selectedOrders.length === 1 ? "а" : "и"} успешно избришен${selectedOrders.length === 1 ? "а" : "и"}.`,
+      });
+    } catch (error) {
+      notificationAlert.error({
+        title: "Грешка",
+        text: "Неуспешен обид, Обидете се повторно.",
+      });
+    }
   };
 
   const { data: referencesData, error: referencesError } =
@@ -386,6 +414,11 @@ const AllOrders: React.FC = () => {
     navigate("new");
   };
 
+  const canDeleteSelected = useMemo(
+    () => canDeleteSelectedOrders(selectedOrders, tableListData),
+    [selectedOrders, tableListData],
+  );
+
   return (
     <div className="b-orders">
       <div className="b-orders-toolbar">
@@ -432,7 +465,7 @@ const AllOrders: React.FC = () => {
           />
         </div>
 
-        {selectedOrders.length > 0 && (
+        {canDeleteSelected && (
           <div className="b-orders-delete">
             <Activity mode="visible">
               <Modal

@@ -35,3 +35,8 @@ export interface UpdateOrderQueryType {
   scheduledDate?: string;
   orderNote?: string | null;
 }
+export interface UpdateOrderPiece {
+  width: number;
+  height: number;
+  pieceNote?: string | null;
+}

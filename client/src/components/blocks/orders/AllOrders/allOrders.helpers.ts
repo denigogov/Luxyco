@@ -183,3 +183,20 @@ export const buildOrdersFilterData = (params: {
     },
   ],
 });
+
+export function canDeleteSelectedOrders(
+  selectedOrders: number[],
+  tableListData: any[],
+): boolean {
+  if (selectedOrders.length === 0) return false;
+
+  const selectedOrdersData = tableListData.filter((order) =>
+    selectedOrders.includes(order.id),
+  );
+
+  const hasRestrictedStatus = selectedOrdersData.some(
+    (order) => order.status.id === 1 || order.status.id === 6,
+  );
+
+  return hasRestrictedStatus;
+}

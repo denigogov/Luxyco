@@ -6,8 +6,7 @@ import DetailsOrder from "../../../components/blocks/orders/DetailsOrder/Details
 import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 import EditOrders from "../../../components/blocks/orders/EditOrders/EditOrders";
-
-const OrderItemDetail = () => <h1>AllOrder page</h1>;
+import OrderPiecesModal from "../../../components/organisms/orderPiecesModal/OrderPiecesModal";
 
 const modalBase: ModalTypes = {
   options: {
@@ -34,6 +33,11 @@ const orderDetailsSubRoutee = [
       </Modal>
     ),
   },
+  {
+    fullPath: "/orders/:id/item/:qr",
+    path: "item/:qr",
+    element: <OrderPiecesModal />,
+  },
 ];
 
 export const OrdersRoutes = (
@@ -53,7 +57,5 @@ export const OrdersRoutes = (
           <Route key={r.path} path={r.path} element={r.element} />
         ))}
     </Route>
-
-    <Route path=":id/details/:itemId" element={<OrderItemDetail />} />
   </Route>
 );

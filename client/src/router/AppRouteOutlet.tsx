@@ -17,6 +17,8 @@ import ErrorWrapper from "../components/blocks/ErrorWrapper";
 import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole";
 import QuickContextMenu from "../whitelabel/src/molecules/QuickContextMenu/QuickContextMenu";
 import { quickMenuItems } from "../whitelabel/src/molecules/QuickContextMenu/quickContextMenu.data";
+import { QrScanner } from "../whitelabel/src/molecules/qrScanner/QrScanner";
+import Button from "../whitelabel/src/atoms/button/A-Button";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -29,6 +31,7 @@ const AppRoute: React.FC = () => {
   const { isNavOpen } = useUIState();
   const { isAuthenticated, logout, status, user } = useAuth(); // user has role
   const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
 
   useEffect(() => {
     const path = location.pathname;
@@ -43,7 +46,7 @@ const AppRoute: React.FC = () => {
       setIsUserOnline(true);
       notifySuccess({
         title: "Повторно сте онлајн",
-        text: "Вашата интернет конекција е стабилна",
+        text: "Интернет конекцијата е повторно воспоставена.",
         pos: "top-center",
       });
     };
@@ -52,8 +55,8 @@ const AppRoute: React.FC = () => {
       setIsUserOnline(false);
 
       notifyWarning({
-        title: "Немате интернет конекција (офлајн)",
-        text: "Брат ми нема интернет",
+        title: "Немате интернет конекција",
+        text: "Проверете ја вашата интернет конекција. Дел од функциите може да бидат недостапни.",
         pos: "top-center",
       });
     };
@@ -131,6 +134,28 @@ const AppRoute: React.FC = () => {
     });
   };
 
+  const getOrderQrFromPieceQr = (pieceQr: string) => {
+    return pieceQr.replace(/-P\d+$/, "");
+  };
+  const handleScan = (qrCode: string) => {
+    setIsQrScannerOpen(false);
+
+    const isPieceQr = /-P\d+$/.test(qrCode);
+
+    if (!isPieceQr) {
+      navigate(`/orders/${encodeURIComponent(qrCode)}`, { replace: true });
+      return;
+    }
+
+    const orderQrCode = getOrderQrFromPieceQr(qrCode);
+
+    navigate(
+      `/orders/${encodeURIComponent(orderQrCode)}/item/${encodeURIComponent(
+        qrCode,
+      )}`,
+    );
+  };
+
   return (
     <div className="app-layout">
       <Navbar {...navbarConfig} />
@@ -138,6 +163,14 @@ const AppRoute: React.FC = () => {
         className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
         onContextMenu={handleContextMenu}
       >
+        <Button label="Скенирај" onClick={() => setIsQrScannerOpen(true)} />
+        <QrScanner
+          isOpen={isQrScannerOpen}
+          onClose={() => setIsQrScannerOpen(false)}
+          onScan={handleScan}
+          onError={(error) => console.error(error)}
+        />
+
         <QuickContextMenu
           open={quickMenu.open}
           x={quickMenu.x}

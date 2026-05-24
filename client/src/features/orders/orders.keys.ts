@@ -43,10 +43,14 @@ export const ordersKeys = {
   list: (params: OrdersListParams) => [...ordersKeys.lists(), params] as const,
   references: () => [...ordersKeys.all, "references"],
   details: () => [...ordersKeys.all, "detail"] as const,
-  detail: (id: number) => [...ordersKeys.details(), id] as const,
+  detail: (identifier: number | string) =>
+    [...ordersKeys.details(), String(identifier)] as const,
 
   mutations: {
-    create: () => ["order", "create"] as const,
+    create: () => ["orders", "create"] as const,
     update: (orderId: number) => ["orders", orderId, "update"] as const,
+    updatePiece: (identifier: number | string, qr: string) =>
+      ["orders", String(identifier), "item", qr, "update"] as const,
+    deleteMany: () => ["oprders", "bulk-delete"] as const,
   },
 };

@@ -4,6 +4,7 @@ import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/butt
 import type { ConfirmDialogTypes } from "../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { PrintActionGroupTypes } from "../../../../whitelabel/src/molecules/printActionGroup/printActionGroup.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 import type { DetailsOrderTypes } from "./detailsOrder.types";
 
 const table: TableTypes = {
@@ -305,6 +306,15 @@ const notification = {
     title: "Ажурирањето не беше успешно",
     text: "Не можевме да го ажурираме статусот на нарачката. Обидете се повторно.",
   },
+};
+
+export const deleteButtonModal: ModalTypes = {
+  actionButtons: [
+    {
+      label: "Избриши",
+      style: "link",
+    },
+  ],
 };
 
 export const detailsOrderData: DetailsOrderTypes = {

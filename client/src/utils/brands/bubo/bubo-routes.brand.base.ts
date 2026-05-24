@@ -9,6 +9,7 @@ export const BRAND_BUBO_ROUTE_CONFIG = {
       "/orders/new": true,
       "/orders/:id": true,
       "/orders/:id/edit": true,
+      "/orders/:id/item/:qr": true,
     },
     "/settings": {
       "/settings": true,

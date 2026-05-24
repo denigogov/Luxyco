@@ -7,14 +7,18 @@ import {
 import type { OrdersListParams } from "./orders.types";
 import {
   createOrder,
+  deleteMultipleOrders,
+  deleteOrderPieces,
   getOrderById,
   getOrderReferencesList,
   getOrdersList,
   updateOrder,
+  updateOrderPieces,
 } from "../../api/orders/orders.api";
 import { normalizeOrdersListParams, ordersKeys } from "./orders.keys";
 import type {
   CreateOrderQueryType,
+  UpdateOrderPiece,
   UpdateOrderQueryType,
 } from "../../components/blocks/orders/CreateOrder/createOrder.types";
 
@@ -50,14 +54,16 @@ export function useCreateOrder() {
   });
 }
 
-export function useOrderDetail(id: number) {
+export function useOrderDetail(
+  identifier: number | string | undefined,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: ordersKeys.detail(id),
-    queryFn: ({ signal }) => getOrderById(id, signal),
-    enabled: id > 0,
+    queryKey: ordersKeys.detail(identifier ?? ""),
+    queryFn: ({ signal }) => getOrderById(identifier!, signal),
+    enabled: Boolean(identifier) && enabled,
   });
 }
-
 export function useUpdateOrder(id: number) {
   const qc = useQueryClient();
 
@@ -69,6 +75,59 @@ export function useUpdateOrder(id: number) {
         qc.invalidateQueries({ queryKey: ordersKeys.detail(id) }),
         qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
       ]);
+    },
+  });
+}
+export function useUpdateOrderPiece(identifier: number | string, qr: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ordersKeys.mutations.updatePiece(identifier, qr),
+    mutationFn: (dto: UpdateOrderPiece) =>
+      updateOrderPieces(identifier, qr, dto),
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ordersKeys.details() }),
+        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+      ]);
+    },
+  });
+}
+
+export function useDeleteOrderPieces() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["orders", "delete"] as const,
+    mutationFn: ({
+      orderId,
+      piecesId,
+    }: {
+      orderId: number | string;
+      piecesId: string;
+    }) => deleteOrderPieces(orderId, piecesId),
+
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ordersKeys.details() }),
+        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+      ]);
+    },
+  });
+}
+
+export function useDeletOrdersBulk() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["orders", "bulk-delete"] as const,
+    mutationFn: (ids: number[]) => deleteMultipleOrders(ids),
+    onSuccess: (_data, ids) => {
+      ids.forEach((id) =>
+        qc.removeQueries({ queryKey: ordersKeys.detail(id) }),
+      );
+
+      qc.invalidateQueries({ queryKey: ordersKeys.lists() });
     },
   });
 }

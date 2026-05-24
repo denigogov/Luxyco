@@ -1,5 +1,6 @@
 import type {
   CreateOrderQueryType,
+  UpdateOrderPiece,
   UpdateOrderQueryType,
 } from "../../components/blocks/orders/CreateOrder/createOrder.types";
 import type {
@@ -8,7 +9,7 @@ import type {
   OrdersListParams,
   OrdersListResponse,
 } from "../../features/orders/orders.types";
-import { apiGet, apiPatch, apiPost } from "../http";
+import { apiDelete, apiGet, apiPatch, apiPost } from "../http";
 
 export function getOrdersList(
   params: OrdersListParams,
@@ -59,10 +60,43 @@ export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
   return apiPost<OrderPostResponse>("/orders", body, signal);
 }
 
-export function getOrderById(id: number, signal?: AbortSignal) {
-  return apiGet<any>(`/orders/${id}`, signal);
+export function getOrderById(
+  identifier: number | string,
+  signal?: AbortSignal,
+) {
+  return apiGet<any>(
+    `/orders/${encodeURIComponent(String(identifier))}`,
+    signal,
+  );
 }
 
 export function updateOrder(id: number, dto: Partial<UpdateOrderQueryType>) {
   return apiPatch<void>(`/orders/${id}`, dto);
+}
+
+export function updateOrderPieces(
+  identifier: number | string,
+  qr: string,
+  dto: UpdateOrderPiece,
+) {
+  return apiPatch<void>(
+    `/orders/${encodeURIComponent(String(identifier))}/item/${encodeURIComponent(qr)}`,
+    dto,
+  );
+}
+
+export function deleteOrderPieces(
+  orderId: number | string,
+  pieceQr: string,
+  signal?: AbortSignal,
+) {
+  return apiDelete<void>(
+    `/orders/${encodeURIComponent(String(orderId))}/item/${encodeURIComponent(pieceQr)}`,
+    undefined,
+    signal,
+  );
+}
+
+export function deleteMultipleOrders(ids: number[], signal?: AbortSignal) {
+  return apiDelete<void>("/orders/bulk", { ids }, signal);
 }
