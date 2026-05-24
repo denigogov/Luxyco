@@ -19,7 +19,9 @@ export class CreateCustomerDto {
   @Matches(/\S/, { message: 'Last name must not be empty or only spaces' })
   lastName: string;
 
-  @IsPhoneNumber('MK', {
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^(?:\+389|0)(7[0-9])\d{6}$/, {
     message: 'Phone number must be a valid Macedonian phone number',
   })
   phoneNumber: string;

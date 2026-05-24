@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
 
 @Injectable()
 export class OrdersDetailService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async details(orderId: number) {
-    return this.prisma.orders.findUnique({
-      where: { id: orderId },
+  async details(identifier: number | string) {
+    const value = String(identifier);
+    const isNumericId = /^\d+$/.test(value);
+
+    const order = await this.prisma.orders.findUnique({
+      where: isNumericId ? { id: Number(value) } : { qr_code: value },
 
       select: {
         id: true,
@@ -63,6 +66,16 @@ export class OrdersDetailService {
             height: true,
             price: true,
             piece_note: true,
+            orders: {
+              select: {
+                customers: {
+                  select: {
+                    first_name: true,
+                    last_name: true,
+                  },
+                },
+              },
+            },
 
             product_types: {
               select: {
@@ -85,5 +98,10 @@ export class OrdersDetailService {
         },
       },
     });
+    if (!order) {
+      throw new NotFoundException(`Order ${value} not found`);
+    }
+
+    return order;
   }
 }

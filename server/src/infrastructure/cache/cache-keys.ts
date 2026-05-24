@@ -161,3 +161,11 @@ export function buildOrderReferencesListCacheKey() {
     scope: 'references',
   });
 }
+
+export function buildOrderDetailCacheKey(id: number | string) {
+  return buildCacheKey({
+    module: 'orders',
+    scope: 'detail',
+    query: { id },
+  });
+}

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
@@ -12,6 +16,7 @@ import {
 } from './queries/orders.find-many.args';
 import {
   buildCustomerDetailCacheKey,
+  buildOrderDetailCacheKey,
   buildOrderReferencesListCacheKey,
   buildOrdersListCacheKey,
 } from 'src/infrastructure/cache/cache-keys';
@@ -19,6 +24,9 @@ import { OrdersCreateService } from './order.create.service';
 import { PrintEventsService } from 'src/infrastructure/printing/print-events.service';
 import { OrdersDetailService } from './order.detail.service';
 import { OrdersUpdateService } from './order.update.services';
+import { OrderPieceUpdateService } from './order-piece.update.service';
+import { UpdateOrderPieceDto } from './dto/update-order-piece.dto';
+import { AddOrderPieceDto } from './dto/add-order-piece.dto';
 
 @Injectable()
 export class OrdersService {
@@ -29,21 +37,48 @@ export class OrdersService {
     private readonly printEvents: PrintEventsService,
     private readonly OrdersDetailService: OrdersDetailService,
     private readonly ordersUpdateService: OrdersUpdateService,
+    private readonly orderPieceUpdateService: OrderPieceUpdateService,
   ) {}
+
+  private async invalidateOrdersCache(args?: {
+    orderId?: number | string;
+    customerId?: number;
+  }) {
+    const keysToDelete: string[] = [];
+
+    if (args?.orderId) {
+      keysToDelete.push(buildOrderDetailCacheKey(args.orderId));
+    }
+
+    if (args?.customerId) {
+      keysToDelete.push(
+        buildCustomerDetailCacheKey({
+          id: args.customerId,
+          isActive: true,
+        }),
+
+        buildCustomerDetailCacheKey({
+          id: args.customerId,
+          isActive: false,
+        }),
+      );
+    }
+
+    await Promise.all([
+      this.redis.delByPrefix('luxyco:orders:list:v1:'),
+
+      keysToDelete.length ? this.redis.del(keysToDelete) : Promise.resolve(0),
+    ]);
+  }
 
   async create(dto: CreateOrderDto, userId: number) {
     const order = await this.ordersCreateService.create(dto, userId);
 
     // invalidate after success
-    await Promise.all([
-      this.redis.delByPrefix('luxyco:orders:list:v1:'),
-      this.redis.delByPrefix('luxyco:orders:detail:v1:'),
-
-      this.redis.del([
-        buildCustomerDetailCacheKey({ id: dto.customerId, isActive: true }),
-        buildCustomerDetailCacheKey({ id: dto.customerId, isActive: false }),
-      ]),
-    ]);
+    await this.invalidateOrdersCache({
+      orderId: order?.id,
+      customerId: dto.customerId,
+    });
     this.printEvents.emitOrderCreated(order);
     return order;
   }
@@ -112,7 +147,7 @@ export class OrdersService {
     return result;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
     const orderDetails = await this.OrdersDetailService.details(id);
     return orderDetails;
   }
@@ -121,35 +156,18 @@ export class OrdersService {
     const result = await this.ordersUpdateService.update(id, dto);
 
     await Promise.all([
-      this.redis.delByPrefix('luxyco:orders:list:v1:'),
-      this.redis.delByPrefix('luxyco:orders:detail:v1:'),
-
-      result.previousCustomerId
-        ? this.redis.del([
-            buildCustomerDetailCacheKey({
-              id: result.previousCustomerId,
-              isActive: true,
-            }),
-            buildCustomerDetailCacheKey({
-              id: result.previousCustomerId,
-              isActive: false,
-            }),
-          ])
-        : Promise.resolve(0),
+      this.invalidateOrdersCache({
+        orderId: id,
+        customerId: result.previousCustomerId ?? undefined,
+      }),
 
       result.currentCustomerId &&
       result.currentCustomerId !== result.previousCustomerId
-        ? this.redis.del([
-            buildCustomerDetailCacheKey({
-              id: result.currentCustomerId,
-              isActive: true,
-            }),
-            buildCustomerDetailCacheKey({
-              id: result.currentCustomerId,
-              isActive: false,
-            }),
-          ])
-        : Promise.resolve(0),
+        ? this.invalidateOrdersCache({
+            orderId: id,
+            customerId: result.currentCustomerId,
+          })
+        : Promise.resolve(),
     ]);
 
     return {
@@ -157,7 +175,125 @@ export class OrdersService {
     };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async updateOrderPiece(
+    orderIdentifier: number | string,
+    pieceQr: string,
+    dto: UpdateOrderPieceDto,
+    userId: number,
+  ) {
+    const result = await this.orderPieceUpdateService.updatePiece(
+      orderIdentifier,
+      pieceQr,
+      dto,
+      userId,
+    );
+
+    await this.invalidateOrdersCache({
+      orderId: result.orderId,
+      customerId: result.customerId ?? undefined,
+    });
+
+    return {
+      success: true,
+    };
+  }
+
+  async addOrderPiece(
+    orderIdentifier: number | string,
+    dto: AddOrderPieceDto,
+    userId: number,
+  ) {
+    const result = await this.orderPieceUpdateService.addPiece(
+      orderIdentifier,
+      dto,
+      userId,
+    );
+
+    await this.invalidateOrdersCache({
+      orderId: result.orderId,
+      customerId: result.customerId ?? undefined,
+    });
+
+    return {
+      success: true,
+      ...result,
+    };
+  }
+
+  async removeOrderPiece(orderIdentifier: number | string, pieceQr: string) {
+    const result = await this.orderPieceUpdateService.removePiece(
+      orderIdentifier,
+      pieceQr,
+    );
+
+    await this.invalidateOrdersCache({
+      orderId: result.orderId,
+      customerId: result.customerId ?? undefined,
+    });
+
+    return {
+      success: true,
+      ...result,
+    };
+  }
+
+  async deleteMany(ids: number[]) {
+    if (!ids.length) {
+      throw new BadRequestException('No ids provided');
+    }
+
+    const orders = await this.prisma.orders.findMany({
+      where: {
+        id: { in: ids },
+      },
+      include: {
+        status: true,
+      },
+    });
+    const customerIds = [...new Set(orders.map((o) => o.customer_id))];
+
+    if (!orders.length) {
+      throw new NotFoundException('Orders not found');
+    }
+
+    const deletableStatusesId = [1, 6];
+
+    const invalidOrders = orders.filter(
+      (order) => !deletableStatusesId.includes(Number(order.status?.id)),
+    );
+
+    if (invalidOrders.length) {
+      throw new BadRequestException(`Some orders cannot be deleted`);
+    }
+
+    const result = await this.prisma.orders.deleteMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+
+    await Promise.all([
+      this.redis.delByPrefix('luxyco:orders:list:v1:'),
+
+      ...ids.map((id) => this.redis.del([buildOrderDetailCacheKey(id)])),
+
+      ...customerIds.map((customerId) =>
+        this.redis.del([
+          buildCustomerDetailCacheKey({
+            id: Number(customerId),
+            isActive: true,
+          }),
+
+          buildCustomerDetailCacheKey({
+            id: Number(customerId),
+            isActive: false,
+          }),
+        ]),
+      ),
+    ]);
+
+    return {
+      message: `Deleted ${result.count} orders`,
+    };
   }
 }

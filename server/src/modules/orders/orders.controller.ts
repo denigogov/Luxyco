@@ -19,6 +19,9 @@ import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { OrdersQueryDto } from './dto/get-order.dto';
+import { UpdateOrderPieceDto } from './dto/update-order-piece.dto';
+import { AddOrderPieceDto } from './dto/add-order-piece.dto';
+import { BulkIdsDto } from '../customers/dto/bulk-delete.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -46,7 +49,31 @@ export class OrdersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+    return this.ordersService.findOne(id);
+  }
+
+  @Post(':id/item')
+  addOrderPiece(
+    @Param('id') id: string,
+    @Body() dto: AddOrderPieceDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.ordersService.addOrderPiece(id, dto, req.user.sub);
+  }
+
+  @Patch(':id/item/:qr')
+  updateOrderPiece(
+    @Param('id') id: string,
+    @Param('qr') qr: string,
+    @Body() dto: UpdateOrderPieceDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.ordersService.updateOrderPiece(id, qr, dto, req.user.sub);
+  }
+
+  @Delete(':id/item/:qr')
+  removeOrderPiece(@Param('id') id: string, @Param('qr') qr: string) {
+    return this.ordersService.removeOrderPiece(id, qr);
   }
 
   @Patch(':id')
@@ -54,8 +81,8 @@ export class OrdersController {
     return this.ordersService.update(+id, updateOrderDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  @Delete('bulk')
+  deleteMany(@Body() body: BulkIdsDto) {
+    return this.ordersService.deleteMany(body.ids);
   }
 }
