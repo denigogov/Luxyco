@@ -1,11 +1,25 @@
 import { Navigate, Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
+import PriceConfigurationPage from "../../../components/blocks/settings/price/PriceConfigurationPage";
+import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
+import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 
-const Price = () => (
+const modalBase: ModalTypes = {
+  options: {
+    initialOpen: true,
+    returnBack: true,
+  },
+};
+const SimpleSetupPage = () => {
+  return <h1>Setup Page</h1>;
+};
+
+const NewProduct = () => (
   <div>
-    <h1>Price</h1> page
+    <h1>NewProduct</h1> page
   </div>
 );
+
 const Status = () => (
   <div>
     <h1>Status</h1> page
@@ -21,13 +35,23 @@ const settingsSubRoute = [
   {
     fullPath: "/settings/price",
     path: "price",
-    element: <Price />,
+    element: <PriceConfigurationPage />,
+  },
+
+  {
+    fullPath: "/settings/price/new",
+    path: "price/new",
+    element: (
+      <Modal {...modalBase}>
+        <NewProduct />,
+      </Modal>
+    ),
   },
 ];
 
 export const SettingsRoutes = (
   <Route path="/settings">
-    <Route index element={<Navigate to="/settings/price" replace />} />
+    <Route index element={<SimpleSetupPage />} />
     {settingsSubRoute
       .filter((r) => allowedPaths.includes(r.fullPath))
       .map((r) => (
