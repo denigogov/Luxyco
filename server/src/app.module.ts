@@ -16,6 +16,7 @@ import { StatusModule } from './modules/status/status.module';
 import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module';
 import { ServiceTypeModule } from './modules/service-type/service-type.module';
 import { PrintModule } from './infrastructure/printing/print.module';
+import { PriceModule } from './modules/price/price.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PrintModule } from './infrastructure/printing/print.module';
     DeliveryTypeModule,
     ServiceTypeModule,
     PrintModule,
+    PriceModule,
   ],
   controllers: [AppController],
   providers: [
