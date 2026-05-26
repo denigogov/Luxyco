@@ -1,8 +1,18 @@
-import { Outlet, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import Table from "../../../../whitelabel/src/molecules/table/M-table";
 import { PriceConfigurationPageData } from "./priceConfigurationPage.data";
+import { usePriceList } from "../../../../features/price/price.queries";
+import {
+  CreateOrderTags,
+  mapPriceListToRow,
+} from "./priceConfigurationPage.helpers";
+import { useMemo } from "react";
+import { useDataFilters } from "../../../../utils/hooks/useDataFilters";
+import ActiveTag from "../../../../whitelabel/src/molecules/activeTag/ActiveTag";
+import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import type { CreatePriceListTagsArgs } from "./priceConfigurationPage.types";
 
 const PriceConfigurationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -10,6 +20,54 @@ const PriceConfigurationPage: React.FC = () => {
   const handleNavigateCreateProduct = () => {
     navigate("new");
   };
+
+  const { page, limit, setFilters } = useDataFilters();
+
+  const params = useMemo(
+    () => ({
+      page: page ?? 1,
+      limit,
+    }),
+    [page, limit],
+  );
+
+  const { data, isLoading, error } = usePriceList(params);
+  const tableListData = data?.data ?? [];
+  console.log(tableListData);
+
+  const rows = useMemo(
+    () => tableListData?.map(mapPriceListToRow),
+    [tableListData],
+  );
+
+  const handleFilterReset = () => {
+    setFilters({
+      limit: undefined,
+      page: undefined,
+    });
+  };
+
+  const clearAllFilterTags = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    handleFilterReset();
+  };
+
+  const tags = CreateOrderTags({
+    setFilters,
+    limit,
+    page,
+  });
+
+  if (isLoading) {
+    return <h1>Loading</h1>;
+  }
+
+  if (error) {
+    return <h1>Error Batej</h1>;
+  }
+
   return (
     <div>
       <div className="uk-inline">
@@ -19,8 +77,20 @@ const PriceConfigurationPage: React.FC = () => {
           onClick={handleNavigateCreateProduct}
         />
       </div>
-      <Table {...PriceConfigurationPageData.table} />
-      <TableFooterPagination {...PriceConfigurationPageData.pagination} />
+      <br /> <br />
+      <ActiveTag
+        {...PriceConfigurationPageData.tags}
+        items={tags}
+        onClearAll={clearAllFilterTags}
+        className="b-orders-tags"
+      />
+      <Table {...PriceConfigurationPageData.table} rows={rows} />
+      <TableFooterPagination
+        {...PriceConfigurationPageData.pagination}
+        meta={(data as any)?.meta}
+        onPageChange={(p) => setFilters({ page: p })}
+        onLimitChange={(l) => setFilters({ limit: l, page: 1 })}
+      />
     </div>
   );
 };

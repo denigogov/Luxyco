@@ -1,12 +1,13 @@
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { TableFooterPaginationTypes } from "../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
+import type { ActiveTagItemTypes } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
 import type { TableTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { TableFilterTypes } from "../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
 
 import type { PriceConfigurationPageTypes } from "./priceConfigurationPage.types";
 
 const tableData: TableTypes = {
-  type: "orders",
+  type: "price/edit",
   classes: "",
   tooltipSelectAll: "",
   noResultMessage: "Нема пронајдени резултати",
@@ -134,14 +135,24 @@ const tableData: TableTypes = {
 
 const pagination: TableFooterPaginationTypes = {
   meta: {
-    limit: 10,
+    limit: 20,
     page: 1,
-    total: 20,
-    totalPages: 2,
+    total: 52215,
+    totalPages: 25,
   },
+  role: "orders",
+  limitOptions: [5, 10, 20],
+  customSelectButton: {
+    label: "",
+    style: "default",
+    className: "limit_customSelect",
+    icon: {
+      name: "chevron-down",
+      position: "right",
+    },
+  },
+  onLimitChange: () => {},
   onPageChange: () => {},
-  customSelectButton: { label: "test" },
-  role: "customers",
 };
 
 const filters: TableFilterTypes = {
@@ -192,9 +203,39 @@ const createNewProductButton: ButtonTypes = {
   icon: { name: "plus", position: "right" },
   role: "navigate",
 };
+
+const tags: ActiveTagItemTypes = {
+  onClearAll: () => {},
+  items: [
+    {
+      key: "пример-таг",
+      value: "Струмица",
+      onRemove: () => {},
+    },
+
+    {
+      key: "пример-клиент",
+      value: "Дејан Гогов",
+      onRemove: () => {},
+    },
+  ],
+  clearButton: {
+    label: "Ресетирај Филтери",
+    style: "default",
+    role: "reset",
+    icon: {
+      name: "trash",
+      position: "right",
+    },
+    onlyIcon: true,
+    tooltip: "ресетирај сите филтери",
+  },
+};
+
 export const PriceConfigurationPageData: PriceConfigurationPageTypes = {
   table: tableData,
   pagination,
   filters,
   createNewProductButton,
+  tags,
 };
