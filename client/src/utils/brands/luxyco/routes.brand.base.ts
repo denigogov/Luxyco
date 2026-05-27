@@ -15,6 +15,7 @@ export const BRAND_LUXYCO_ROUTE_CONFIG = {
       "/settings": true,
       "/settings/price": true,
       "/settings/price/new": true,
+      "/settings/price/edit/:id": true,
       "/settings/status": false,
     },
 

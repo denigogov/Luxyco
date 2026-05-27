@@ -20,6 +20,12 @@ const NewProduct = () => (
   </div>
 );
 
+const EditProduct = () => (
+  <div>
+    <h1>EditProduct</h1> page
+  </div>
+);
+
 const Status = () => (
   <div>
     <h1>Status</h1> page
@@ -44,6 +50,15 @@ const settingsSubRoute = [
     element: (
       <Modal {...modalBase}>
         <NewProduct />,
+      </Modal>
+    ),
+  },
+  {
+    fullPath: "/settings/price/edit/:id",
+    path: "price/edit/:id",
+    element: (
+      <Modal {...modalBase}>
+        <EditProduct />,
       </Modal>
     ),
   },

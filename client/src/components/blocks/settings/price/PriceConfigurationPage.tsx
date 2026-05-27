@@ -11,8 +11,6 @@ import {
 import { useMemo } from "react";
 import { useDataFilters } from "../../../../utils/hooks/useDataFilters";
 import ActiveTag from "../../../../whitelabel/src/molecules/activeTag/ActiveTag";
-import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import type { CreatePriceListTagsArgs } from "./priceConfigurationPage.types";
 
 const PriceConfigurationPage: React.FC = () => {
   const navigate = useNavigate();

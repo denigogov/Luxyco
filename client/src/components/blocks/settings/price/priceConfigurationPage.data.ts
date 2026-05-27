@@ -7,7 +7,7 @@ import type { TableFilterTypes } from "../../../../whitelabel/src/molecules/tabl
 import type { PriceConfigurationPageTypes } from "./priceConfigurationPage.types";
 
 const tableData: TableTypes = {
-  type: "price/edit",
+  type: "settings",
   classes: "",
   tooltipSelectAll: "",
   noResultMessage: "Нема пронајдени резултати",
@@ -17,6 +17,7 @@ const tableData: TableTypes = {
   hover: true,
   loadingRows: 5,
   loadingVariant: "bar+skeleton",
+  basePath: "/settings/price/edit/",
   columns: [
     {
       header: "Креирано",
