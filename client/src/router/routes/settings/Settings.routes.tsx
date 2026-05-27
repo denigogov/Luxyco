@@ -1,6 +1,6 @@
 import { Navigate, Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
-import PriceConfigurationPage from "../../../components/blocks/settings/price/PriceConfigurationPage";
+import PriceConfigurationPage from "../../../components/blocks/settings/price/All/PriceConfigurationPage";
 import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 

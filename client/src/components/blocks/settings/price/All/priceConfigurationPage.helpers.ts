@@ -1,7 +1,7 @@
-import type { PriceListTypes } from "../../../../features/price/price.types";
-import { timeFormat } from "../../../../utils/helpers/timeFormat";
-import type { ActiveTagItem } from "../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
+import type { PriceListTypes } from "../../../../../features/price/price.types";
+import { timeFormat } from "../../../../../utils/helpers/timeFormat";
+import type { ActiveTagItem } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import type { RowTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import type { CreatePriceListTagsArgs } from "./priceConfigurationPage.types";
 
 export function mapPriceListToRow(o: PriceListTypes): RowTypes {

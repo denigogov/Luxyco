@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router";
-import Button from "../../../../whitelabel/src/atoms/button/A-Button";
-import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
-import Table from "../../../../whitelabel/src/molecules/table/M-table";
+import Button from "../../../../../whitelabel/src/atoms/button/A-Button";
+import TableFooterPagination from "../../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
+import Table from "../../../../../whitelabel/src/molecules/table/M-table";
 import { PriceConfigurationPageData } from "./priceConfigurationPage.data";
-import { usePriceList } from "../../../../features/price/price.queries";
+import { usePriceList } from "../../../../../features/price/price.queries";
 import {
   CreateOrderTags,
   mapPriceListToRow,
 } from "./priceConfigurationPage.helpers";
 import { useMemo } from "react";
-import { useDataFilters } from "../../../../utils/hooks/useDataFilters";
-import ActiveTag from "../../../../whitelabel/src/molecules/activeTag/ActiveTag";
+import { useDataFilters } from "../../../../../utils/hooks/useDataFilters";
+import ActiveTag from "../../../../../whitelabel/src/molecules/activeTag/ActiveTag";
 
 const PriceConfigurationPage: React.FC = () => {
   const navigate = useNavigate();
