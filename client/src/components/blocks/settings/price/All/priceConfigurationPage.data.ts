@@ -1,10 +1,10 @@
 import type { ButtonTypes } from "../../../../../whitelabel/src/atoms/button/a-button.types";
 import type { TableFooterPaginationTypes } from "../../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import type { ConfirmDialogTypes } from "../../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { TableTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import type { TableFilterTypes } from "../../../../../whitelabel/src/molecules/tableFilter/m-tableFitler.types";
-
-import type { PriceConfigurationPageTypes } from "../priceConfigurationPage.types";
+import type { PriceConfigurationPageTypes } from "./priceConfigurationPage.types";
 
 const tableData: TableTypes = {
   type: "settings",
@@ -13,7 +13,7 @@ const tableData: TableTypes = {
   noResultMessage: "Нема пронајдени резултати",
   enableMultiSelect: false,
   striped: false,
-  responsive: true,
+  responsive: false,
   hover: true,
   loadingRows: 5,
   loadingVariant: "bar+skeleton",
@@ -22,10 +22,12 @@ const tableData: TableTypes = {
     {
       header: "Креирано",
       key: "createdAt",
+      enableSort: true,
     },
     {
       header: "Продук",
       key: "product",
+      enableSort: true,
     },
     {
       header: "Модел",
@@ -44,6 +46,7 @@ const tableData: TableTypes = {
     {
       header: "Ажурирано",
       key: "updatedAt",
+      enableSort: true,
     },
     {
       header: "Акција",
@@ -116,7 +119,7 @@ const tableData: TableTypes = {
     modals: [
       {
         openButton: {
-          label: "Избриши",
+          label: "Деактивирај",
           size: "medium",
           style: "text",
           role: "delete",
@@ -233,10 +236,35 @@ const tags: ActiveTagItemTypes = {
   },
 };
 
+export const productPrompDeleteMessages = {
+  deleteOne: {
+    success: {
+      title: "Продуктот е успешно отстранет",
+      text: "Продуктот е отстранет од системот.",
+    },
+    error: {
+      title: "Бришењето не беше успешно",
+      text: "Не можевме да го отстраниме продуктот во моментов. Ве молиме обидете се повторно.",
+    },
+  },
+};
+
+const confirmationDeleteDialog: ConfirmDialogTypes = {
+  type: "danger",
+  title: "Деактивирај Продукт ?",
+  message: "Оваа акција ќе го деактивира продуктор, Дали сакате да продолжите?",
+  buttons: [
+    {
+      label: "test",
+    },
+  ],
+};
+
 export const PriceConfigurationPageData: PriceConfigurationPageTypes = {
   table: tableData,
   pagination,
   filters,
   createNewProductButton,
   tags,
+  confirmationDeleteDialog,
 };

@@ -13,4 +13,10 @@ export const priceKeys = {
   all: ["pricelist"] as const,
   lists: () => [...priceKeys.all, "list"] as const,
   list: (params: PriceQueryTypes) => [...priceKeys.lists(), params] as const,
+  mutations: {
+    create: () => ["pricelist", "create"] as const,
+    update: (productID: number | undefined) =>
+      ["pricelist", "update", productID] as const,
+    deleteOne: () => ["pricelist", "delete"] as const,
+  },
 };

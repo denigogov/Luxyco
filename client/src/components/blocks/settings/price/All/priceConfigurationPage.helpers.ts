@@ -1,8 +1,28 @@
 import type { PriceListTypes } from "../../../../../features/price/price.types";
 import { timeFormat } from "../../../../../utils/helpers/timeFormat";
 import type { ActiveTagItem } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import type { RowTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
+import type {
+  RowMarker,
+  RowTypes,
+} from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import type { CreatePriceListTagsArgs } from "./priceConfigurationPage.types";
+
+export function getOrderRowMarker(active?: boolean): RowMarker | undefined {
+  switch (active) {
+    case true: // product active
+      return undefined;
+
+    case false: // product deactivated
+      return {
+        variant: "danger",
+        message: "неактивен продукт",
+        onlySideMarker: false,
+      };
+
+    default:
+      return undefined;
+  }
+}
 
 export function mapPriceListToRow(o: PriceListTypes): RowTypes {
   return {
@@ -13,7 +33,7 @@ export function mapPriceListToRow(o: PriceListTypes): RowTypes {
     priceModel: o?.priceModel?.name === "PER_PIECE" ? "По Парче" : "По М2",
     price: String(o?.basePrice) ?? "-",
     status: o.isActive ? "Активен" : "Неактивен",
-    // rowMarker: getOrderRowMarker(o.status?.id),
+    rowMarker: getOrderRowMarker(o.isActive),
   };
 }
 

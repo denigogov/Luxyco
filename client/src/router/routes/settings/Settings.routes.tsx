@@ -3,6 +3,8 @@ import { allowedPaths } from "../../../utils/brands";
 import PriceConfigurationPage from "../../../components/blocks/settings/price/All/PriceConfigurationPage";
 import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
+import PriceConfigurationNew from "../../../components/blocks/settings/price/Create/PriceConfigurationNew";
+import PriceConfigurationEdit from "../../../components/blocks/settings/price/Edit/PriceConfigurationEdit";
 
 const modalBase: ModalTypes = {
   options: {
@@ -49,7 +51,7 @@ const settingsSubRoute = [
     path: "price/new",
     element: (
       <Modal {...modalBase}>
-        <NewProduct />,
+        <PriceConfigurationNew />,
       </Modal>
     ),
   },
@@ -58,7 +60,7 @@ const settingsSubRoute = [
     path: "price/edit/:id",
     element: (
       <Modal {...modalBase}>
-        <EditProduct />,
+        <PriceConfigurationEdit />,
       </Modal>
     ),
   },
