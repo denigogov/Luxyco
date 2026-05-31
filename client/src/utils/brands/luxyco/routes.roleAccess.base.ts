@@ -14,6 +14,29 @@ type BrandRouteAccess = Partial<Record<BrandUserRole, string[]>>;
 const baseRouteAccess: BrandRouteAccess = {
   SUPER_ADMIN: ["*"],
 
+  ADMIN: [
+    "/",
+    "/dashboard",
+
+    "/orders",
+    "/orders/new",
+    "/orders/:id",
+    "/orders/:id/edit",
+    "/orders/:id/item/:qr",
+
+    "/customers",
+    "/customers/new",
+    "/customers/:customerId",
+    "/customers/:customerId/addresses/new",
+    "/customers/:customerId/addresses/:addressId/edit",
+    "/customers/:customerId/notes/add",
+    "/customers/:customerId/notes/:noteId/edit",
+
+    "/settings/price",
+    "/settings/price/edit/:id",
+    "/settings/delivery",
+  ],
+
   MANAGER: [
     "/",
     "/dashboard",
@@ -46,15 +69,6 @@ const baseRouteAccess: BrandRouteAccess = {
     "/customers/:customerId",
   ],
 
-  ADMIN: [
-    "/",
-    "/dashboard",
-    "/orders",
-    "/orders/:id",
-    "/orders/:id/details/:itemId",
-    "/customers",
-    "/customers/:customerId",
-  ],
   RECEPTION: [],
   MACHINE_OPERATOR: [],
 };

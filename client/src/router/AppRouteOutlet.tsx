@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
 import "./_appRouteOutlet.styles.scss";
 import Navbar from "../whitelabel/src/organisms/navbar/O-Navbar";
-import { o_navbarData } from "../whitelabel/src/organisms/navbar/o-navbar.data";
 import { useAuth } from "../utils/hooks/useAuth";
 import { allowedPaths } from "../utils/brands";
 import { setLastValidRoute } from "../utils/routes/routeStore";
@@ -19,7 +18,7 @@ import QuickContextMenu from "../whitelabel/src/molecules/QuickContextMenu/Quick
 import { quickMenuItems } from "../whitelabel/src/molecules/QuickContextMenu/quickContextMenu.data";
 import { QrScanner } from "../whitelabel/src/molecules/qrScanner/QrScanner";
 import Button from "../whitelabel/src/atoms/button/A-Button";
-import { navigationMenuData } from "../utils/brands/navigationMenu.global";
+import { MAIN_NAVIGATION_MENU } from "../utils/brands/navigationMenu.global";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -106,7 +105,7 @@ const AppRoute: React.FC = () => {
     return <ErrorWrapper />;
   }
 
-  const navbarForRole = filterNavbarByRole(o_navbarData, role);
+  const navbarForRole = filterNavbarByRole(MAIN_NAVIGATION_MENU, role);
 
   const navbarConfig: NavbarTypes = {
     ...navbarForRole,
@@ -159,7 +158,7 @@ const AppRoute: React.FC = () => {
 
   return (
     <div className="app-layout">
-      <Navbar {...navbarConfig} navItems={navigationMenuData} />
+      <Navbar {...navbarConfig} />
       <main
         className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
         onContextMenu={handleContextMenu}
