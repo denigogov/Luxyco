@@ -19,6 +19,7 @@ import QuickContextMenu from "../whitelabel/src/molecules/QuickContextMenu/Quick
 import { quickMenuItems } from "../whitelabel/src/molecules/QuickContextMenu/quickContextMenu.data";
 import { QrScanner } from "../whitelabel/src/molecules/qrScanner/QrScanner";
 import Button from "../whitelabel/src/atoms/button/A-Button";
+import { navigationMenuData } from "../utils/brands/navigationMenu.global";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -158,7 +159,7 @@ const AppRoute: React.FC = () => {
 
   return (
     <div className="app-layout">
-      <Navbar {...navbarConfig} />
+      <Navbar {...navbarConfig} navItems={navigationMenuData} />
       <main
         className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
         onContextMenu={handleContextMenu}

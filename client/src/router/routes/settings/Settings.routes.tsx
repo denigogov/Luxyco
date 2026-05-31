@@ -1,10 +1,14 @@
-import { Navigate, Route } from "react-router";
+import { Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
 import PriceConfigurationPage from "../../../components/blocks/settings/price/All/PriceConfigurationPage";
 import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 import PriceConfigurationNew from "../../../components/blocks/settings/price/Create/PriceConfigurationNew";
 import PriceConfigurationEdit from "../../../components/blocks/settings/price/Edit/PriceConfigurationEdit";
+
+import DeliveryPriceConfigCreate from "../../../components/blocks/settings/delivery/create/DeliveryPriceConfigCreate";
+import DeliveryPriceConfigEdit from "../../../components/blocks/settings/delivery/edit/DeliveryPriceConfigEdit";
+import DeliveryPriceConfig from "../../../components/blocks/settings/delivery/all/DeliveryPriceConfig";
 
 const modalBase: ModalTypes = {
   options: {
@@ -15,18 +19,6 @@ const modalBase: ModalTypes = {
 const SimpleSetupPage = () => {
   return <h1>Setup Page</h1>;
 };
-
-const NewProduct = () => (
-  <div>
-    <h1>NewProduct</h1> page
-  </div>
-);
-
-const EditProduct = () => (
-  <div>
-    <h1>EditProduct</h1> page
-  </div>
-);
 
 const Status = () => (
   <div>
@@ -46,6 +38,7 @@ const settingsSubRoute = [
     element: <PriceConfigurationPage />,
   },
 
+  // price conig route
   {
     fullPath: "/settings/price/new",
     path: "price/new",
@@ -61,6 +54,31 @@ const settingsSubRoute = [
     element: (
       <Modal {...modalBase}>
         <PriceConfigurationEdit />,
+      </Modal>
+    ),
+  },
+
+  // delivery types conig route
+  {
+    fullPath: "/settings/delivery",
+    path: "delivery",
+    element: <DeliveryPriceConfig />,
+  },
+  {
+    fullPath: "/settings/delivery/new",
+    path: "delivery/new",
+    element: (
+      <Modal {...modalBase}>
+        <DeliveryPriceConfigCreate />,
+      </Modal>
+    ),
+  },
+  {
+    fullPath: "/settings/delivery/edit/:id",
+    path: "delivery/edit/:id",
+    element: (
+      <Modal {...modalBase}>
+        <DeliveryPriceConfigEdit />,
       </Modal>
     ),
   },

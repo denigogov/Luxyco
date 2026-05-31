@@ -13,9 +13,18 @@ export const BRAND_LUXYCO_ROUTE_CONFIG = {
     },
     "/settings": {
       "/settings": true,
+
+      // price route
       "/settings/price": true,
       "/settings/price/new": true,
       "/settings/price/edit/:id": true,
+
+      // delivery type
+      "/settings/delivery": true,
+      "/settings/delivery/new": true,
+      "/settings/price/delivery/:id": true,
+
+      // fake status nothing just example
       "/settings/status": false,
     },
 
