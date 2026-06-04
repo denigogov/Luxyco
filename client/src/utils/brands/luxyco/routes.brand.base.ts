@@ -22,7 +22,7 @@ export const BRAND_LUXYCO_ROUTE_CONFIG = {
       // delivery type
       "/settings/delivery": true,
       "/settings/delivery/new": true,
-      "/settings/price/delivery/:id": true,
+      "/settings/delivery/edit/:id": true,
 
       // fake status nothing just example
       "/settings/status": false,

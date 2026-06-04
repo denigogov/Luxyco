@@ -35,8 +35,13 @@ type OrdersFilters = Pick<
   | "sortDir"
 >;
 
+type DeliverTypeFilter = {
+  active?: string;
+};
+
 export type Filters = CustomersFilters &
-  Omit<OrdersFilters, keyof CustomersFilters>;
+  Omit<OrdersFilters, keyof CustomersFilters> &
+  DeliverTypeFilter;
 
 type SetFiltersArg = Partial<Filters> | ((prev: Filters) => Partial<Filters>);
 
@@ -75,6 +80,9 @@ function readFilters(sp: URLSearchParams): Filters {
     scheduledTo: readParam(sp, "scheduledTo"),
     createdFrom: readParam(sp, "createdFrom"),
     createdTo: readParam(sp, "createdTo"),
+
+    // deliveryType
+    active: readParam(sp, "active"),
   };
 }
 

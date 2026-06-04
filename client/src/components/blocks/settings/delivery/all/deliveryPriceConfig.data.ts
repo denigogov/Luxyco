@@ -17,7 +17,7 @@ const tableData: TableTypes = {
   hover: true,
   loadingRows: 5,
   loadingVariant: "bar+skeleton",
-  basePath: "/settings/price/edit/",
+  basePath: "/settings/delivery/edit/",
   columns: [
     {
       header: "Креирано",
@@ -26,7 +26,7 @@ const tableData: TableTypes = {
     },
     {
       header: "Тип Достава",
-      key: "product",
+      key: "type",
       enableSort: true,
     },
     {
@@ -173,7 +173,7 @@ const filters: TableFilterTypes = {
 };
 
 const createNewProductButton: ButtonTypes = {
-  label: "Додади нов продукт",
+  label: "Додади нов тип достава",
   style: "secondary",
   icon: { name: "plus", position: "right" },
   role: "navigate",
@@ -207,23 +207,24 @@ const tags: ActiveTagItemTypes = {
   },
 };
 
-export const productPrompDeleteMessages = {
+export const deliveryTypePrompDeleteMessages = {
   deleteOne: {
     success: {
-      title: "Продуктот е успешно отстранет",
-      text: "Продуктот е отстранет од системот.",
+      title: "Тип на достава е успешно отстранет",
+      text: "Типот на достава  е отстранет од системот.",
     },
     error: {
       title: "Бришењето не беше успешно",
-      text: "Не можевме да го отстраниме продуктот во моментов. Ве молиме обидете се повторно.",
+      text: "Не можевме да го отстраниме овој тип на достава во моментов. Ве молиме обидете се повторно.",
     },
   },
 };
 
 const confirmationDeleteDialog: ConfirmDialogTypes = {
   type: "danger",
-  title: "Деактивирај Продукт ?",
-  message: "Оваа акција ќе го деактивира продуктор, Дали сакате да продолжите?",
+  title: "Деактивирај тип на достава ?",
+  message:
+    "Оваа акција ќе го деактивира овој тип достава, Дали сакате да продолжите?",
   buttons: [
     {
       label: "test",
