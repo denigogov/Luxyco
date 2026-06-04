@@ -5,6 +5,8 @@ import { PrismaService } from 'src/infrastructure/database/prisma.service';
 import { RedisService } from 'src/infrastructure/cache/redis.service';
 import { buildDeliveryTypeListCacheKey } from 'src/infrastructure/cache/cache-keys';
 import { delivery_type } from '@prisma/client';
+import { paginate } from 'src/common/utils/pagination.util';
+import { GetDeliveryTypeDto } from './dto/get-delivery-type.dto';
 
 @Injectable()
 export class DeliveryTypeService {
@@ -17,7 +19,7 @@ export class DeliveryTypeService {
     return 'This action adds a new deliveryType';
   }
 
-  async findAll() {
+  async findAll(query: GetDeliveryTypeDto) {
     const cacheKey = buildDeliveryTypeListCacheKey();
     const cached = await this.redis.get<delivery_type[]>(cacheKey);
 
@@ -25,9 +27,22 @@ export class DeliveryTypeService {
       return cached;
     }
 
-    const result = await this.prisma.delivery_type.findMany({
-      where: { is_active: true },
-    });
+    const args = {
+      where: {
+        ...(query.active !== undefined && {
+          is_active: query.active,
+        }),
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    };
+
+    const result = await paginate(
+      this.prisma.delivery_type as any,
+      args,
+      query,
+    );
 
     await this.redis.set(cacheKey, result);
 

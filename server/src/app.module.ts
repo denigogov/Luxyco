@@ -17,7 +17,6 @@ import { DeliveryTypeModule } from './modules/delivery-type/delivery-type.module
 import { ServiceTypeModule } from './modules/service-type/service-type.module';
 import { PrintModule } from './infrastructure/printing/print.module';
 import { PriceModule } from './modules/price/price.module';
-import { DeliveryModule } from './modules/delivery/delivery.module';
 
 @Module({
   imports: [
@@ -34,7 +33,6 @@ import { DeliveryModule } from './modules/delivery/delivery.module';
     ServiceTypeModule,
     PrintModule,
     PriceModule,
-    DeliveryModule,
   ],
   controllers: [AppController],
   providers: [
