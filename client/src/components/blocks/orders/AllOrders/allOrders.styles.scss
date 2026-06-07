@@ -11,24 +11,16 @@
       "search search search search"
       "filter filter new new"
       "scheduledDate scheduledDate createdDate createdDate"
-      "sort sort sort delete"
+      "sort sort refetch refetch"
+      "delete delete delete delete"
       "tags tags tags tags";
-
-    @include breakpoint(medium) {
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-areas:
-        "search search"
-        "new filter"
-        "createdDate scheduledDate"
-        "sort delete"
-        "tags tags";
-    }
 
     @include breakpoint(large) {
       grid-template-columns: repeat(5, 1fr);
       grid-template-areas:
         "search search search search new"
-        "filter createdDate scheduledDate sort delete"
+        "filter createdDate scheduledDate sort refetch"
+        "delete . . . . "
         "tags tags tags tags tags";
     }
 
@@ -64,6 +56,13 @@
 
   &-sort {
     grid-area: sort;
+  }
+
+  &-refetch {
+    grid-area: refetch;
+    button {
+      justify-content: start !important;
+    }
   }
 
   &-delete {

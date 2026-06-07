@@ -87,7 +87,7 @@ const CustomerDetails: React.FC = () => {
 
   const cid = Number(customerFromState?.id ?? customerId ?? 0);
 
-  const { data, isLoading, isFetching, error } = useCustomer(cid);
+  const { data, isLoading, isFetching, refetch, error } = useCustomer(cid);
 
   const customerOrders: CustomerOrderTypes[] = data?.orders ?? [];
   const customerAddresses: CustomerAddressTypes[] =
@@ -335,9 +335,17 @@ const CustomerDetails: React.FC = () => {
     [rows, addressesBoxSectionData, notesBoxSectionData],
   );
 
-  if (isLoading) return <h3>Loading</h3>;
-  if (error || data === undefined) return <ErrorWrapper />;
+  if (isLoading || isFetching) {
+    return <h1>Loading</h1>;
+  }
 
+  if (error) {
+    return <ErrorWrapper />;
+  }
+
+  if (!data) {
+    return <h1>Loading</h1>;
+  }
   return (
     <div className="b-customerDetails">
       <Breadcrumbs {...breadcrumbsProps} />
@@ -371,6 +379,12 @@ const CustomerDetails: React.FC = () => {
             className="uk-flex uk-flex-middle uk-grid-small uk-flex-right"
             uk-grid="true"
           >
+            <Button
+              {...customerDetailsData?.customerHeader?.refreshDataButton}
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className={`${isMobile && "b-customerDetails__rightSide-button-refetch"}`}
+            />
             {isMobile && (
               <Button
                 {...customerDetailsData?.customerHeader?.callButton}

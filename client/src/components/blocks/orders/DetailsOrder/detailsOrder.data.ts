@@ -1,3 +1,4 @@
+import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
 import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/buttonGroup/buttonGroup.types";
@@ -266,6 +267,15 @@ const printActionGroup: PrintActionGroupTypes = {
   ],
 };
 
+const refreshDataButton: ButtonTypes = {
+  label: "освежи податоци",
+  icon: { name: "refresh" },
+  style: "link",
+  size: "large",
+  onlyIcon: true,
+  tooltip: "освежи податоци",
+};
+
 const orderStatusSelect: SelectTypes = {
   name: "orderStatusId",
   label: "Статус",
@@ -325,4 +335,5 @@ export const detailsOrderData: DetailsOrderTypes = {
   printActionGroup,
   orderStatusSelect,
   notification,
+  refreshDataButton,
 };

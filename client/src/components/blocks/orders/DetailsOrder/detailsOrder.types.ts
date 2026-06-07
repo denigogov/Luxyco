@@ -1,3 +1,4 @@
+import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
 import type { ButtonGroupTypes } from "../../../../whitelabel/src/molecules/buttonGroup/buttonGroup.types";
@@ -14,4 +15,5 @@ export interface DetailsOrderTypes {
   printActionGroup: PrintActionGroupTypes;
   orderStatusSelect: SelectTypes;
   notification: NotificationAlert;
+  refreshDataButton: ButtonTypes;
 }

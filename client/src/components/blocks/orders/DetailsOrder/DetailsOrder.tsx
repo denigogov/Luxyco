@@ -28,6 +28,7 @@ import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
 import { notificationAlert } from "../../../../utils/hooks/notify";
 import ErrorWrapper from "../../ErrorWrapper";
+import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
@@ -123,9 +124,8 @@ const DetailsOrder: React.FC = () => {
   });
 
   // enable to send or qr-code | the customer ID depend from where its scan
-  const { data, isLoading, error, isPending } = useOrderDetail(
-    isQrCodeParam ? id : Number(id),
-  );
+  const { data, isLoading, error, isPending, refetch, isFetching } =
+    useOrderDetail(isQrCodeParam ? id : Number(id));
   const updateOrderMutattion = useUpdateOrder(data?.id);
   const status = data?.status;
 
@@ -297,7 +297,7 @@ const DetailsOrder: React.FC = () => {
     <div className="detailsOrder">
       <Breadcrumbs {...breadcrumbsProps} />
       <div className="order-card__row uk-padding-small uk-flex  uk-flex-right uk-visible@m">
-        <span uk-icon="refresh"> </span>
+        <span uk-icon="history"> </span>
         <span className=" uk-text-small">
           Ажурирано: {timeFormat(data?.updatedAt, { showTime: true })}
         </span>
@@ -310,6 +310,7 @@ const DetailsOrder: React.FC = () => {
           onError={(error) => console.error(error)}
         />
       </div>
+
       {data && (
         <OrderCard
           orderId={data.id}
@@ -332,15 +333,14 @@ const DetailsOrder: React.FC = () => {
             navigate(`/customers/${data?.customers?.id}`)
           }
           updateOrderStatus={handleUpdateOrderStatus}
+          onRefetchData={() => refetch()}
         />
       )}
       {data?.orderNote && (
         <div className="detailsOrder__note">{data?.orderNote}</div>
       )}
       <OrderStepper currentStatusId={status?.id ?? 1} />
-
       <ButtonGroup {...buttonGroupProps} />
-
       <OrderItemsDetails
         items={tableRows}
         onDelete={handleDeleteOrderPiece}
@@ -351,7 +351,6 @@ const DetailsOrder: React.FC = () => {
           navigate(`item/${pieces.qrCode}`, { state: pieces })
         }
       />
-
       {isPrintModalOpen && data && (
         <div className="detailsOrder__printOverlay">
           <div className="detailsOrder__printModal">
@@ -382,7 +381,6 @@ const DetailsOrder: React.FC = () => {
           </div>
         </div>
       )}
-
       {isStatusModalOpen && (
         <Modal
           classes="detailsOrder__modal"

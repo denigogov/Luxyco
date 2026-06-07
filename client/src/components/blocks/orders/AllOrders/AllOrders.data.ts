@@ -630,6 +630,15 @@ const sortOpenButton: TableSortTypes = {
   ],
 };
 
+const refreshDataButton: ButtonTypes = {
+  label: "освежи податоци",
+  icon: { name: "refresh" },
+  style: "link",
+  size: "large",
+  onlyIcon: true,
+  tooltip: "освежи податоци",
+};
+
 export const filterData: TableFilterTypes = {
   title: "Детално Пребарување",
   filters: [
@@ -891,6 +900,7 @@ export const allOrdersData: AllordersTypes = {
   filterOpenButton: filterOpenButton,
   filterData: filterData,
   sortData: sortOpenButton,
+  refreshDataButton: refreshDataButton,
   tags: tags,
   searchInputData: searchInputData,
   scheduledDate,

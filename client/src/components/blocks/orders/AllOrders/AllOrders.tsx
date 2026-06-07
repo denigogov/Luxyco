@@ -265,7 +265,7 @@ const AllOrders: React.FC = () => {
     },
   ];
 
-  const { data, isLoading, error, isFetching } = useOrdersList(params);
+  const { data, isLoading, error, isFetching, refetch } = useOrdersList(params);
   const tableListData = data?.data ?? [];
 
   const rows = useMemo(() => tableListData.map(mapOrderToRow), [tableListData]);
@@ -462,6 +462,14 @@ const AllOrders: React.FC = () => {
             {...allOrdersData.sortData}
             value={sortKey}
             onChange={handleSortValue}
+          />
+        </div>
+
+        <div className="b-orders-refetch">
+          <Button
+            {...allOrdersData?.refreshDataButton}
+            onClick={() => refetch()}
+            disabled={isFetching}
           />
         </div>
 

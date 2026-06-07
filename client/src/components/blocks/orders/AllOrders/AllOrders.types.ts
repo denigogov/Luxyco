@@ -15,6 +15,7 @@ export interface AllordersTypes {
   filterOpenButton: ButtonTypes;
   filterData: TableFilterTypes;
   sortData: TableSortTypes;
+  refreshDataButton: ButtonTypes;
   tags: ActiveTagItemTypes;
   searchInputData: InputTypes;
   scheduledDate: DaterangeTypes;

@@ -120,6 +120,15 @@ const newOrderBtn: ButtonTypes = {
   style: "secondary",
 };
 
+const refreshDataButton: ButtonTypes = {
+  label: "освежи податоци",
+  icon: { name: "refresh" },
+  style: "link",
+  size: "large",
+  onlyIcon: true,
+  tooltip: "освежи податоци",
+};
+
 const addressesBox: BoxSectionTypes = {
   noItemsMessage: {
     text: "Корисникот нема додадено адреса",
@@ -197,6 +206,7 @@ export const customerDetailsData = {
   customerHeader: {
     callButton,
     newOrderBtn,
+    refreshDataButton,
   },
   addressesBox,
   confirmDeleteAddressDialog,
