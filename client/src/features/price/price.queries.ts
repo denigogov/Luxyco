@@ -14,6 +14,7 @@ import {
 } from "../../api/price/price.api";
 import type { CreateProductFormValues } from "../../components/blocks/settings/price/Create/priceConfigurationNew.types";
 import type { EditProductFormValues } from "../../components/blocks/settings/price/Edit/priceConfigurationEdit.types";
+import { ordersKeys } from "../orders/orders.keys";
 
 export function usePriceList(params?: PriceQueryTypes) {
   const normalized = normalizePriceListParams(params ?? {});
@@ -31,8 +32,16 @@ export function useCreateProduct() {
   return useMutation({
     mutationKey: priceKeys.mutations.create(),
     mutationFn: (dto: CreateProductFormValues) => createProduct(dto),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: priceKeys.lists() });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: priceKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
     },
   });
 }
@@ -43,8 +52,16 @@ export function useDeleteProduct() {
   return useMutation({
     mutationKey: priceKeys.mutations.deleteOne(),
     mutationFn: (id: number) => deleteProduct(id),
-    onSuccess: async (_data) => {
-      await qc.invalidateQueries({ queryKey: priceKeys.lists() });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: priceKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
     },
   });
 }
@@ -56,9 +73,15 @@ export function useProductUpdate(id: number | undefined) {
     mutationKey: priceKeys.mutations.update(id),
     mutationFn: (dto: Partial<EditProductFormValues>) => updateProduct(id, dto),
     onSuccess: async () => {
-      await qc.invalidateQueries({
-        queryKey: priceKeys.lists(),
-      });
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: priceKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
     },
   });
 }

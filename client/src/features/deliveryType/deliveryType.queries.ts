@@ -16,6 +16,7 @@ import {
 import type { DeliveryQueryTypes } from "../../components/blocks/settings/delivery/all/deliveryPriceConfig.types";
 import type { EditDeliveryTypeFormValues } from "../../components/blocks/settings/delivery/edit/deliveryPriceConfigEdit.types";
 import type { CreateDeliveryTypeFormValues } from "../../components/blocks/settings/delivery/create/deliveryPriceConfigCreate.types";
+import { ordersKeys } from "../orders/orders.keys";
 
 export function useDeliveryTypeList(params?: DeliveryQueryTypes) {
   const normalized = normalizeDeliveryListTypesParams(params ?? {});
@@ -36,9 +37,15 @@ export function useDeliveryTypeUpdate(id: number | undefined) {
     mutationFn: (dto: Partial<EditDeliveryTypeFormValues>) =>
       updateDeliveryType(id, dto),
     onSuccess: async () => {
-      await qc.invalidateQueries({
-        queryKey: deliveryTypeKeys.lists(),
-      });
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: deliveryTypeKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
     },
   });
 }
@@ -49,8 +56,16 @@ export function useCreateDeliveryType() {
   return useMutation({
     mutationKey: deliveryTypeKeys.mutations.create(),
     mutationFn: (dto: CreateDeliveryTypeFormValues) => createDeliveryType(dto),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: deliveryTypeKeys.lists() });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: deliveryTypeKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
     },
   });
 }

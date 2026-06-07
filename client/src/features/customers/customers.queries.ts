@@ -99,12 +99,16 @@ export function useUpdateCustomer(id: number) {
   return useMutation({
     mutationKey: ["customers", id, "update"] as const,
     mutationFn: (dto: Partial<Customer>) => updateCustomer(id, dto),
-    onSuccess: (updated) => {
-      qc.setQueryData(customersKeys.detail(id), (old: any) => ({
-        ...(old ?? {}),
-        ...updated,
-      }));
-      qc.invalidateQueries({ queryKey: customersKeys.lists() });
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: customersKeys.detail(id),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: customersKeys.lists(),
+        }),
+      ]);
     },
   });
 }
@@ -144,8 +148,10 @@ export function useRestoreInactiveCustomer() {
   return useMutation({
     mutationKey: ["customers", "restore"] as const,
     mutationFn: (id: number) => restoreInactiveCustomer(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: customersKeys.restoreOne() });
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: customersKeys.all,
+      });
     },
   });
 }
@@ -156,8 +162,10 @@ export function useDeleteCustomerPermanently() {
   return useMutation({
     mutationKey: ["customers", "permanently"] as const,
     mutationFn: (id: number) => deletePermanentlyCustomer(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: customersKeys.deletePermanently() });
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: customersKeys.all,
+      });
     },
   });
 }

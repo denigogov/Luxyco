@@ -51,6 +51,6 @@ export const ordersKeys = {
     update: (orderId: number) => ["orders", orderId, "update"] as const,
     updatePiece: (identifier: number | string, qr: string) =>
       ["orders", String(identifier), "item", qr, "update"] as const,
-    deleteMany: () => ["oprders", "bulk-delete"] as const,
+    deleteMany: () => ["orders", "bulk-delete"] as const,
   },
 };

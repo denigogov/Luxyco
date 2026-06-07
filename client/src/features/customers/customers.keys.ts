@@ -29,7 +29,7 @@ export const customersKeys = {
   list: (params: NormalizedCustomersListParams) =>
     [...customersKeys.lists(), params] as const,
   listOrder: (params: NormalizedCustomersListParams) =>
-    [...customersKeys.lists(), params] as const,
+    [...customersKeys.all, "order-list", params] as const,
   details: () => [...customersKeys.all, "detail"] as const,
   detail: (id: number) => [...customersKeys.details(), id] as const,
 

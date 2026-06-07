@@ -48,8 +48,10 @@ export function useCreateOrder() {
   return useMutation({
     mutationKey: ordersKeys.mutations.create(),
     mutationFn: (dto: CreateOrderQueryType) => createOrder(dto),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ordersKeys.lists() });
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: ordersKeys.lists(),
+      });
     },
   });
 }
@@ -87,8 +89,12 @@ export function useUpdateOrderPiece(identifier: number | string, qr: string) {
       updateOrderPieces(identifier, qr, dto),
     onSuccess: async () => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ordersKeys.details() }),
-        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+        qc.invalidateQueries({
+          queryKey: ordersKeys.detail(identifier),
+        }),
+        qc.invalidateQueries({
+          queryKey: ordersKeys.lists(),
+        }),
       ]);
     },
   });
@@ -107,10 +113,15 @@ export function useDeleteOrderPieces() {
       piecesId: string;
     }) => deleteOrderPieces(orderId, piecesId),
 
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ordersKeys.details() }),
-        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+        qc.invalidateQueries({
+          queryKey: ordersKeys.detail(variables.orderId),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.lists(),
+        }),
       ]);
     },
   });
