@@ -99,9 +99,9 @@ export class OrdersService {
   }
 
   async getOrderReferences() {
-    // const cacheKey = buildOrderReferencesListCacheKey();
-    // const cached = await this.redis.get<any>(cacheKey);
-    // if (cached) return cached;
+    const cacheKey = buildOrderReferencesListCacheKey();
+    const cached = await this.redis.get<any>(cacheKey);
+    if (cached) return cached;
 
     const [deliveryTypes, serviceTypes, priceModels] = await Promise.all([
       this.prisma.delivery_type.findMany({
@@ -143,7 +143,7 @@ export class OrdersService {
 
     const result = { deliveryTypes, serviceTypes, productTypes };
 
-    // await this.redis.set(cacheKey, result, 300);
+    await this.redis.set(cacheKey, result, 300);
     return result;
   }
 

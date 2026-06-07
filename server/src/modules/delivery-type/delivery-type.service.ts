@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDeliveryTypeDto } from './dto/create-delivery-type.dto';
 import { UpdateDeliveryTypeDto } from './dto/update-delivery-type.dto';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
@@ -15,23 +19,47 @@ export class DeliveryTypeService {
     private readonly redis: RedisService,
   ) {}
 
-  create(createDeliveryTypeDto: CreateDeliveryTypeDto) {
-    return 'This action adds a new deliveryType';
+  private async invalidateDeliveryTypeCache() {
+    await this.redis.delByPrefix('luxyco:orders:references:v1:');
+    await this.redis.delByPrefix('luxyco:orders:detail:v1:');
+    // const activeDetailKey = buildCustomerDetailCacheKey({
+    //   id: customerId,
+    //   isActive: true,
+    // });
+    // const inactiveDetailKey = buildCustomerDetailCacheKey({
+    //   id: customerId,
+    //   isActive: false,
+    // });
+
+    // await this.redis.del([activeDetailKey, inactiveDetailKey]);
+  }
+
+  async create(createDeliveryTypeDto: CreateDeliveryTypeDto) {
+    const createDeliveryType = this.prisma.delivery_type.create({
+      data: {
+        price: createDeliveryTypeDto.price,
+        type_name: createDeliveryTypeDto.typeName,
+        is_active: true,
+      },
+    });
+
+    await this.invalidateDeliveryTypeCache();
+
+    return createDeliveryType;
   }
 
   async findAll(query: GetDeliveryTypeDto) {
-    const cacheKey = buildDeliveryTypeListCacheKey();
-    const cached = await this.redis.get<delivery_type[]>(cacheKey);
+    const isActive = query.active ?? true;
+    // const cacheKey = buildDeliveryTypeListCacheKey();
+    // const cached = await this.redis.get<delivery_type[]>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
+    // if (cached) {
+    //   return cached;
+    // }
 
     const args = {
       where: {
-        ...(query.active !== undefined && {
-          is_active: query.active,
-        }),
+        is_active: isActive,
       },
       orderBy: {
         id: 'desc',
@@ -44,7 +72,7 @@ export class DeliveryTypeService {
       query,
     );
 
-    await this.redis.set(cacheKey, result);
+    // await this.redis.set(cacheKey, result);
 
     return result;
   }
@@ -53,8 +81,29 @@ export class DeliveryTypeService {
     return `This action returns a #${id} deliveryType`;
   }
 
-  update(id: number, updateDeliveryTypeDto: UpdateDeliveryTypeDto) {
-    return `This action updates a #${id} deliveryType`;
+  async update(id: number, updateDeliveryTypeDto: UpdateDeliveryTypeDto) {
+    if (Object.keys(updateDeliveryTypeDto).length === 0) {
+      throw new BadRequestException('No fields provided to update');
+    }
+
+    const existing = await this.prisma.delivery_type.findUnique({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundException(`Delivery Type with id ${id} not found`);
+    }
+
+    const updateDeliveryType = await this.prisma.delivery_type.update({
+      where: { id },
+      data: {
+        type_name: updateDeliveryTypeDto.typeName,
+        price: updateDeliveryTypeDto.price,
+        is_active: updateDeliveryTypeDto.isActive,
+      },
+    });
+
+    await this.invalidateDeliveryTypeCache();
+    return updateDeliveryType;
   }
 
   remove(id: number) {

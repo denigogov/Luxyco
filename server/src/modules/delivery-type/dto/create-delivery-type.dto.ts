@@ -4,6 +4,7 @@ import {
   IsDecimal,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
@@ -18,7 +19,7 @@ export class CreateDeliveryTypeDto {
   typeName: string;
 
   @Type(() => Number)
-  @IsDecimal()
+  @IsNumber()
   price: number;
 
   @IsOptional()

@@ -16,8 +16,6 @@ export class PriceService {
     private readonly redis: RedisService,
   ) {}
   private async invalidateCustomerCache() {
-    await this.redis.delByPrefix('luxyco:customers:list:v1:');
-    await this.redis.delByPrefix('luxyco:customers:order-list:v1:');
     await this.redis.delByPrefix('luxyco:orders:references:v1:');
     // const activeDetailKey = buildCustomerDetailCacheKey({
     //   id: customerId,
@@ -32,7 +30,7 @@ export class PriceService {
   }
 
   async create(dto: CreatePriceDto) {
-    const createdNote = this.prisma.product_types.create({
+    const createdNote = await this.prisma.product_types.create({
       data: {
         base_price: dto.basePrice,
         name: dto.name,
