@@ -8,6 +8,7 @@ import type {
   CustomerOrderTypes,
 } from "./customerDetails.types";
 import { timeFormat } from "../../../../utils/helpers/timeFormat";
+import { priceFormatted } from "../../../../utils/helpers/priceFormater";
 
 /**
  * Orders -> Table rows
@@ -22,7 +23,7 @@ export function mapOrdersToRows(customerOrders: CustomerOrderTypes[]) {
       scheduledDate: timeFormat(c?.scheduledDate),
       deliveryType: c?.deliveryType ?? "не дефинирано",
       qrCode: c?.qrCode ?? 0,
-      totalPrice: `${(c?.totalPrice ?? 0).toFixed(2)} ден.`,
+      totalPrice: priceFormatted(c?.totalPrice),
       totalM2: `${(c?.totalM2 ?? 0).toFixed(2)} m²`,
       status: c?.status ?? "",
       messuredPieces: `${c?.measuredPieces ?? 0}/${c?.totalPieces ?? 0}`,
@@ -188,11 +189,11 @@ export function buildCustomerStatistic(args: {
           break;
 
         case "totalPrice":
-          value = `${stats?.totalMoney?.toFixed?.(2) ?? 0} ден.`;
+          value = priceFormatted(stats?.totalMoney?.toFixed?.(2));
           break;
 
         case "avgOrderPrice":
-          value = `${stats?.avgOrderValue?.toFixed?.(2) ?? 0} ден.`;
+          value = priceFormatted(stats?.avgOrderValue?.toFixed?.(2));
           break;
 
         case "lastOrder":

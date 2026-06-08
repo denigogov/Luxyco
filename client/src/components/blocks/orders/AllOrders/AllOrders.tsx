@@ -271,7 +271,10 @@ const AllOrders: React.FC = () => {
   const rows = useMemo(() => tableListData.map(mapOrderToRow), [tableListData]);
 
   const deliveryTypesData = referencesData?.deliveryTypes ?? [];
-
+  const canDeleteSelected = useMemo(
+    () => canDeleteSelectedOrders(selectedOrders, tableListData),
+    [selectedOrders, tableListData],
+  );
   const filterData = useMemo(
     () =>
       buildOrdersFilterData({
@@ -413,11 +416,6 @@ const AllOrders: React.FC = () => {
   const navigateToCreateNewOrder = () => {
     navigate("new");
   };
-
-  const canDeleteSelected = useMemo(
-    () => canDeleteSelectedOrders(selectedOrders, tableListData),
-    [selectedOrders, tableListData],
-  );
 
   return (
     <div className="b-orders">

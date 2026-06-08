@@ -1,3 +1,4 @@
+import { ORDER_STATUS_OPTIONS } from "../../../../utils/helpers/hardcodedDataImportant";
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { DaterangeTypes } from "../../../../whitelabel/src/atoms/datepicker/a-daterange.types";
 import type { InputTypes } from "../../../../whitelabel/src/atoms/input/a-input.types";
@@ -555,13 +556,6 @@ const tableData: TableTypes = {
         style: "text",
         role: "details",
       },
-
-      {
-        label: "Принтај",
-        size: "medium",
-        style: "text",
-        role: "details",
-      },
     ],
   },
 };
@@ -647,17 +641,36 @@ export const filterData: TableFilterTypes = {
       label: "Име / Презиме",
       name: "name",
       type: "text",
-      placeholder: "ex: John",
       icon: { name: "user", position: "right" },
     },
 
-    { keyName: "city", label: "Град", name: "city", type: "text" },
+    {
+      keyName: "city",
+      label: "Град",
+      name: "city",
+      type: "text",
+    },
 
-    { keyName: "street", label: "Улица", name: "street", type: "text" },
+    {
+      keyName: "street",
+      label: "Улица",
+      name: "street",
+      type: "text",
+    },
 
-    { keyName: "village", label: "Село", name: "village", type: "text" },
+    {
+      keyName: "village",
+      label: "Село",
+      name: "village",
+      type: "text",
+    },
 
-    { keyName: "qrCode", label: "QR Код", name: "qrCode", type: "text" },
+    {
+      keyName: "qrCode",
+      label: "QR Код",
+      name: "qrCode",
+      type: "text",
+    },
 
     {
       keyName: "phoneNumber",
@@ -671,56 +684,7 @@ export const filterData: TableFilterTypes = {
       name: "status",
       type: "select",
       placeholder: "одбери статус",
-      options: [
-        { label: "сите", value: "" },
-        {
-          label: "Мерење",
-          value: "2",
-        },
-        {
-          label: "Во обработка",
-          value: "1",
-        },
-        {
-          label: "Се чека за достава",
-          value: "3",
-        },
-        {
-          label: "Се доставуват",
-          value: "4",
-        },
-        {
-          label: "Завршени",
-          value: "5",
-        },
-        {
-          label: "Откажени",
-          value: "6",
-        },
-      ],
-    },
-
-    {
-      keyName: "deliveryType",
-      label: "Тип на Испорака",
-      name: "status",
-      type: "select",
-      placeholder: "тип",
-      options: [
-        {
-          label: "сите",
-          value: "",
-        },
-        {
-          label: "Подигнување",
-          value: "1",
-        },
-
-        {
-          label: "Достава",
-          value: "2",
-        },
-      ],
+      options: ORDER_STATUS_OPTIONS,
     },
   ],
   actionButton: [
