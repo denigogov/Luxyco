@@ -121,8 +121,9 @@ export const buildOrdersFilterData = (params: {
 export function canDeleteSelectedOrders(
   selectedOrders: number[],
   tableListData: any[],
+  isUserAllowedToDelete: boolean,
 ): boolean {
-  if (selectedOrders.length === 0) return false;
+  if (selectedOrders.length === 0 || !isUserAllowedToDelete) return false;
 
   const selectedOrdersData = tableListData.filter((order) =>
     selectedOrders.includes(order.id),

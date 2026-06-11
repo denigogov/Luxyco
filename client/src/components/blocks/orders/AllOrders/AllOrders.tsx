@@ -47,6 +47,8 @@ import "./allOrders.styles.scss";
 import type { RowTypes } from "../../../../whitelabel/src/molecules/table/m-table.types";
 import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/modal.types";
 import { notificationAlert } from "../../../../utils/hooks/notify";
+import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
+import useUserPermissions from "../../../../utils/hooks/useUserPermissions";
 
 const toApiDate = (date: Date) => {
   const year = date.getFullYear();
@@ -71,7 +73,8 @@ const AllOrders: React.FC = () => {
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const canDeleteOrder = true;
+  const { allowedPermitions } = useUserPermissions();
+  const canUserDeleteOrder = allowedPermitions(PERMISSIONS.ORDERS_DELETE);
 
   const modalCloseRef = useRef<null | (() => void)>(null);
   const deleteOrderMutation = useDeletOrdersBulk();
@@ -272,7 +275,12 @@ const AllOrders: React.FC = () => {
 
   const deliveryTypesData = referencesData?.deliveryTypes ?? [];
   const canDeleteSelected = useMemo(
-    () => canDeleteSelectedOrders(selectedOrders, tableListData),
+    () =>
+      canDeleteSelectedOrders(
+        selectedOrders,
+        tableListData,
+        canUserDeleteOrder,
+      ),
     [selectedOrders, tableListData],
   );
   const filterData = useMemo(
@@ -525,7 +533,7 @@ const AllOrders: React.FC = () => {
           {...allOrdersData.table}
           actionButtons={{
             buttons: [...(allOrdersData.table.actionButtons?.buttons ?? [])],
-            modals: [...(canDeleteOrder ? tableActionButton : [])],
+            modals: [...(canUserDeleteOrder ? tableActionButton : [])],
           }}
           rows={rows}
           loading={isFetching}

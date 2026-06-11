@@ -74,13 +74,16 @@ const baseRouteAccess: BrandRouteAccess = {
 };
 
 //  Feature / permission tokens per role
-// (no real URLs here, only PERMISSIONS)z
+// (no real URLs here, only PERMISSIONS)
+// if user have access to all route i mean has * in route this mean that he has permition to do everything also!
 const permissionAccess: BrandRouteAccess = {
   SUPER_ADMIN: [
     PERMISSIONS.CUSTOMERS_DELETE,
     PERMISSIONS.CUSTOMERS_ADDRESSES_DELETE,
+    PERMISSIONS.ORDERS_DELETE,
   ],
   MANAGER: [PERMISSIONS.CUSTOMERS_DELETE],
+  ADMIN: [],
   // DRIVER: [], etc.
 };
 

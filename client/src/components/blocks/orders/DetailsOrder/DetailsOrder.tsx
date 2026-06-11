@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";
-import { detailsOrderData } from "./detailsOrder.data";
+import { detailsOrderData, notificationMessages } from "./detailsOrder.data";
 import Breadcrumbs from "../../../../whitelabel/src/molecules/Breadcrumbs/M-Breadcrumbs";
 import OrderStepper from "../../../../whitelabel/src/organisms/orderStepper/OrderStepper";
 import OrderItemsDetails from "../../../../whitelabel/src/organisms/orderItemsDetails/OrderItemsDetails";
@@ -28,7 +28,9 @@ import Modal from "../../../../whitelabel/src/organisms/Modal/Modal";
 import ASelect from "../../../../whitelabel/src/atoms/formComponents/select/A-select";
 import { notificationAlert } from "../../../../utils/hooks/notify";
 import ErrorWrapper from "../../ErrorWrapper";
-import Button from "../../../../whitelabel/src/atoms/button/A-Button";
+import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
+import useUserPermissions from "../../../../utils/hooks/useUserPermissions";
+import { ORDER_STATUS } from "../../../../utils/helpers/hardcodedDataImportant";
 
 const DetailsOrder: React.FC = () => {
   const { id } = useParams();
@@ -45,6 +47,16 @@ const DetailsOrder: React.FC = () => {
   const mainTicketRef = useRef<HTMLDivElement>(null);
   const itemLabelsRef = useRef<HTMLDivElement>(null);
   const customerBillRef = useRef<HTMLDivElement>(null);
+
+  const { allowedPermitions } = useUserPermissions();
+  const canUserDeleteOrder = allowedPermitions(PERMISSIONS.ORDERS_DELETE);
+  const canUserDeleteOrderPieces = allowedPermitions(
+    PERMISSIONS.ORDERS_PIECES_DELETE,
+  );
+  const canUserOrderUpdate = allowedPermitions(PERMISSIONS.ORDERS_UPDATE);
+  const canUserOrderPiecesUpdate = allowedPermitions(
+    PERMISSIONS.ORDERS_PIECES_UPDATE,
+  );
 
   const deleteOrderPiecesMutation = useDeleteOrderPieces();
   const deleteOrderMutation = useDeletOrdersBulk();
@@ -68,7 +80,13 @@ const DetailsOrder: React.FC = () => {
   });
 
   const handleDeleteOrder = async () => {
-    if (!id) return;
+    if (!id || !canUserDeleteOrder) {
+      if (!canUserDeleteOrder) {
+        notificationAlert.error(notificationMessages.notAllowed);
+      }
+      closeModal();
+      return;
+    }
 
     try {
       await deleteOrderMutation.mutateAsync([Number(id)]);
@@ -76,32 +94,27 @@ const DetailsOrder: React.FC = () => {
       navigate("/orders", { replace: true });
     } catch (error) {
       console.error(error);
-      notificationAlert.error({
-        title: "Грешка",
-        text: "Нарачката не беше избришана. Обидете се повторно.",
-      });
+      notificationAlert.error(notificationMessages.error);
     }
   };
 
   const handleDeleteOrderPiece = async (item: any) => {
-    if (!id || !item?.qrCode) return;
-
+    if (!id || !item?.qrCode || !canUserDeleteOrderPieces) {
+      if (!canUserDeleteOrderPieces) {
+        notificationAlert.error(notificationMessages.notAllowedPieces);
+      }
+      closeModal();
+      return;
+    }
     try {
       await deleteOrderPiecesMutation.mutateAsync({
         orderId: id,
         piecesId: item.qrCode,
       });
 
-      notificationAlert.success({
-        title: "Парчето е избришано",
-        text: "Парчето е успешно отстрането од нарачката.",
-      });
+      notificationAlert.success(notificationMessages.success);
     } catch (error) {
-      notificationAlert.error({
-        title: "Грешка",
-        text: "Парчето не беше избришано. Обидете се повторно.",
-      });
-
+      notificationAlert.error(notificationMessages.error);
       console.error(error);
     }
   };
@@ -124,15 +137,17 @@ const DetailsOrder: React.FC = () => {
   });
 
   // enable to send or qr-code | the customer ID depend from where its scan
-  const { data, isLoading, error, isPending, refetch, isFetching } =
-    useOrderDetail(isQrCodeParam ? id : Number(id));
+  const { data, isLoading, error, isPending, refetch } = useOrderDetail(
+    isQrCodeParam ? id : Number(id),
+  );
   const updateOrderMutattion = useUpdateOrder(data?.id);
   const status = data?.status;
 
   const handleBreadCrumbNavigation = (name: string, orderData = {}) => {
     switch (name) {
       case "editOrder":
-        if (status.id === 5) {
+        if (status.id === ORDER_STATUS.FINISHED || !canUserOrderUpdate) {
+          notificationAlert.error(notificationMessages.notAllowedUpdate);
           return;
         }
         navigate(`/orders/${id}/edit`, { state: orderData });
@@ -157,7 +172,12 @@ const DetailsOrder: React.FC = () => {
         />
       ),
       setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
-      allowDeleteOrder: Boolean(status?.id !== 1 || status?.id === 6),
+      allowDeleteOrder:
+        Boolean(
+          status?.id !== ORDER_STATUS.PROCESSING ||
+          status?.id === ORDER_STATUS.CANCELLED,
+        ) && canUserDeleteOrder,
+      notAllowedPemision: !canUserDeleteOrder && !canUserOrderUpdate,
     });
   }, [id, data]);
 
@@ -296,6 +316,7 @@ const DetailsOrder: React.FC = () => {
   return (
     <div className="detailsOrder">
       <Breadcrumbs {...breadcrumbsProps} />
+
       <div className="order-card__row uk-padding-small uk-flex  uk-flex-right uk-visible@m">
         <span uk-icon="history"> </span>
         <span className=" uk-text-small">
@@ -339,15 +360,17 @@ const DetailsOrder: React.FC = () => {
       {data?.orderNote && (
         <div className="detailsOrder__note">{data?.orderNote}</div>
       )}
-      <OrderStepper currentStatusId={status?.id ?? 1} />
+      <OrderStepper currentStatusId={status?.id ?? ORDER_STATUS.PROCESSING} />
       <ButtonGroup {...buttonGroupProps} />
       <OrderItemsDetails
         items={tableRows}
         onDelete={handleDeleteOrderPiece}
         onMeasure={(pieces) =>
+          canUserOrderPiecesUpdate &&
           navigate(`item/${pieces.qrCode}`, { state: pieces })
         }
         onEditPiece={(pieces) =>
+          canUserOrderPiecesUpdate &&
           navigate(`item/${pieces.qrCode}`, { state: pieces })
         }
       />

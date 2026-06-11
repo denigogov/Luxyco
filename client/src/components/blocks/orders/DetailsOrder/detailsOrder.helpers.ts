@@ -8,6 +8,7 @@ export function buildOrderBreadcrumbsProps(args: {
   modalChildren: ReactNode;
   setModalClose: (closeFn: () => void) => void;
   allowDeleteOrder: boolean;
+  notAllowedPemision: boolean;
 }) {
   const {
     base,
@@ -17,6 +18,7 @@ export function buildOrderBreadcrumbsProps(args: {
     modalChildren,
     setModalClose,
     allowDeleteOrder,
+    notAllowedPemision,
   } = args;
   const isFinished = order?.status?.id === 5;
 
@@ -38,19 +40,23 @@ export function buildOrderBreadcrumbsProps(args: {
     openButton: allowDeleteOrder ? modalData.openButton : {},
   }));
 
+  const dropdown = notAllowedPemision
+    ? {}
+    : {
+        ...(base.dropdown ?? {}),
+        items: {
+          ...(base.dropdown?.items ?? {}),
+          buttons,
+          modals,
+        },
+      };
+
   return {
     ...base,
     returnLink: {
       ...(base.returnLink ?? {}),
       onClick: returnToPrevRoute,
     },
-    dropdown: {
-      ...(base.dropdown ?? {}),
-      items: {
-        ...(base.dropdown?.items ?? {}),
-        buttons,
-        modals,
-      },
-    },
+    dropdown,
   };
 }

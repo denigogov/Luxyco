@@ -24,3 +24,12 @@ export const ORDER_STATUS_OPTIONS = [
     label: "Откажано",
   },
 ];
+
+export const ORDER_STATUS = {
+  PROCESSING: 1,
+  MEASURING: 2,
+  READY_FOR_DELIVERY: 3,
+  DELIVERING: 4,
+  FINISHED: 5,
+  CANCELLED: 6,
+};
