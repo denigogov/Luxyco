@@ -163,7 +163,7 @@ const breadcrumps: BreadcrumbsTypes = {
     },
   },
   returnLink: {
-    label: "Сите налози",
+    label: "Врати се назад",
     style: "link",
     icon: { name: "chevron-left" },
   },
@@ -347,6 +347,11 @@ export const notificationMessages = {
   notAllowedUpdate: {
     title: "Пристап одбиен",
     text: "Немате дозвола за уредување на нарачките.",
+  },
+
+  notAllowedStatusUpdate: {
+    title: "Пристап одбиен",
+    text: "Нарачката сеуште има неизмерени парчиња",
   },
 };
 

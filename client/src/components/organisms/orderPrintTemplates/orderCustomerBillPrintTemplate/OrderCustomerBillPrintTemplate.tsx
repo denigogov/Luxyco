@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { brandConfig } from "../../../../utils/brands";
 import type { OrderPostResponse } from "../../../../features/orders/orders.types";
 import "./orderCustomerBillPrintTemplate.styles.scss";
+import { priceFormatted } from "../../../../utils/helpers/priceFormater";
 
 interface OrderCustomerBillPrintTemplateProps {
   order: OrderPostResponse | null;
@@ -32,7 +33,7 @@ const formatDateTime = (isoDate?: string): string => {
 
 const formatMoney = (value?: string | number): string => {
   const amount = Number(value ?? 0);
-  return `${amount.toFixed(2)} ден.`;
+  return priceFormatted(Number(amount.toFixed(2)));
 };
 
 const Divider = () => <div className="c-bill-divider">{"- ".repeat(21)}</div>;

@@ -99,7 +99,12 @@ const DetailsOrder: React.FC = () => {
   };
 
   const handleDeleteOrderPiece = async (item: any) => {
-    if (!id || !item?.qrCode || !canUserDeleteOrderPieces) {
+    if (
+      !id ||
+      !item?.qrCode ||
+      !canUserDeleteOrderPieces ||
+      item.status === ORDER_STATUS.FINISHED
+    ) {
       if (!canUserDeleteOrderPieces) {
         notificationAlert.error(notificationMessages.notAllowedPieces);
       }
@@ -296,8 +301,27 @@ const DetailsOrder: React.FC = () => {
     setIsStatusModalOpen(true);
   };
 
+  const AllowedStatuses = [
+    ORDER_STATUS.DELIVERING,
+    ORDER_STATUS.READY_FOR_DELIVERY,
+    ORDER_STATUS.FINISHED,
+  ];
+
   const handleConfirmUpdateOrderStatus = async () => {
     if (!data?.id || !selectedStatusId) return;
+
+    const blockedStatuses = [
+      ORDER_STATUS.FINISHED,
+      ORDER_STATUS.DELIVERING,
+      ORDER_STATUS.READY_FOR_DELIVERY,
+    ];
+
+    if (!isTotalFinal && blockedStatuses.includes(Number(selectedStatusId))) {
+      return notificationAlert.error(
+        notificationMessages.notAllowedStatusUpdate,
+      );
+    }
+
     try {
       await updateOrderMutattion.mutateAsync({
         orderStatusId: Number(selectedStatusId),
@@ -372,6 +396,11 @@ const DetailsOrder: React.FC = () => {
         onEditPiece={(pieces) =>
           canUserOrderPiecesUpdate &&
           navigate(`item/${pieces.qrCode}`, { state: pieces })
+        }
+        updatePermission={canUserOrderPiecesUpdate}
+        deletePermission={
+          canUserDeleteOrderPieces &&
+          !AllowedStatuses.includes(Number(status.id))
         }
       />
       {isPrintModalOpen && data && (
