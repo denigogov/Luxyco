@@ -264,6 +264,7 @@ const CreateOrder = () => {
             <div>
               {!selectedCustomer ? (
                 <Autocomplete
+                  classes="b-createOrder__autocomplete"
                   searchInput={searchInput}
                   onSearchChange={handleSearchChange}
                   results={customersData?.data ?? []}

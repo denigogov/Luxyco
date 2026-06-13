@@ -9,6 +9,7 @@ export const BRAND_LUXYCO_ROUTE_CONFIG = {
       "/orders/new": true,
       "/orders/:id": true,
       "/orders/:id/edit": true,
+      "/orders/:id/piece-new": true,
       "/orders/:id/item/:qr": true,
     },
     "/settings": {

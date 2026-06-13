@@ -22,6 +22,7 @@ const baseRouteAccess: BrandRouteAccess = {
     "/orders/new",
     "/orders/:id",
     "/orders/:id/edit",
+    "/orders/:id/piece-new",
     "/orders/:id/item/:qr",
 
     "/customers",

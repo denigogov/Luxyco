@@ -7,6 +7,7 @@ import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.t
 import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
 import EditOrders from "../../../components/blocks/orders/EditOrders/EditOrders";
 import OrderPiecesModal from "../../../components/organisms/orderPiecesModal/OrderPiecesModal";
+import AdditionalPieces from "../../../components/blocks/orders/AdditionPieces/AdditionalPieces";
 
 const modalBase: ModalTypes = {
   options: {
@@ -37,6 +38,15 @@ const orderDetailsSubRoutee = [
     fullPath: "/orders/:id/item/:qr",
     path: "item/:qr",
     element: <OrderPiecesModal />,
+  },
+  {
+    fullPath: "/orders/:id/piece-new",
+    path: "piece-new",
+    element: (
+      <Modal {...modalBase}>
+        <AdditionalPieces />
+      </Modal>
+    ),
   },
 ];
 

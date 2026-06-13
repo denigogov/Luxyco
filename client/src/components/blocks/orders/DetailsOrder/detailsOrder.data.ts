@@ -200,6 +200,7 @@ const buttonGroup: ButtonGroupTypes = {
     },
     {
       label: "Додади парче",
+      role: "add",
       icon: {
         name: "plus",
       },

@@ -3,6 +3,10 @@
   flex-direction: column;
   gap: spacing(medium);
 
+  &__autocomplete {
+    margin: 0 auto;
+  }
+
   &__card {
     background: color(backgroundWhite);
     padding: spacing(medium);

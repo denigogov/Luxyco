@@ -231,6 +231,14 @@ const DetailsOrder: React.FC = () => {
           };
         }
 
+        if (button.role === "add") {
+          console.log("is add");
+          return {
+            ...button,
+            onClick: () => navigate("piece-new"),
+          };
+        }
+
         return button;
       });
 
