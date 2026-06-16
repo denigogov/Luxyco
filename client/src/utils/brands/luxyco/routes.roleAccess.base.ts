@@ -58,6 +58,7 @@ const baseRouteAccess: BrandRouteAccess = {
 
     "/settings",
     "/settings/price",
+    "/settings/user",
   ],
 
   DRIVER: [

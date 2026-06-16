@@ -1,21 +1,17 @@
 import { Route } from "react-router";
 import { allowedPaths } from "../../../utils/brands";
-import PriceConfigurationPage from "../../../components/blocks/settings/price/All/PriceConfigurationPage";
-import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
-import Modal from "../../../whitelabel/src/organisms/Modal/Modal";
-import PriceConfigurationNew from "../../../components/blocks/settings/price/Create/PriceConfigurationNew";
-import PriceConfigurationEdit from "../../../components/blocks/settings/price/Edit/PriceConfigurationEdit";
+// import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
+import { userSubRoutes } from "./UserSettingsPath.routes";
+import { deliverySettingsSubRoutes } from "./DeliverySettingsPath.routes";
+import { priceSettingsSubRoutes } from "./PriceSettingsPath.routes";
 
-import DeliveryPriceConfigCreate from "../../../components/blocks/settings/delivery/create/DeliveryPriceConfigCreate";
-import DeliveryPriceConfigEdit from "../../../components/blocks/settings/delivery/edit/DeliveryPriceConfigEdit";
-import DeliveryPriceConfig from "../../../components/blocks/settings/delivery/all/DeliveryPriceConfig";
+// const modalBase: ModalTypes = {
+//   options: {
+//     initialOpen: true,
+//     returnBack: true,
+//   },
+// };
 
-const modalBase: ModalTypes = {
-  options: {
-    initialOpen: true,
-    returnBack: true,
-  },
-};
 const SimpleSetupPage = () => {
   return <h1>Setup Page</h1>;
 };
@@ -32,56 +28,15 @@ const settingsSubRoute = [
     path: "status",
     element: <Status />,
   },
-  {
-    fullPath: "/settings/price",
-    path: "price",
-    element: <PriceConfigurationPage />,
-  },
 
-  // price conig route
-  {
-    fullPath: "/settings/price/new",
-    path: "price/new",
-    element: (
-      <Modal {...modalBase}>
-        <PriceConfigurationNew />,
-      </Modal>
-    ),
-  },
-  {
-    fullPath: "/settings/price/edit/:id",
-    path: "price/edit/:id",
-    element: (
-      <Modal {...modalBase}>
-        <PriceConfigurationEdit />,
-      </Modal>
-    ),
-  },
+  // price route
+  ...priceSettingsSubRoutes,
 
-  // delivery types conig route
-  {
-    fullPath: "/settings/delivery",
-    path: "delivery",
-    element: <DeliveryPriceConfig />,
-  },
-  {
-    fullPath: "/settings/delivery/new",
-    path: "delivery/new",
-    element: (
-      <Modal {...modalBase}>
-        <DeliveryPriceConfigCreate />,
-      </Modal>
-    ),
-  },
-  {
-    fullPath: "/settings/delivery/edit/:id",
-    path: "delivery/edit/:id",
-    element: (
-      <Modal {...modalBase}>
-        <DeliveryPriceConfigEdit />,
-      </Modal>
-    ),
-  },
+  // delivery settings route
+  ...deliverySettingsSubRoutes,
+
+  // user settings route
+  ...userSubRoutes,
 ];
 
 export const SettingsRoutes = (

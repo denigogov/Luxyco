@@ -145,7 +145,7 @@ export let MAIN_NAVIGATION_MENU: NavbarTypes = {
           title: "Корисници",
           icon: "users",
 
-          path: "/personal",
+          path: "/settings/user",
         },
         {
           title: "Помош и Поддршка",
