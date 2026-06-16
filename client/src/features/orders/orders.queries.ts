@@ -7,6 +7,7 @@ import {
 import type { OrdersListParams } from "./orders.types";
 import {
   createOrder,
+  createOrderAdditionalPiece,
   deleteMultipleOrders,
   deleteOrderPieces,
   getOrderById,
@@ -17,6 +18,7 @@ import {
 } from "../../api/orders/orders.api";
 import { normalizeOrdersListParams, ordersKeys } from "./orders.keys";
 import type {
+  CreateOrderItemsType,
   CreateOrderQueryType,
   UpdateOrderPiece,
   UpdateOrderQueryType,
@@ -80,6 +82,23 @@ export function useUpdateOrder(id: number) {
     },
   });
 }
+
+export function useCreateAdditionalPiece(id: number) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ordersKeys.mutations.createPiece(id),
+    mutationFn: (dto: CreateOrderItemsType) =>
+      createOrderAdditionalPiece(id, dto),
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ordersKeys.detail(id) }),
+        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+      ]);
+    },
+  });
+}
+
 export function useUpdateOrderPiece(identifier: number | string, qr: string) {
   const qc = useQueryClient();
 

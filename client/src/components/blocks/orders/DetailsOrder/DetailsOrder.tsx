@@ -61,6 +61,18 @@ const DetailsOrder: React.FC = () => {
   const deleteOrderPiecesMutation = useDeleteOrderPieces();
   const deleteOrderMutation = useDeletOrdersBulk();
 
+  const AllowedStatuses = [
+    ORDER_STATUS.DELIVERING,
+    ORDER_STATUS.READY_FOR_DELIVERY,
+    ORDER_STATUS.FINISHED,
+  ];
+
+  const blockedStatuses = [
+    ORDER_STATUS.FINISHED,
+    ORDER_STATUS.DELIVERING,
+    ORDER_STATUS.READY_FOR_DELIVERY,
+  ];
+
   const returnToPrevRoute = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const from = (state as any)?.from;
@@ -178,10 +190,7 @@ const DetailsOrder: React.FC = () => {
       ),
       setModalClose: (closeFn) => (modalCloseRef.current = closeFn),
       allowDeleteOrder:
-        Boolean(
-          status?.id !== ORDER_STATUS.PROCESSING ||
-          status?.id === ORDER_STATUS.CANCELLED,
-        ) && canUserDeleteOrder,
+        !AllowedStatuses.includes(Number(status?.id)) && canUserDeleteOrder,
       notAllowedPemision: !canUserDeleteOrder && !canUserOrderUpdate,
     });
   }, [id, data]);
@@ -309,20 +318,8 @@ const DetailsOrder: React.FC = () => {
     setIsStatusModalOpen(true);
   };
 
-  const AllowedStatuses = [
-    ORDER_STATUS.DELIVERING,
-    ORDER_STATUS.READY_FOR_DELIVERY,
-    ORDER_STATUS.FINISHED,
-  ];
-
   const handleConfirmUpdateOrderStatus = async () => {
     if (!data?.id || !selectedStatusId) return;
-
-    const blockedStatuses = [
-      ORDER_STATUS.FINISHED,
-      ORDER_STATUS.DELIVERING,
-      ORDER_STATUS.READY_FOR_DELIVERY,
-    ];
 
     if (!isTotalFinal && blockedStatuses.includes(Number(selectedStatusId))) {
       return notificationAlert.error(

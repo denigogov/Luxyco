@@ -48,6 +48,7 @@ export const ordersKeys = {
 
   mutations: {
     create: () => ["orders", "create"] as const,
+    createPiece: (orderId: number) => ["orders", orderId, "update"] as const,
     update: (orderId: number) => ["orders", orderId, "update"] as const,
     updatePiece: (identifier: number | string, qr: string) =>
       ["orders", String(identifier), "item", qr, "update"] as const,

@@ -6,7 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
 import { UpdateOrderPieceDto } from './dto/update-order-piece.dto';
-import { AddOrderPieceDto } from './dto/add-order-piece.dto';
+import { AddOrderPieceItemDto } from './dto/add-order-piece.dto';
 
 const PENDING_STATUS_ID = 1;
 const MEASURING_STATUS_ID = 2;
@@ -162,26 +162,20 @@ export class OrderPieceUpdateService {
     };
   }
 
+  // Takes ONE item (called in a loop from the service above)
   async addPiece(
     orderIdentifier: number | string,
-    dto: AddOrderPieceDto,
+    dto: AddOrderPieceItemDto,
     userId: number,
   ) {
     const order = await this.findOrder(orderIdentifier);
 
     const productType = await this.prisma.product_types.findFirst({
-      where: {
-        id: dto.productTypeId,
-        is_active: true,
-      },
+      where: { id: dto.productTypeId, is_active: true },
       select: {
         id: true,
         base_price: true,
-        price_model: {
-          select: {
-            name: true,
-          },
-        },
+        price_model: { select: { name: true } },
       },
     });
 
@@ -192,24 +186,18 @@ export class OrderPieceUpdateService {
     }
 
     const maxPiece = await this.prisma.order_pieces.aggregate({
-      where: {
-        order_id: order.id,
-      },
-      _max: {
-        piece_index: true,
-      },
+      where: { order_id: order.id },
+      _max: { piece_index: true },
     });
 
     const nextPieceIndex = (maxPiece._max.piece_index ?? 0) + 1;
     const labelCode = this.generateLabelCode(order.qr_code, nextPieceIndex);
-
     const isPerPiece = productType.price_model.name === 'PER_PIECE';
-
     const piecePrice = isPerPiece
       ? new Prisma.Decimal(productType.base_price ?? 0)
       : new Prisma.Decimal(0);
 
-    const result = await this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx) => {
       const createdPiece = await tx.order_pieces.create({
         data: {
           order_id: order.id,
@@ -223,10 +211,12 @@ export class OrderPieceUpdateService {
           measured_by_user_id: isPerPiece ? userId : null,
           measured_at: isPerPiece ? new Date() : null,
         },
-        select: {
-          id: true,
-          label_code: true,
-        },
+        select: { id: true, label_code: true },
+      });
+
+      await tx.orders.update({
+        where: { id: order.id },
+        data: { order_status_id: 1 },
       });
 
       const recalculated = await this.recalculateOrder(tx, order);
@@ -239,8 +229,6 @@ export class OrderPieceUpdateService {
         ...recalculated,
       };
     });
-
-    return result;
   }
 
   async updatePiece(

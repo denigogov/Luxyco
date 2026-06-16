@@ -200,23 +200,36 @@ export class OrdersService {
 
   async addOrderPiece(
     orderIdentifier: number | string,
-    dto: AddOrderPieceDto,
+    dto: AddOrderPieceDto, // wrapper with items[]
     userId: number,
   ) {
-    const result = await this.orderPieceUpdateService.addPiece(
-      orderIdentifier,
-      dto,
-      userId,
-    );
+    const results: Awaited<
+      ReturnType<typeof this.orderPieceUpdateService.addPiece>
+    >[] = [];
+
+    for (const item of dto.items) {
+      for (let i = 0; i < item.quantity; i++) {
+        const result = await this.orderPieceUpdateService.addPiece(
+          orderIdentifier,
+          item, // single AddOrderPieceItemDto
+          userId,
+        );
+        results.push(result);
+      }
+    }
+
+    const last = results[results.length - 1];
 
     await this.invalidateOrdersCache({
-      orderId: result.orderId,
-      customerId: result.customerId ?? undefined,
+      orderId: last.orderId,
+      customerId: last.customerId ?? undefined,
     });
 
     return {
       success: true,
-      ...result,
+      pieces: results.map((r) => ({ pieceId: r.pieceId, pieceQr: r.pieceQr })),
+      orderId: last.orderId,
+      customerId: last.customerId,
     };
   }
 

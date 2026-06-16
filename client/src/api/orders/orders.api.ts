@@ -1,4 +1,5 @@
 import type {
+  CreateOrderItemsType,
   CreateOrderQueryType,
   UpdateOrderPiece,
   UpdateOrderQueryType,
@@ -58,6 +59,13 @@ export function getOrderReferencesList(
 
 export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
   return apiPost<OrderPostResponse>("/orders", body, signal);
+}
+
+export function createOrderAdditionalPiece(
+  id: number,
+  dto?: CreateOrderItemsType,
+) {
+  return apiPost<any>(`/orders/pieces/${id}`, dto);
 }
 
 export function getOrderById(
