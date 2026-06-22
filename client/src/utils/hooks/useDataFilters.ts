@@ -39,9 +39,14 @@ type DeliverTypeFilter = {
   active?: string;
 };
 
+type UsersFilter = {
+  userType?: string;
+};
+
 export type Filters = CustomersFilters &
   Omit<OrdersFilters, keyof CustomersFilters> &
-  DeliverTypeFilter;
+  DeliverTypeFilter &
+  UsersFilter;
 
 type SetFiltersArg = Partial<Filters> | ((prev: Filters) => Partial<Filters>);
 
@@ -83,6 +88,9 @@ function readFilters(sp: URLSearchParams): Filters {
 
     // deliveryType
     active: readParam(sp, "active"),
+
+    //users
+    userType: readParam(sp, "userType"),
   };
 }
 

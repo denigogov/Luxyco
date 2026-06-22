@@ -1,8 +1,6 @@
 // import type { ModalTypes } from "../../../whitelabel/src/organisms/Modal/modal.types";
 
-const User = () => {
-  return <h1>All USER VVVS</h1>;
-};
+import AllUsers from "../../../components/blocks/settings/users/AllUsers/AllUsers";
 
 // const modalBase: ModalTypes = {
 //   options: {
@@ -15,6 +13,6 @@ export const userSubRoutes = [
   {
     fullPath: "/settings/user",
     path: "user",
-    element: <User />,
+    element: <AllUsers />,
   },
 ];

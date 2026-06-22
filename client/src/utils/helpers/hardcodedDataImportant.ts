@@ -33,3 +33,39 @@ export const ORDER_STATUS = {
   FINISHED: 5,
   CANCELLED: 6,
 };
+
+export const ACCOUNT_TYPES_OPTIONS = [
+  {
+    label: "Тип Корисник",
+    value: "",
+    disabled: true,
+  },
+
+  {
+    label: "Сите",
+    value: "all",
+  },
+  {
+    label: "Супер Администратор",
+    value: "SUPER_ADMIN",
+  },
+
+  {
+    label: "Администратор",
+    value: "ADMIN",
+  },
+
+  { value: "MANAGER", label: "Менаџер" },
+
+  {
+    value: "RECEPTION",
+    label: "Рецепција",
+  },
+
+  { value: "MACHINE_OPERATOR", label: "Оператор" },
+
+  {
+    value: "DRIVER",
+    label: "Возач",
+  },
+];
