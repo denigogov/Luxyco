@@ -1,5 +1,7 @@
+import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -10,24 +12,38 @@ import {
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  @MinLength(5, { message: 'вмро дете' })
+  @MinLength(2)
   firstName: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   lastName: string;
 
-  @IsEmail()
-  email: string;
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
+  username: string;
 
   @IsString()
-  @MinLength(6)
+  @IsNotEmpty()
+  @Matches(/^\+?[0-9\s-]{6,20}$/, {
+    message: 'Phone number is not valid',
+  })
+  phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6, {
+    message: 'Лозинката мора да има најмалку 6 карактери',
+  })
+  @Matches(/^(?=.*(?:\d|[^A-Za-z0-9\s])).{6,64}$/, {
+    message: 'Лозинката мора да содржи барем еден број или специјален карактер',
+  })
   password: string;
 
-  @IsString()
-  @IsOptional()
-  @Matches(/^(admin|superadmin|kopale)$/, {
-    message: 'Role must be one of: admin | superadmin | kopale',
-  })
-  role?: 'admin' | 'superadmin' | 'kopale';
+  // easiest for now: frontend sends the account type id
+  @Type(() => Number)
+  @IsInt()
+  accountTypeId: number;
 }
