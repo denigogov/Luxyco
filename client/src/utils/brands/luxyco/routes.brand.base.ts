@@ -27,6 +27,8 @@ export const BRAND_LUXYCO_ROUTE_CONFIG = {
 
       // user route
       "/settings/user": true,
+      "/settings/user/add": true,
+      "/settings/user/edit/:id": true,
 
       // fake status nothing just example
       "/settings/status": false,

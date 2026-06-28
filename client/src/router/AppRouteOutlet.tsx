@@ -163,7 +163,7 @@ const AppRoute: React.FC = () => {
         className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
         onContextMenu={handleContextMenu}
       >
-        <Button label="Скенирај" onClick={() => setIsQrScannerOpen(true)} />
+        {/* <Button label="Скенирај" onClick={() => setIsQrScannerOpen(true)} /> */}
         <QrScanner
           isOpen={isQrScannerOpen}
           onClose={() => setIsQrScannerOpen(false)}
@@ -177,6 +177,7 @@ const AppRoute: React.FC = () => {
           y={quickMenu.y}
           items={quickMenuItems}
           onNavigate={(path) => navigate(path)}
+          onScan={() => setIsQrScannerOpen(true)}
           onClose={() =>
             setQuickMenu((prev) => ({
               ...prev,

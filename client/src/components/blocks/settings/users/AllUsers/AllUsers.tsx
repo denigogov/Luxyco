@@ -8,8 +8,11 @@ import { allUsersData } from "./AllUseres.data";
 import { CreateUserTags, mapUserListToRow } from "./allUser.helpers";
 import ToggleButton from "../../../../../whitelabel/src/atoms/toggle/ToggleButton";
 import ActiveTag from "../../../../../whitelabel/src/molecules/activeTag/ActiveTag";
+import Button from "../../../../../whitelabel/src/atoms/button/A-Button";
+import { useNavigate } from "react-router";
 
 const AllUsers: React.FC = () => {
+  const navigate = useNavigate();
   const [showIsActive, setIsActive] = useState<boolean>(true);
   const { page, limit, active, setFilters, userType } = useDataFilters();
 
@@ -78,13 +81,23 @@ const AllUsers: React.FC = () => {
   if (isLoading) return <h1>Loading</h1>;
   if (isError) return <h1>error</h1>;
 
+  const navigateToCreateUser = () => {
+    navigate("add");
+  };
+
   return (
     <div>
       <div className="uk-flex uk-flex-between">
-        <ASelect
-          {...allUsersData.filterByType}
-          onChange={(e) => filterAccountyType(e)}
-        />
+        <div className="uk-flex uk-padding-small" style={{ gap: "20px" }}>
+          <Button
+            {...allUsersData.createUserBtn}
+            onClick={navigateToCreateUser}
+          />
+          <ASelect
+            {...allUsersData.filterByType}
+            onChange={(e) => filterAccountyType(e)}
+          />
+        </div>
         <ToggleButton
           handleToggleOnClick={filterActiveUsers}
           state={showIsActive}

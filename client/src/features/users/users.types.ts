@@ -29,6 +29,17 @@ export interface UserQueryTypes {
   userType?: string;
 }
 
+export interface CreateUserQuery extends Partial<UsersTypes> {
+  password: string;
+  confirmPassword?: string;
+}
+
+export interface UpdateUserForm extends Partial<UsersTypes> {
+  password?: string;
+  confirmPassword?: string;
+  accountTypeId?: number;
+}
+
 export interface UserResponseTypes {
   data: UsersTypes[];
   meta: {

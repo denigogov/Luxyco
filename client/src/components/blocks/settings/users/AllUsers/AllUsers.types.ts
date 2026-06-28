@@ -1,3 +1,4 @@
+import type { ButtonTypes } from "../../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { TableFooterPaginationTypes } from "../../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
@@ -17,4 +18,5 @@ export interface AllUsersTypes {
   tableData: TableTypes;
   pagination: TableFooterPaginationTypes;
   tags: ActiveTagItemTypes;
+  createUserBtn: ButtonTypes;
 }

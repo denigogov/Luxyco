@@ -1,5 +1,5 @@
-import type { AccountNameType } from "../../../../../features/users/users.types";
 import { ACCOUNT_TYPES_OPTIONS } from "../../../../../utils/helpers/hardcodedDataImportant";
+import type { ButtonTypes } from "../../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { TableFooterPaginationTypes } from "../../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
@@ -16,7 +16,7 @@ const tableData: TableTypes = {
   hover: true,
   loadingRows: 5,
   loadingVariant: "bar+skeleton",
-  basePath: "/settings/users/edit/",
+  basePath: "/settings/user/edit/",
   columns: [
     {
       header: "Креирано",
@@ -103,6 +103,7 @@ const pagination: TableFooterPaginationTypes = {
 };
 
 const filterByType: SelectTypes = {
+  placeholder: "Тип Корисник",
   options: ACCOUNT_TYPES_OPTIONS,
 };
 
@@ -133,10 +134,18 @@ const tags: ActiveTagItemTypes = {
     tooltip: "ресетирај сите филтери",
   },
 };
-
+const createUserBtn: ButtonTypes = {
+  label: "Додади нов корисник",
+  icon: {
+    name: "user",
+    position: "right",
+  },
+  style: "default",
+};
 export const allUsersData: AllUsersTypes = {
   filterByType,
   tableData,
   pagination,
   tags,
+  createUserBtn,
 };

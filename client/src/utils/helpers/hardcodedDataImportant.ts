@@ -36,12 +36,6 @@ export const ORDER_STATUS = {
 
 export const ACCOUNT_TYPES_OPTIONS = [
   {
-    label: "Тип Корисник",
-    value: "",
-    disabled: true,
-  },
-
-  {
     label: "Сите",
     value: "all",
   },
