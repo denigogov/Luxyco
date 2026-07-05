@@ -1,4 +1,3 @@
-import type { UpdateUserTypes } from "../../components/blocks/settings/users/UpdateUser/UpdateUser.types";
 import type {
   CreateUserQuery,
   UpdateUserForm,

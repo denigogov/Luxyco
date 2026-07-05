@@ -26,6 +26,7 @@ import {
   createOrderDefaultValues,
   customerContentMapper,
   getCustomerDefaultAddress,
+  resolveNavigationPath,
 } from "./createOrder.helpers";
 import { createOrderData } from "./CreateOrder.data";
 import "./createOrder.styles.scss";
@@ -471,7 +472,7 @@ const CreateOrder = () => {
           {/* Hidden print templates */}
         </form>
       )}
-      {lastCreatedOrder && BRAND_PRINT_MODE === "manual" && (
+      {lastCreatedOrder && (
         <div className="b-createOrder__printButtons">
           {createOrderData.printActionGroup && (
             <PrintActionGroup
@@ -490,6 +491,23 @@ const CreateOrder = () => {
                       : handlePrintItemLabels(),
                 }),
               )}
+              navigationButtons={
+                createOrderData.printActionGroup?.navigationButtons
+                  ? {
+                      ...createOrderData.printActionGroup.navigationButtons,
+                      items:
+                        createOrderData.printActionGroup.navigationButtons.items.map(
+                          (navBtn) => ({
+                            ...navBtn,
+                            path: resolveNavigationPath(
+                              navBtn,
+                              lastCreatedOrder,
+                            ),
+                          }),
+                        ),
+                    }
+                  : undefined
+              }
             />
           )}
 

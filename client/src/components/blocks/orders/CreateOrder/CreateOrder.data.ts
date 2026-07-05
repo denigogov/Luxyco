@@ -94,5 +94,29 @@ export const createOrderData: CreateOrderTyeps = {
         },
       },
     ],
+    navigationButtons: {
+      items: [
+        {
+          label: "Отвори ја нарачката",
+          description: "Прегледај детали за креираната нарачка",
+          path: `/orders`,
+          icon: "file-text",
+          role: "details",
+        },
+        {
+          label: "Детали за Клиентот",
+          description: "Прегледајте ги сите детали за клиентот",
+          path: "/customers/",
+          icon: "users",
+          role: "customer-details",
+        },
+        {
+          label: "Сите налози",
+          description: "Врати се кон листата со налози",
+          path: "/orders",
+          icon: "list",
+        },
+      ],
+    },
   },
 };

@@ -60,3 +60,15 @@ export const buildOrderPayload = (formData: any) => ({
   customerId: Number(formData.customerId),
   deliveryAddressId: Number(formData.deliveryAddressId),
 });
+
+export const resolveNavigationPath = (navBtn: any, lastCreatedOrder: any) => {
+  if (navBtn.role === "details" && lastCreatedOrder?.id) {
+    return `/orders/${lastCreatedOrder.id}`;
+  }
+
+  if (navBtn.role === "customer-details" && lastCreatedOrder?.customers?.id) {
+    return `/customers/${lastCreatedOrder.customerId}`;
+  }
+
+  return navBtn.path;
+};
