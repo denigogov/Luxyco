@@ -1,3 +1,5 @@
+import type { AccountNameType } from "../../features/users/users.types";
+
 export const ORDER_STATUS_OPTIONS = [
   {
     value: "1",
@@ -63,3 +65,28 @@ export const ACCOUNT_TYPES_OPTIONS = [
     label: "Возач",
   },
 ];
+
+export const formatAccountNames = (type: AccountNameType | string) => {
+  switch (type) {
+    case "SUPER_ADMIN":
+      return "Супер Администратор";
+
+    case "ADMIN":
+      return "Администратор";
+
+    case "MANAGER":
+      return "Менаџер";
+
+    case "RECEPTION":
+      return "Рецепција";
+
+    case "MACHINE_OPERATOR":
+      return "Оператор";
+
+    case "DRIVER":
+      return "Возач";
+
+    default:
+      "-";
+  }
+};
