@@ -1,24 +1,19 @@
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUIState } from "../whitelabel/src/global/utils/hooks/useUIState";
 import "./_appRouteOutlet.styles.scss";
 import Navbar from "../whitelabel/src/organisms/navbar/O-Navbar";
 import { useAuth } from "../utils/hooks/useAuth";
-import { allowedPaths } from "../utils/brands";
-import { setLastValidRoute } from "../utils/routes/routeStore";
 import type { NavbarTypes } from "../whitelabel/src/organisms/navbar/o-navbar.types";
-import {
-  notifySuccess,
-  notifyWarning,
-} from "../whitelabel/src/atoms/notification/Notification";
 import { hasRoleAccessToPath } from "../utils/routes/roleAccess";
 import ErrorWrapper from "../components/blocks/ErrorWrapper";
 import { filterNavbarByRole } from "../utils/helpers/filterNavbarByRole";
 import QuickContextMenu from "../whitelabel/src/molecules/QuickContextMenu/QuickContextMenu";
 import { quickMenuItems } from "../whitelabel/src/molecules/QuickContextMenu/quickContextMenu.data";
 import { QrScanner } from "../whitelabel/src/molecules/qrScanner/QrScanner";
-import Button from "../whitelabel/src/atoms/button/A-Button";
 import { MAIN_NAVIGATION_MENU } from "../utils/brands/navigationMenu.global";
+import { useLastValidRouteTracker } from "../utils/routes/useLastValidRouteTracker";
+import { useNetworkStatus } from "../utils/hooks/useNetworkStatus";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -29,51 +24,27 @@ const AppRoute: React.FC = () => {
     y: 0,
   });
   const { isNavOpen } = useUIState();
+  const isUserOnline = useNetworkStatus();
   const { isAuthenticated, logout, status, user } = useAuth(); // user has role
-  const [isUserOnline, setIsUserOnline] = useState(() => navigator.onLine);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
 
-  useEffect(() => {
-    const path = location.pathname;
+  const currentPath = location.pathname;
+  const currentFullPath = location.pathname + location.search + location.hash;
+  const role = user?.role ?? null;
 
-    if (allowedPaths.includes(path)) {
-      setLastValidRoute(path);
-    }
-  }, [location.pathname]);
+  const canAccess = hasRoleAccessToPath(currentPath, role);
 
-  useEffect(() => {
-    const onOnline = () => {
-      setIsUserOnline(true);
-      notifySuccess({
-        title: "Повторно сте онлајн",
-        text: "Интернет конекцијата е повторно воспоставена.",
-        pos: "top-center",
-      });
-    };
-
-    const onOffline = () => {
-      setIsUserOnline(false);
-
-      notifyWarning({
-        title: "Немате интернет конекција",
-        text: "Проверете ја вашата интернет конекција. Дел од функциите може да бидат недостапни.",
-        pos: "top-center",
-      });
-    };
-
-    window.addEventListener("online", onOnline);
-    window.addEventListener("offline", onOffline);
-
-    return () => {
-      window.removeEventListener("online", onOnline);
-      window.removeEventListener("offline", onOffline);
-    };
-  }, []);
+  useLastValidRouteTracker({
+    isAuthenticated,
+    pathname: currentPath,
+    fullPath: currentFullPath,
+    canAccess,
+  });
 
   const handleLogoutUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    navigate("/login", { replace: true });
     logout();
+    navigate("/login", { replace: true });
   };
 
   if (status === "checking") {
@@ -95,11 +66,6 @@ const AppRoute: React.FC = () => {
       />
     );
   }
-
-  const currentPath = location.pathname;
-  const role = user?.role ?? null;
-
-  const canAccess = hasRoleAccessToPath(currentPath, role);
 
   if (!canAccess) {
     return <ErrorWrapper />;
