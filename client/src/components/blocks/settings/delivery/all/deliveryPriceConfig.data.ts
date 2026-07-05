@@ -115,7 +115,7 @@ const pagination: TableFooterPaginationTypes = {
     total: 52215,
     totalPages: 25,
   },
-  role: "orders",
+  role: "delivery",
   limitOptions: [5, 10, 20],
   customSelectButton: {
     label: "",
