@@ -20,6 +20,7 @@ export interface UsersTypes {
   phoneNumber: string;
   createdAt: string;
   updatedAt: string;
+  isActive: boolean;
 }
 
 export interface UserQueryTypes {
