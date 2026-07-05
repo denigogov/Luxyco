@@ -1,20 +1,28 @@
-import { useMemo, useState } from "react";
-import { useUserList } from "../../../../../features/users/users.queries";
+import { useCallback, useEffectEvent, useMemo, useRef, useState } from "react";
+import {
+  useDeleteUser,
+  useUserList,
+} from "../../../../../features/users/users.queries";
 import { useDataFilters } from "../../../../../utils/hooks/useDataFilters";
 import ASelect from "../../../../../whitelabel/src/atoms/formComponents/select/A-select";
 import TableFooterPagination from "../../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
 import Table from "../../../../../whitelabel/src/molecules/table/M-table";
-import { allUsersData } from "./AllUseres.data";
+import { allUsersData, userPrompDeleteMessages } from "./AllUseres.data";
 import { CreateUserTags, mapUserListToRow } from "./allUser.helpers";
 import ToggleButton from "../../../../../whitelabel/src/atoms/toggle/ToggleButton";
 import ActiveTag from "../../../../../whitelabel/src/molecules/activeTag/ActiveTag";
 import Button from "../../../../../whitelabel/src/atoms/button/A-Button";
 import { useNavigate } from "react-router";
+import type { ModalTypes } from "../../../../../whitelabel/src/organisms/Modal/modal.types";
+import ConfirmDialog from "../../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
+import type { RowTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
+import { notificationAlert } from "../../../../../utils/hooks/notify";
 
 const AllUsers: React.FC = () => {
   const navigate = useNavigate();
-  const [showIsActive, setIsActive] = useState<boolean>(true);
   const { page, limit, active, setFilters, userType } = useDataFilters();
+  const modalCloseRef = useRef<null | (() => void)>(null);
+  const showIsActive = active !== "false";
 
   const params = useMemo(
     () => ({
@@ -26,8 +34,31 @@ const AllUsers: React.FC = () => {
     [page, limit, active, userType],
   );
 
+  const deleteUserMutation = useDeleteUser();
+  const userCanEdit = true;
+  const canUserDelete = true;
+
+  const closeModal = () => {
+    modalCloseRef.current?.();
+  };
+
+  const handleDeleteUser = useEffectEvent(async (row: RowTypes) => {
+    const id = Number(row.id);
+    if (!Number.isFinite(id) || id <= 0 || !canUserDelete) return;
+
+    try {
+      await deleteUserMutation.mutateAsync(id);
+      closeModal();
+      notificationAlert.success(userPrompDeleteMessages.deleteOne.success);
+    } catch (err) {
+      notificationAlert.error(userPrompDeleteMessages.deleteOne.error);
+      closeModal();
+    }
+  });
+
   const { data, isLoading, isError, isFetching } = useUserList(params);
   const tableListData = data?.data ?? [];
+
   const rows = useMemo(() => {
     return tableListData.map(mapUserListToRow);
   }, [tableListData]);
@@ -43,7 +74,6 @@ const AllUsers: React.FC = () => {
 
   const filterActiveUsers = () => {
     const next = !showIsActive;
-    setIsActive(next);
 
     setFilters({
       active: next ? undefined : "false",
@@ -78,12 +108,50 @@ const AllUsers: React.FC = () => {
     userType,
   });
 
-  if (isLoading) return <h1>Loading</h1>;
-  if (isError) return <h1>error</h1>;
+  const renderDeleteUserDialog = useCallback(
+    (row: RowTypes) => (
+      <ConfirmDialog
+        {...allUsersData.confirmationDeleteDialog}
+        buttons={allUsersData?.confirmationDeleteDialog?.buttons?.map(
+          (button) => {
+            if (button.role === "cancel") {
+              return {
+                ...button,
+                onClick: closeModal,
+              };
+            }
+
+            if (button.role === "submit") {
+              return {
+                ...button,
+                onClick: () => handleDeleteUser(row),
+              };
+            }
+
+            return button;
+          },
+        )}
+      />
+    ),
+    [closeModal, handleDeleteUser],
+  );
 
   const navigateToCreateUser = () => {
     navigate("add");
   };
+
+  const tableActionButton: ModalTypes[] = [
+    {
+      openButton: {
+        label: showIsActive ? "Деактивирај" : "Активирај",
+        style: "link",
+      },
+      onClose: (close) => (modalCloseRef.current = close),
+    },
+  ];
+
+  if (isLoading) return <h1>Loading</h1>;
+  if (isError) return <h1>error</h1>;
 
   return (
     <div>
@@ -118,6 +186,14 @@ const AllUsers: React.FC = () => {
         loading={isFetching}
         loadingVariant="bar+skeleton"
         loadingRows={limit ?? 10}
+        onRowDelete={canUserDelete ? handleDeleteUser : undefined}
+        renderActionModalChildren={renderDeleteUserDialog}
+        actionButtons={{
+          buttons: userCanEdit
+            ? [...(allUsersData.tableData?.actionButtons?.buttons ?? [])]
+            : [],
+          modals: [...(canUserDelete ? tableActionButton : [])],
+        }}
       />
       <TableFooterPagination
         {...allUsersData.pagination}

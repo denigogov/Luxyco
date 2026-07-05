@@ -1,53 +1,29 @@
-import type {
-  AccountNameType,
-  UsersTypes,
-} from "../../../../../features/users/users.types";
+import type { UsersTypes } from "../../../../../features/users/users.types";
+import { formatAccountNames } from "../../../../../utils/helpers/hardcodedDataImportant";
 import { timeFormat } from "../../../../../utils/helpers/timeFormat";
 import type { ActiveTagItem } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
-import type { RowTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
+import type {
+  RowMarker,
+  RowTypes,
+} from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import type { CreateUserListTagsArgs } from "./AllUsers.types";
 
-// export function getOrderRowMarker(active?: boolean): RowMarker | undefined {
-//   switch (active) {
-//     case true: // product active
-//       return undefined;
+export function getOrderRowMarker(active?: boolean): RowMarker | undefined {
+  switch (active) {
+    case true:
+      return undefined;
 
-//     case false: // product deactivated
-//       return {
-//         variant: "danger",
-//         message: "неактивен продукт",
-//         onlySideMarker: false,
-//       };
-
-//     default:
-//       return undefined;
-//   }
-// }
-
-const formatAccountNames = (type: AccountNameType | string) => {
-  switch (type) {
-    case "SUPER_ADMIN":
-      return "Супер Администратор";
-
-    case "ADMIN":
-      return "Администратор";
-
-    case "MANAGER":
-      return "Менаџер";
-
-    case "RECEPTION":
-      return "Рецепција";
-
-    case "MACHINE_OPERATOR":
-      return "Оператор";
-
-    case "DRIVER":
-      return "Возач";
+    case false:
+      return {
+        variant: "danger",
+        message: "неактивен корисник",
+        onlySideMarker: false,
+      };
 
     default:
-      "-";
+      return undefined;
   }
-};
+}
 
 export function mapUserListToRow(o: UsersTypes): RowTypes {
   return {
@@ -58,7 +34,8 @@ export function mapUserListToRow(o: UsersTypes): RowTypes {
     fullName: `${o?.firstName ?? "-"} ${o.lastName ?? "-"}`,
     phoneNumber: o?.phoneNumber ?? "-",
     username: o?.username ?? "-",
-    // rowMarker: getOrderRowMarker(o.isActive),
+    status: o?.isActive === true ? "Активен" : "Неактивен",
+    rowMarker: getOrderRowMarker(o.isActive),
   };
 }
 

@@ -3,6 +3,7 @@ import type { ButtonTypes } from "../../../../../whitelabel/src/atoms/button/a-b
 import type { SelectTypes } from "../../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { TableFooterPaginationTypes } from "../../../../../whitelabel/src/atoms/pagination/a-tableFooterPagination.types";
 import type { ActiveTagItemTypes } from "../../../../../whitelabel/src/molecules/activeTag/m-activeTag.types";
+import type { ConfirmDialogTypes } from "../../../../../whitelabel/src/molecules/confirmDialog/m-confirmDialog.types";
 import type { TableTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import type { AllUsersTypes } from "./AllUsers.types";
 const tableData: TableTypes = {
@@ -46,6 +47,11 @@ const tableData: TableTypes = {
       key: "updatedAt",
       enableSort: true,
     },
+
+    {
+      header: "Статус",
+      key: "status",
+    },
     {
       header: "Акција",
       key: "action",
@@ -70,11 +76,19 @@ const tableData: TableTypes = {
     modals: [
       {
         openButton: {
-          label: "уреди",
+          label: "Деактивирај",
           size: "medium",
           style: "text",
-          role: "edit",
+          role: "delete",
         },
+      },
+    ],
+    buttons: [
+      {
+        label: "Уреди",
+        size: "medium",
+        style: "text",
+        role: "details",
       },
     ],
   },
@@ -87,7 +101,7 @@ const pagination: TableFooterPaginationTypes = {
     total: 52215,
     totalPages: 25,
   },
-  role: "orders",
+  role: "user",
   limitOptions: [5, 10, 20],
   customSelectButton: {
     label: "",
@@ -142,10 +156,44 @@ const createUserBtn: ButtonTypes = {
   },
   style: "default",
 };
+
+const confirmationDeleteDialog: ConfirmDialogTypes = {
+  type: "danger",
+  title: "Деактивирај корисник ?",
+  message:
+    "Оваа акција ќе го деактивира овој корисник, Дали сакате да продолжите?",
+  buttons: [
+    {
+      label: "избриши",
+      style: "danger",
+      role: "submit",
+    },
+    {
+      label: "Откажи",
+      style: "default",
+      role: "cancel",
+    },
+  ],
+};
+
+export const userPrompDeleteMessages = {
+  deleteOne: {
+    success: {
+      title: "Корисникот е успешно отстранет",
+      text: "Корисникот е отстранет од системот.",
+    },
+    error: {
+      title: "Бришењето не беше успешно",
+      text: "Не можевме да го отстраниме овој корисникот во моментов. Ве молиме обидете се повторно.",
+    },
+  },
+};
+
 export const allUsersData: AllUsersTypes = {
   filterByType,
   tableData,
   pagination,
   tags,
   createUserBtn,
+  confirmationDeleteDialog,
 };
