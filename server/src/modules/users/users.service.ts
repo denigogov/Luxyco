@@ -35,7 +35,6 @@ export class UsersService {
       omit: {
         password: true,
         account_type_id: true,
-        is_active: true,
       },
 
       include: {
@@ -119,7 +118,113 @@ export class UsersService {
     }
   }
 
-  update(id: number, dto: UpdateUserDto) {}
+  async update(id: number, dto: UpdateUserDto) {
+    const existingUser = await this.prisma.users.findFirst({
+      where: {
+        id,
+        is_active: true,
+      },
+    });
 
-  remove(id: number): void {}
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    const data: Prisma.usersUpdateInput = {};
+
+    if (dto.firstName !== undefined) {
+      data.first_name = dto.firstName.trim();
+    }
+
+    if (dto.lastName !== undefined) {
+      data.last_name = dto.lastName.trim();
+    }
+
+    if (dto.username !== undefined) {
+      data.username = dto.username.trim();
+    }
+
+    if (dto.phoneNumber !== undefined) {
+      data.phone_number = dto.phoneNumber.trim();
+    }
+
+    if (dto.accountTypeId !== undefined) {
+      const accountType = await this.prisma.account_types.findFirst({
+        where: {
+          id: dto.accountTypeId,
+          is_active: true,
+        },
+      });
+
+      if (!accountType) {
+        throw new NotFoundException('Account type not found');
+      }
+
+      data.account_types = {
+        connect: {
+          id: dto.accountTypeId,
+        },
+      };
+    }
+
+    if (dto.password && dto.password.trim()) {
+      data.password = await argon2.hash(dto.password);
+    }
+
+    try {
+      return await this.prisma.users.update({
+        where: {
+          id,
+        },
+        data,
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          username: true,
+          phone_number: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
+          account_types: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Username or phone number already exists');
+      }
+
+      throw error;
+    }
+  }
+
+  async remove(id: number) {
+    const existing = await this.prisma.users.findUnique({
+      where: { id },
+      select: { id: true, is_active: true },
+    });
+
+    if (!existing || !existing.is_active) {
+      throw new NotFoundException(
+        `User with id ${id} not found or already inactive`,
+      );
+    }
+
+    await this.prisma.users.update({
+      where: { id },
+      data: { is_active: false },
+    });
+    // await this.invalidateCustomerCache();
+    return {
+      success: true,
+    };
+  }
 }
