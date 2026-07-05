@@ -138,7 +138,6 @@ const filters: TableFilterTypes = {
       label: "Име / Презиме",
       name: "name",
       type: "text",
-      placeholder: "ex: John",
       icon: { name: "user", position: "right" },
     },
 
