@@ -7,6 +7,7 @@ import { PrintModule } from 'src/infrastructure/printing/print.module';
 import { OrdersDetailService } from './order.detail.service';
 import { OrdersUpdateService } from './order.update.services';
 import { OrderPieceUpdateService } from './order-piece.update.service';
+import { OrderBulkPrintService } from './order.bulk-print.services';
 
 @Module({
   imports: [DatabaseModule, PrintModule],
@@ -17,6 +18,7 @@ import { OrderPieceUpdateService } from './order-piece.update.service';
     OrdersDetailService,
     OrdersUpdateService,
     OrderPieceUpdateService,
+    OrderBulkPrintService,
   ],
 })
 export class OrdersModule {}

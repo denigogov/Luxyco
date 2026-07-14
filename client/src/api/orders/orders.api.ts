@@ -1,6 +1,7 @@
 import type {
   CreateOrderItemsType,
   CreateOrderQueryType,
+  PrintBulkOrders,
   UpdateOrderPiece,
   UpdateOrderQueryType,
 } from "../../components/blocks/orders/CreateOrder/createOrder.types";
@@ -59,6 +60,10 @@ export function getOrderReferencesList(
 
 export function createOrder(body: CreateOrderQueryType, signal?: AbortSignal) {
   return apiPost<OrderPostResponse>("/orders", body, signal);
+}
+
+export function printBulkOrders(body: PrintBulkOrders, signal?: AbortSignal) {
+  return apiPost<OrderPostResponse[]>("/orders/bulk-data", body, signal);
 }
 
 export function createOrderAdditionalPiece(

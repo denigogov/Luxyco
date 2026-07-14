@@ -9,10 +9,12 @@
     grid-template-columns: repeat(4, 1fr);
     grid-template-areas:
       "search search search search"
-      "filter filter new new"
-      "scheduledDate scheduledDate createdDate createdDate"
-      "sort sort refetch refetch"
+      "new new filter filter "
+      "scheduledDate scheduledDate scheduledDate scheduledDate"
+      " createdDate createdDate  createdDate createdDate"
+      "sort sort sort refetch "
       "delete delete delete delete"
+      "print print print print"
       "tags tags tags tags";
 
     @include breakpoint(large) {
@@ -20,7 +22,7 @@
       grid-template-areas:
         "search search search search new"
         "filter createdDate scheduledDate sort refetch"
-        "delete . . . . "
+        "delete print . . . "
         "tags tags tags tags tags";
     }
 
@@ -69,6 +71,10 @@
     grid-area: delete;
   }
 
+  &-printBulk {
+    grid-area: print;
+  }
+
   &-tags {
     grid-area: tags;
   }
@@ -80,5 +86,27 @@
   &-scheduled-date > *,
   &-sort > * {
     width: 100%;
+  }
+}
+.page-break {
+  page-break-after: always;
+  break-after: page;
+}
+
+// Also good practice: prevent a single bill from splitting across two pages
+.bulk-customer-bill-print__page {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+@media print {
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .bulk-customer-bill-print__page {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 }

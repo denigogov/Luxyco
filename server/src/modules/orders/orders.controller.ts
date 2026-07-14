@@ -22,6 +22,7 @@ import { OrdersQueryDto } from './dto/get-order.dto';
 import { UpdateOrderPieceDto } from './dto/update-order-piece.dto';
 import { AddOrderPieceDto } from './dto/add-order-piece.dto';
 import { BulkIdsDto } from '../customers/dto/bulk-delete.dto';
+import { BulkCustomerBillPrintDto } from './dto/bulk-customer-bill-print.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -34,6 +35,11 @@ export class OrdersController {
     @Req() req: Request & { user: JwtPayload },
   ) {
     return this.ordersService.create(dto, req.user.sub);
+  }
+
+  @Post('bulk-data')
+  async getBulkCustomerBillData(@Body() dto: BulkCustomerBillPrintDto) {
+    return this.ordersService.getBulkCustomerBillData(dto);
   }
 
   @Get()

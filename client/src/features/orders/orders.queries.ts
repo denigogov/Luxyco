@@ -13,6 +13,7 @@ import {
   getOrderById,
   getOrderReferencesList,
   getOrdersList,
+  printBulkOrders,
   updateOrder,
   updateOrderPieces,
 } from "../../api/orders/orders.api";
@@ -20,6 +21,7 @@ import { normalizeOrdersListParams, ordersKeys } from "./orders.keys";
 import type {
   CreateOrderItemsType,
   CreateOrderQueryType,
+  PrintBulkOrders,
   UpdateOrderPiece,
   UpdateOrderQueryType,
 } from "../../components/blocks/orders/CreateOrder/createOrder.types";
@@ -50,6 +52,20 @@ export function useCreateOrder() {
   return useMutation({
     mutationKey: ordersKeys.mutations.create(),
     mutationFn: (dto: CreateOrderQueryType) => createOrder(dto),
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: ordersKeys.lists(),
+      });
+    },
+  });
+}
+
+export function usePrintBulkOrders() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ordersKeys.mutations.printMany(),
+    mutationFn: (dto: PrintBulkOrders) => printBulkOrders(dto),
     onSuccess: async () => {
       await qc.invalidateQueries({
         queryKey: ordersKeys.lists(),

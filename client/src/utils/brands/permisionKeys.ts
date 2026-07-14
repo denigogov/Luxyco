@@ -9,6 +9,7 @@ export const PERMISSIONS = {
   ORDERS_PIECES_DELETE: "perm:orders:pieces:delete",
   ORDERS_PIECES_UPDATE: "perm:orders:pieces:update",
   ORDERS_UPDATE: "perm:orders:update",
+  ORDERS_PRINT: "perm:orders:print",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

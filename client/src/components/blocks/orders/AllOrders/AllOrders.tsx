@@ -10,6 +10,7 @@ import {
   useDeletOrdersBulk,
   useOrderReferencesList,
   useOrdersList,
+  usePrintBulkOrders,
 } from "../../../../features/orders/orders.queries";
 import Button from "../../../../whitelabel/src/atoms/button/A-Button";
 import TableFooterPagination from "../../../../whitelabel/src/atoms/pagination/A-TableFooterPagination";
@@ -49,6 +50,9 @@ import type { ModalTypes } from "../../../../whitelabel/src/organisms/Modal/moda
 import { notificationAlert } from "../../../../utils/hooks/notify";
 import { PERMISSIONS } from "../../../../utils/brands/permisionKeys";
 import useUserPermissions from "../../../../utils/hooks/useUserPermissions";
+import type { OrderPostResponse } from "../../../../features/orders/orders.types";
+import OrderCustomerBillPrintTemplate from "../../../organisms/orderPrintTemplates/orderCustomerBillPrintTemplate/OrderCustomerBillPrintTemplate";
+import { useReactToPrint } from "react-to-print";
 
 const toApiDate = (date: Date) => {
   const year = date.getFullYear();
@@ -68,16 +72,23 @@ const parseApiDate = (value?: string) => {
 };
 
 const AllOrders: React.FC = () => {
-  // const [resetSelection, setResetSelection] = useState(false);
+  const bulkCustomerBillRef = useRef<HTMLDivElement>(null);
+  const [ordersForPrint, setOrdersForPrint] = useState<OrderPostResponse[]>([]);
+  const [resetSelection, setResetSelection] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
   const [resetLocalSort, setResetLocalSort] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const { allowedPermitions } = useUserPermissions();
   const canUserDeleteOrder = allowedPermitions(PERMISSIONS.ORDERS_DELETE);
+  const canUserPrintOrder = allowedPermitions(PERMISSIONS.ORDERS_PRINT);
 
   const modalCloseRef = useRef<null | (() => void)>(null);
   const deleteOrderMutation = useDeletOrdersBulk();
+  const postBulkPrintOrders = usePrintBulkOrders();
+
+  const isPreparingPrint = postBulkPrintOrders.isPending;
+
   const closeDeleteOrderModal = () => {
     modalCloseRef.current?.();
   };
@@ -291,6 +302,20 @@ const AllOrders: React.FC = () => {
     [referencesData],
   );
 
+  const handlePrintBills = useReactToPrint({
+    contentRef: bulkCustomerBillRef,
+    documentTitle: "orders-group-print",
+  });
+  useEffect(() => {
+    if (!ordersForPrint.length) return;
+
+    const frame = requestAnimationFrame(() => {
+      handlePrintBills();
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [ordersForPrint, handlePrintBills]);
+
   if (isLoading) return <h1>Loading</h1>;
   if (error || referencesError) return <ErrorWrapper />;
 
@@ -425,6 +450,24 @@ const AllOrders: React.FC = () => {
     navigate("new");
   };
 
+  const handlePrintSelectedOrders = async () => {
+    if (!selectedOrders.length) return;
+
+    try {
+      const orders = await postBulkPrintOrders.mutateAsync({
+        orderIds: selectedOrders,
+      });
+
+      setOrdersForPrint(orders);
+      setResetSelection(true);
+    } catch (error) {
+      notificationAlert.error({
+        title: "Грешка",
+        text: "Неуспешна подготовка за печатење.",
+      });
+    }
+  };
+
   return (
     <div className="b-orders">
       <div className="b-orders-toolbar">
@@ -479,26 +522,42 @@ const AllOrders: React.FC = () => {
           />
         </div>
 
-        {canDeleteSelected && (
+        <Activity mode={canDeleteSelected ? "visible" : "hidden"}>
           <div className="b-orders-delete">
-            <Activity mode="visible">
-              <Modal
-                {...allOrdersData.deleteOrderBtn}
-                onClose={(close) => (modalCloseRef.current = close)}
-              >
-                <ConfirmDialog
-                  {...allOrdersData.confirmationDeleteDialog}
-                  buttons={confirmDeleteBulklButtons}
-                  title={
-                    selectedOrders.length > 1
-                      ? `Избриши ${selectedOrders.length} Нарачки`
-                      : "Избриши Нарачка"
-                  }
-                />
-              </Modal>
-            </Activity>
+            <Modal
+              {...allOrdersData.deleteOrderBtn}
+              onClose={(close) => (modalCloseRef.current = close)}
+            >
+              <ConfirmDialog
+                {...allOrdersData.confirmationDeleteDialog}
+                buttons={confirmDeleteBulklButtons}
+                title={
+                  selectedOrders.length > 1
+                    ? `Избриши ${selectedOrders.length} Нарачки`
+                    : "Избриши Нарачка"
+                }
+              />
+            </Modal>
           </div>
-        )}
+        </Activity>
+
+        <Activity
+          mode={
+            selectedOrders.length > 0 && canUserPrintOrder
+              ? "visible"
+              : "hidden"
+          }
+        >
+          <div className="b-orders-printBulk">
+            <Button
+              label={isPreparingPrint ? "Се подготвува..." : "Принтај"}
+              icon={{ name: "print", position: "right" }}
+              style="default"
+              disabled={isPreparingPrint}
+              onClick={handlePrintSelectedOrders}
+            />
+          </div>
+        </Activity>
 
         <ActiveTag
           {...allOrdersData.tags}
@@ -542,6 +601,7 @@ const AllOrders: React.FC = () => {
           setSelectedCustomers={setSelectedOrders}
           renderActionModalChildren={renderDeleteOrderDialog}
           resetTable={resetLocalSort}
+          resetSelection={resetSelection}
         />
       </div>
 
@@ -551,6 +611,17 @@ const AllOrders: React.FC = () => {
         onPageChange={(p) => setFilters({ page: p })}
         onLimitChange={(l) => setFilters({ limit: l, page: 1 })}
       />
+
+      <div ref={bulkCustomerBillRef} className="print-wrapper">
+        {ordersForPrint.map((order, index) => (
+          <div key={order.id} className="bulk-customer-bill-print__page">
+            <OrderCustomerBillPrintTemplate order={order} />
+            {index < ordersForPrint.length - 1 && (
+              <div className="page-break" />
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

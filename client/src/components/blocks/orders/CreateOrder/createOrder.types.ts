@@ -26,6 +26,10 @@ export interface CreateOrderQueryType {
   items: CreateOrderItemsType[];
 }
 
+export interface PrintBulkOrders {
+  orderIds: number[];
+}
+
 export interface UpdateOrderQueryType {
   orderStatusId?: number;
   customerId?: number;

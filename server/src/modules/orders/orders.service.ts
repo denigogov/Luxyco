@@ -27,6 +27,8 @@ import { OrdersUpdateService } from './order.update.services';
 import { OrderPieceUpdateService } from './order-piece.update.service';
 import { UpdateOrderPieceDto } from './dto/update-order-piece.dto';
 import { AddOrderPieceDto } from './dto/add-order-piece.dto';
+import { BulkCustomerBillPrintDto } from './dto/bulk-customer-bill-print.dto';
+import { OrderBulkPrintService } from './order.bulk-print.services';
 
 @Injectable()
 export class OrdersService {
@@ -38,6 +40,7 @@ export class OrdersService {
     private readonly OrdersDetailService: OrdersDetailService,
     private readonly ordersUpdateService: OrdersUpdateService,
     private readonly orderPieceUpdateService: OrderPieceUpdateService,
+    private readonly orderBulkPrintService: OrderBulkPrintService,
   ) {}
 
   private async invalidateOrdersCache(args?: {
@@ -69,6 +72,10 @@ export class OrdersService {
 
       keysToDelete.length ? this.redis.del(keysToDelete) : Promise.resolve(0),
     ]);
+  }
+
+  async getBulkCustomerBillData(dto: BulkCustomerBillPrintDto) {
+    return this.orderBulkPrintService.getBulkCustomerBillData(dto.orderIds);
   }
 
   async create(dto: CreateOrderDto, userId: number) {
