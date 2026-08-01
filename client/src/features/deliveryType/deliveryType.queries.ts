@@ -10,6 +10,7 @@ import {
 } from "./deliveryType.keys";
 import {
   createDeliveryType,
+  deleteDeliveryType,
   getDeliveryTypeList,
   updateDeliveryType,
 } from "../../api/deliveryType/deliveryType.api";
@@ -29,19 +30,29 @@ export function useDeliveryTypeList(params?: DeliveryQueryTypes) {
   });
 }
 
-export function useDeliveryTypeUpdate(id: number | undefined) {
+export function useDeliveryTypeUpdate(id?: number) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationKey: deliveryTypeKeys.mutations.update(id),
-    mutationFn: (dto: Partial<EditDeliveryTypeFormValues>) =>
-      updateDeliveryType(id, dto),
+
+    mutationFn: ({
+      deliveryID,
+      ...dto
+    }: Partial<EditDeliveryTypeFormValues>) => {
+      const resolvedID = id ?? deliveryID;
+
+      if (!resolvedID) {
+        throw new Error("Delivery type ID is required");
+      }
+
+      return updateDeliveryType(resolvedID, dto);
+    },
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({
           queryKey: deliveryTypeKeys.lists(),
         }),
-
         qc.invalidateQueries({
           queryKey: ordersKeys.references(),
         }),
@@ -56,6 +67,26 @@ export function useCreateDeliveryType() {
   return useMutation({
     mutationKey: deliveryTypeKeys.mutations.create(),
     mutationFn: (dto: CreateDeliveryTypeFormValues) => createDeliveryType(dto),
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: deliveryTypeKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
+    },
+  });
+}
+
+export function useDeleteDelivetyType() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: deliveryTypeKeys.mutations.deleteOne(),
+    mutationFn: (id: number) => deleteDeliveryType(id),
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({

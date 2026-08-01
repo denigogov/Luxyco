@@ -5,7 +5,7 @@ import type {
 import type { CreateDeliveryTypeFormValues } from "../../components/blocks/settings/delivery/create/deliveryPriceConfigCreate.types";
 import type { EditDeliveryTypeFormValues } from "../../components/blocks/settings/delivery/edit/deliveryPriceConfigEdit.types";
 
-import { apiGet, apiPatch, apiPost } from "../http";
+import { apiDelete, apiGet, apiPatch, apiPost } from "../http";
 
 const DELIVERY_TYPE_URL = "/delivery-type";
 
@@ -34,4 +34,15 @@ export function updateDeliveryType(
 
 export function createDeliveryType(dto: CreateDeliveryTypeFormValues) {
   return apiPost(`${DELIVERY_TYPE_URL}`, dto);
+}
+
+export function deleteDeliveryType(
+  deliveryTypeId: number,
+  signal?: AbortSignal,
+) {
+  return apiDelete<void>(
+    `${DELIVERY_TYPE_URL}/${deliveryTypeId}`,
+    undefined,
+    signal,
+  );
 }
