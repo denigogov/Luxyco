@@ -3,150 +3,226 @@
 }
 
 @media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 80mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
   body > * {
     display: none !important;
   }
 
-  .print-wrapper {
-    display: block !important;
-  }
-
-  @page {
-    margin: 0;
-    size: 80mm auto;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   // ─── Wrapper ───────────────────────────────────────────────────────────────
 
   .print-wrapper {
-    width: 76mm;
-    padding: 2mm 3mm;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 11px;
-    color: #000;
-    background: #fff;
+    display: block !important;
+    width: 80mm;
+    margin: 0 auto !important;
+    overflow: hidden;
+
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+    font-size: 14px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+
+    color: #000 !important;
+    background: #fff !important;
+
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
+  .print-wrapper p,
+  .print-wrapper span,
+  .print-wrapper th,
+  .print-wrapper td,
+  .print-wrapper strong {
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+    font-weight: 400 !important;
+    color: #000 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+
+  .t-ticket {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    color: #000;
+  }
+
+  // Used when printing individual item labels.
   .page-break {
-    page-break-after: always;
     display: block;
     height: 0;
     clear: both;
+    break-after: page;
+    page-break-after: always;
   }
 
   // ─── Header ────────────────────────────────────────────────────────────────
 
   .t-header {
-    text-align: center;
     margin-bottom: 3mm;
+    text-align: center;
   }
 
   .t-header__company {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 4px;
     margin: 0;
-    line-height: 1.2;
+    font-size: 23px;
+    font-weight: 700 !important;
+    line-height: 1.15;
+    letter-spacing: 3px;
   }
 
   .t-header__tagline {
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #555;
-    margin: 1mm 0 0;
+    margin: 1.5mm 0 0;
+    font-size: 13px;
+    font-weight: 400 !important;
+    line-height: 1.35;
+    letter-spacing: 0.3px;
   }
 
   // ─── Divider ───────────────────────────────────────────────────────────────
 
   .t-divider {
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #888;
+    width: 100%;
     margin: 2mm 0;
-    text-align: center;
     overflow: hidden;
+
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+    font-size: 10px;
+    font-weight: 400 !important;
+    line-height: 1;
+    letter-spacing: 1px;
+    text-align: center;
+    white-space: nowrap;
+    color: #000;
   }
 
   // ─── QR ────────────────────────────────────────────────────────────────────
 
   .t-qr {
+    width: 100%;
+    margin: 3mm 0;
     text-align: center;
-    margin: 2mm 0;
+
+    svg,
+    img {
+      display: block;
+      margin: 0 auto;
+    }
   }
 
   .t-qr__code {
-    font-size: 8px;
-    margin: 1.5mm 0 0;
-    letter-spacing: 0.5px;
+    margin: 2mm 0 0;
+    font-size: 11px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
     word-break: break-all;
-    color: #333;
   }
 
-  // ─── Section ───────────────────────────────────────────────────────────────
+  // ─── Sections ──────────────────────────────────────────────────────────────
 
   .t-section {
-    margin: 1.5mm 0;
+    width: 100%;
+    margin: 2mm 0;
   }
 
   .t-section__title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #333;
-    margin: 0 0 1.5mm;
+    margin: 0 0 2mm;
+    font-size: 15px;
+    font-weight: 400 !important;
+    line-height: 1.35;
+    letter-spacing: 1.5px;
     text-align: center;
   }
 
-  // ─── Row ───────────────────────────────────────────────────────────────────
+  // ─── Information rows ──────────────────────────────────────────────────────
 
   .t-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    width: 100%;
     gap: 3mm;
-    margin-bottom: 1mm;
-    line-height: 1.3;
+    margin-bottom: 1.5mm;
+    line-height: 1.4;
   }
 
   .t-row__label {
-    font-size: 10px;
-    color: #666;
+    width: 22mm;
+    min-width: 22mm;
     flex-shrink: 0;
-    min-width: 20mm;
+
+    font-size: 13px;
+    font-weight: 400 !important;
+    text-align: left;
   }
 
   .t-row__value {
-    font-size: 10px;
-    font-weight: 600;
-    text-align: right;
     flex: 1;
+    min-width: 0;
+
+    font-size: 14px;
+    font-weight: 400 !important;
+    text-align: right;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
-  // ─── Table ─────────────────────────────────────────────────────────────────
+  // ─── Items table ───────────────────────────────────────────────────────────
 
   .t-table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 10px;
     margin: 1mm 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    color: #000;
 
     thead tr {
       border-bottom: 1px solid #000;
     }
 
     th {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 1mm 0 1.5mm;
+      padding: 1mm 1mm 1.5mm 0;
+      font-size: 13px;
+      font-weight: 400 !important;
+      line-height: 1.35;
       text-align: left;
-      color: #333;
+      vertical-align: bottom;
     }
 
     td {
-      padding: 1.5mm 0;
-      border-bottom: 1px dashed #ccc;
+      padding: 2mm 1mm 2mm 0;
+      border-bottom: 1px dashed #000;
+
+      font-size: 14px;
+      font-weight: 400 !important;
+      line-height: 1.4;
       vertical-align: top;
+
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     tr:last-child td {
@@ -156,20 +232,42 @@
 
   .t-table__th--num,
   .t-table__td--num {
-    width: 10mm;
-    font-weight: 700;
-    color: #000;
+    width: 12%;
+    padding-left: 0;
+    font-weight: 400 !important;
+    text-align: left;
     white-space: nowrap;
   }
 
+  // Product column
+  .t-table th:nth-child(2),
+  .t-table td:nth-child(2) {
+    width: 40%;
+    padding-right: 2mm;
+  }
+
+  // Note column
   .t-table__th--note,
   .t-table__td--note {
+    width: 48%;
+    padding-right: 0;
+    padding-left: 2mm;
+
+    font-size: 13px;
+    font-weight: 400 !important;
+    font-style: normal;
+
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .t-table__th--note {
     text-align: right;
-    font-size: 9px;
-    color: #555;
-    font-style: italic;
-    max-width: 22mm;
-    word-break: break-word;
+  }
+
+  .t-table__td--note {
+    line-height: 1.5;
+    text-align: left;
   }
 
   // ─── Total ─────────────────────────────────────────────────────────────────
@@ -178,109 +276,173 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
-    font-weight: 700;
-    margin: 2mm 0;
-    letter-spacing: 0.5px;
+    width: 100%;
+
+    margin: 2.5mm 0;
+    padding-top: 2.5mm;
+    border-top: 2px solid #000;
+
+    font-size: 18px;
+    font-weight: 700 !important;
+    line-height: 1.4;
   }
 
-  // ─── Note ──────────────────────────────────────────────────────────────────
+  .t-total span,
+  .t-total strong {
+    font-size: 18px;
+    font-weight: 700 !important;
+  }
+
+  // ─── Order note ────────────────────────────────────────────────────────────
 
   .t-note {
-    margin: 1mm 0;
+    width: 100%;
+    margin: 3mm 0;
+    padding: 1mm 2mm 2mm;
+  }
+
+  .t-note .t-section__title {
+    margin-bottom: 3mm;
   }
 
   .t-note__text {
-    font-size: 10px;
-    font-style: italic;
-    color: #333;
     margin: 0;
-    line-height: 1.4;
+    font-size: 14px;
+    font-weight: 400 !important;
+    font-style: normal;
+    line-height: 1.6;
+    text-align: left;
+    overflow-wrap: anywhere;
+    word-break: normal;
   }
 
   // ─── Footer ────────────────────────────────────────────────────────────────
 
   .t-footer {
+    margin: 3mm 0 1mm;
+    font-size: 13px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
     text-align: center;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #888;
-    margin: 2mm 0;
   }
 
-  // ─── Label ─────────────────────────────────────────────────────────────────
+  // ─── Item label ────────────────────────────────────────────────────────────
 
   .t-label {
-    padding: 2mm 0;
+    width: 100%;
     min-height: 36mm;
+    padding: 2mm 0;
+
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .t-label__top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #000;
-    padding-bottom: 1.5mm;
+
     margin-bottom: 2mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1px solid #000;
   }
 
   .t-label__company {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 3px;
+    font-size: 16px;
+    font-weight: 700 !important;
+    letter-spacing: 2px;
   }
 
   .t-label__counter {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-size: 16px;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
   }
 
   .t-label__body {
     display: flex;
     align-items: center;
+    width: 100%;
     gap: 3mm;
   }
 
   .t-label__qr {
     flex-shrink: 0;
+
+    svg,
+    img {
+      display: block;
+    }
   }
 
   .t-label__info {
     flex: 1;
-    line-height: 1.3;
+    min-width: 0;
+    line-height: 1.4;
   }
 
   .t-label__customer {
-    font-size: 12px;
-    font-weight: 700;
-    margin: 0 0 0.5mm;
+    margin: 0 0 1mm;
+    font-size: 14px;
+    font-weight: 400 !important;
+    overflow-wrap: anywhere;
   }
 
   .t-label__phone {
-    font-size: 10px;
-    color: #444;
     margin: 0 0 1mm;
+    font-size: 13px;
+    font-weight: 400 !important;
   }
 
   .t-label__product {
-    font-size: 11px;
-    font-weight: 700;
-    margin: 0 0 0.5mm;
+    margin: 0 0 1mm;
+    font-size: 14px;
+    font-weight: 400 !important;
+    overflow-wrap: anywhere;
   }
 
   .t-label__code {
-    font-size: 8px;
-    color: #666;
     margin: 0;
+    font-size: 11px;
+    font-weight: 400 !important;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
     word-break: break-all;
   }
 
   .t-label__note {
-    font-size: 9px;
-    font-style: italic;
-    color: #333;
     margin: 1mm 0 0;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 400 !important;
+    font-style: normal;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  // ─── Prevent accidental receipt splitting ──────────────────────────────────
+
+  .t-ticket,
+  .t-header,
+  .t-qr,
+  .t-section,
+  .t-total,
+  .t-note,
+  .t-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .t-table tr,
+  .t-table th,
+  .t-table td {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .t-divider {
+    break-after: avoid;
+    page-break-after: avoid;
   }
 }

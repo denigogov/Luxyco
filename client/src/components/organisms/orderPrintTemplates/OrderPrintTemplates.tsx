@@ -24,7 +24,7 @@ const formatDateTime = (isoDate: string): string =>
     minute: "2-digit",
   });
 
-const Divider = () => <div className="t-divider">{"- ".repeat(21)}</div>;
+const Divider = () => <div className="t-divider">{"- ".repeat(32)}</div>;
 
 export const OrderPrintTemplate = forwardRef<HTMLDivElement, PrintProps>(
   ({ order }, ref) => {

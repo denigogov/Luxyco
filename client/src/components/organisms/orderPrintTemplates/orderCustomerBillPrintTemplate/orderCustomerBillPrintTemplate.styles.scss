@@ -3,58 +3,94 @@
 }
 
 @media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 80mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
   body > * {
     display: none !important;
   }
 
   .print-wrapper {
     display: block !important;
+    width: 80mm;
+    margin: 0 auto !important;
+    overflow: hidden;
+
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+    font-size: 14px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+
+    color: #000 !important;
+    background: #fff !important;
+
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
-  @page {
-    margin: 0;
-    size: 80mm auto;
-  }
-
-  .print-wrapper {
-    width: 76mm;
-    padding: 2mm 3mm;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 11px;
-    color: #000;
-    background: #fff;
+  // Force the same readable font on every element.
+  .print-wrapper p,
+  .print-wrapper span,
+  .print-wrapper th,
+  .print-wrapper td,
+  .print-wrapper strong {
+    font-family: Tahoma, Arial, Helvetica, sans-serif !important;
+    font-weight: 400 !important;
+    color: #000 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+    -webkit-text-fill-color: #000 !important;
   }
 
   .c-bill {
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
 
+  // ─── Header ────────────────────────────────────────────────────────────────
+
   .c-bill-header {
-    text-align: center;
     margin-bottom: 3mm;
+    text-align: center;
 
     &__company {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 4px;
       margin: 0;
-      line-height: 1.2;
+      font-size: 23px;
+      font-weight: 700 !important;
+      line-height: 1.15;
+      letter-spacing: 3px;
     }
 
     &__tagline {
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: #555;
-      margin: 1mm 0 0;
+      margin: 1.5mm 0 0;
+      font-size: 13px;
+      font-weight: 400 !important;
+      line-height: 1.35;
+      letter-spacing: 0.3px;
     }
 
     &__title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.3px;
-      margin: 2mm 0 0;
+      margin: 2.5mm 0 0;
+      font-size: 14px;
+      font-weight: 500 !important;
+      line-height: 1.4;
+      letter-spacing: 0.5px;
     }
   }
+
+  // ─── Divider ───────────────────────────────────────────────────────────────
 
   .c-bill-divider {
     font-size: 9px;
@@ -65,71 +101,110 @@
     overflow: hidden;
   }
 
+  // ─── Sections ──────────────────────────────────────────────────────────────
+
   .c-bill-section {
-    margin: 1.5mm 0;
+    width: 100%;
+    margin: 2mm 0;
 
     &__title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: #333;
-      margin: 0 0 1.5mm;
+      margin: 0 0 2mm;
+      font-size: 15px;
+      line-height: 1.35;
+      letter-spacing: 1.5px;
       text-align: center;
     }
+
+    p {
+      font-weight: 600 !important;
+    }
   }
+
+  // ─── Information rows ──────────────────────────────────────────────────────
 
   .c-bill-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    width: 100%;
     gap: 3mm;
-    margin-bottom: 1mm;
-    line-height: 1.3;
+    margin-bottom: 1.5mm;
+    line-height: 1.4;
 
     &__label {
-      font-size: 10px;
-      color: #666;
+      width: 22mm;
+      min-width: 22mm;
       flex-shrink: 0;
-      min-width: 20mm;
+      font-size: 13px;
+      font-weight: 400 !important;
+      text-align: left;
     }
 
     &__value {
-      font-size: 10px;
-      font-weight: 600;
-      text-align: right;
       flex: 1;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 400 !important;
+      text-align: right;
+      overflow-wrap: anywhere;
       word-break: break-word;
 
       &--code {
-        font-size: 8px;
-        letter-spacing: 0.3px;
+        font-size: 11px;
+        font-weight: 400 !important;
+        line-height: 1.4;
+        letter-spacing: 0;
+        word-break: break-all;
       }
     }
   }
 
+  // ─── Products table ────────────────────────────────────────────────────────
+
   .c-bill-table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 9px;
     margin: 1mm 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    color: #000;
 
     thead tr {
       border-bottom: 1px solid #000;
     }
 
     th {
-      font-size: 8px;
-      font-weight: 700;
-      padding: 1mm 0 1.5mm;
+      padding: 1mm 1mm 1.5mm 0;
+      font-size: 13px;
+      font-weight: 400 !important;
+      line-height: 1.35;
       text-align: left;
-      color: #333;
+      vertical-align: bottom;
     }
 
     td {
-      padding: 1.5mm 0;
-      border-bottom: 1px dashed #ccc;
+      padding: 2mm 1mm 2mm 0;
+      border-bottom: 1px dashed #000;
+      font-size: 15px;
+      font-weight: 400 !important;
+      line-height: 1.4;
       vertical-align: top;
-      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 42%;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 30%;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 28%;
     }
 
     tr:last-child td {
@@ -137,60 +212,124 @@
     }
 
     &__price {
+      padding-right: 0;
+      padding-left: 1mm;
+      font-weight: 400 !important;
       text-align: right;
       white-space: nowrap;
-      font-weight: 700;
     }
   }
 
+  // ─── Summary ───────────────────────────────────────────────────────────────
+
   .c-bill-summary {
-    margin: 2mm 0;
+    width: 100%;
+    margin: 2.5mm 0;
 
     &__row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      width: 100%;
       gap: 3mm;
-      font-size: 11px;
-      margin-bottom: 1mm;
+      margin-bottom: 1.5mm;
+      font-size: 14px;
+      font-weight: 400 !important;
+      line-height: 1.4;
+
+      span {
+        flex: 1;
+        min-width: 0;
+        font-weight: 400 !important;
+        overflow-wrap: anywhere;
+      }
 
       strong {
-        font-size: 11px;
+        flex-shrink: 0;
+        font-size: 14px;
+        font-weight: 400 !important;
+        text-align: right;
         white-space: nowrap;
       }
 
       &--total {
-        margin-top: 2mm;
-        padding-top: 2mm;
-        border-top: 1px solid #000;
-        font-size: 14px;
-        font-weight: 700;
+        align-items: center;
+        margin-top: 2.5mm;
+        margin-bottom: 0;
+        padding-top: 2.5mm;
+        border-top: 2px solid #000;
 
+        span,
         strong {
-          font-size: 15px;
+          font-size: 18px;
+          font-weight: 700 !important;
         }
       }
     }
   }
 
+  // ─── QR code ───────────────────────────────────────────────────────────────
+
   .c-bill-qr {
+    width: 100%;
+    margin: 3mm 0 2mm;
     text-align: center;
-    margin: 2mm 0 1mm;
+
+    svg,
+    img {
+      display: block;
+      margin: 0 auto;
+    }
 
     &__code {
-      font-size: 8px;
-      margin: 1.5mm 0 0;
-      letter-spacing: 0.5px;
+      margin: 2mm 0 0;
+      font-size: 11px;
+      font-weight: 400 !important;
+      line-height: 1.4;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
       word-break: break-all;
-      color: #333;
     }
   }
 
+  // ─── Footer ────────────────────────────────────────────────────────────────
+
   .c-bill-footer {
+    margin: 3mm 0 1mm;
+    font-size: 13px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
     text-align: center;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #888;
-    margin: 2mm 0;
+  }
+
+  .print-wrapper,
+  .c-bill {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  // Never split individual sections.
+  .c-bill-header,
+  .c-bill-section,
+  .c-bill-summary,
+  .c-bill-qr,
+  .c-bill-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  // Never split a product row between pages.
+  .c-bill-table tr,
+  .c-bill-table th,
+  .c-bill-table td {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  // Keep dividers with the content following them.
+  .c-bill-divider {
+    break-after: avoid;
+    page-break-after: avoid;
   }
 }

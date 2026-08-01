@@ -36,7 +36,7 @@ const formatMoney = (value?: string | number): string => {
   return priceFormatted(Number(amount.toFixed(2)));
 };
 
-const Divider = () => <div className="c-bill-divider">{"- ".repeat(21)}</div>;
+const Divider = () => <div className="c-bill-divider">{"- ".repeat(32)}</div>;
 
 const OrderCustomerBillPrintTemplate = forwardRef<
   HTMLDivElement,
