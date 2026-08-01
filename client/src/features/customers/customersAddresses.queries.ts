@@ -10,7 +10,7 @@ export function useDeleteCustomerAddress() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: ["customer-addresses", "delete"] as const,
+    mutationKey: customerAddressesKeys.mutations.deleteOne(),
     mutationFn: ({
       customerId,
       addressId,
@@ -19,8 +19,21 @@ export function useDeleteCustomerAddress() {
       addressId: number;
     }) => deleteSingleAddress(customerId, addressId),
 
-    onSuccess: (_data, ids) => {
-      qc.invalidateQueries({ queryKey: customersKeys.detail(ids.customerId) });
+    onSuccess: async (_data, ids) => {
+      qc.removeQueries({
+        queryKey: customerAddressesKeys.detail(ids.addressId),
+        exact: true,
+      });
+
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: customersKeys.detail(ids.customerId),
+        }),
+        qc.invalidateQueries({ queryKey: customersKeys.lists() }),
+        qc.invalidateQueries({
+          queryKey: customerAddressesKeys.listByCustomer(ids.customerId),
+        }),
+      ]);
     },
   });
 }
@@ -35,13 +48,22 @@ export function useUpdateCustomerAddresses() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: ["customer-addresses", "update"] as const,
+    mutationKey: customerAddressesKeys.mutations.update(),
     mutationFn: (vars: UpdateCustomerAddressesVars) =>
       updateCustomerAddress(vars.addressId, vars.dto),
 
-    onSuccess: (updated, vars) => {
-      qc.invalidateQueries({ queryKey: customersKeys.detail(vars.customerId) });
+    onSuccess: async (updated, vars) => {
       qc.setQueryData(customerAddressesKeys.detail(vars.addressId), updated);
+
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: customersKeys.detail(vars.customerId),
+        }),
+        qc.invalidateQueries({ queryKey: customersKeys.lists() }),
+        qc.invalidateQueries({
+          queryKey: customerAddressesKeys.listByCustomer(vars.customerId),
+        }),
+      ]);
     },
   });
 }

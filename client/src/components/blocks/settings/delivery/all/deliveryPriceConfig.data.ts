@@ -219,6 +219,19 @@ export const deliveryTypePrompDeleteMessages = {
   },
 };
 
+export const deliveryTypePrompRestoreMessages = {
+  restoreOne: {
+    success: {
+      title: "Тип на достава е успешно активиран",
+      text: "Типот на достава  е активиран во системот.",
+    },
+    error: {
+      title: "Активирањето не беше успешно",
+      text: "Не можевме да го активираме овој тип на достава во моментов. Ве молиме обидете се повторно.",
+    },
+  },
+};
+
 const confirmationDeleteDialog: ConfirmDialogTypes = {
   type: "danger",
   title: "Деактивирај тип на достава ?",

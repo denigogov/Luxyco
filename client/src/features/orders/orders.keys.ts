@@ -1,4 +1,8 @@
-import type { OrdersListParams, YMDDateString } from "./orders.types";
+import type {
+  NormalizedOrdersListParams,
+  OrdersListParams,
+  YMDDateString,
+} from "./orders.types";
 const YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function toYMD(input?: string): YMDDateString | undefined {
@@ -9,7 +13,7 @@ function toYMD(input?: string): YMDDateString | undefined {
 
 export const normalizeOrdersListParams = (
   p: OrdersListParams,
-): OrdersListParams => ({
+): NormalizedOrdersListParams => ({
   page: p.page ?? 1,
   limit: p.limit ?? 20,
 
@@ -36,23 +40,33 @@ export const normalizeOrdersListParams = (
   sortDir: p.sortDir || undefined,
 });
 
-// keys
 export const ordersKeys = {
   all: ["orders"] as const,
   lists: () => [...ordersKeys.all, "list"] as const,
-  list: (params: OrdersListParams) => [...ordersKeys.lists(), params] as const,
-  references: () => [...ordersKeys.all, "references"],
+  list: (params: NormalizedOrdersListParams) =>
+    [...ordersKeys.lists(), params] as const,
+  references: () => [...ordersKeys.all, "references"] as const,
   details: () => [...ordersKeys.all, "detail"] as const,
   detail: (identifier: number | string) =>
-    [...ordersKeys.details(), String(identifier)] as const,
+    [...ordersKeys.details(), String(identifier).trim()] as const,
 
   mutations: {
-    create: () => ["orders", "create"] as const,
-    createPiece: (orderId: number) => ["orders", orderId, "update"] as const,
-    update: (orderId: number) => ["orders", orderId, "update"] as const,
+    all: () => [...ordersKeys.all, "mutation"] as const,
+    create: () => [...ordersKeys.mutations.all(), "create"] as const,
+    update: (orderId: number) =>
+      [...ordersKeys.mutations.all(), "update", orderId] as const,
+    pieces: () => [...ordersKeys.mutations.all(), "piece"] as const,
+    createPiece: (orderId: number) =>
+      [...ordersKeys.mutations.pieces(), "create", orderId] as const,
     updatePiece: (identifier: number | string, qr: string) =>
-      ["orders", String(identifier), "item", qr, "update"] as const,
-    deleteMany: () => ["orders", "bulk-delete"] as const,
-    printMany: () => ["orders", "bulk-print"] as const,
+      [
+        ...ordersKeys.mutations.pieces(),
+        "update",
+        String(identifier).trim(),
+        qr.trim(),
+      ] as const,
+    deletePieces: () => [...ordersKeys.mutations.pieces(), "delete"] as const,
+    deleteMany: () => [...ordersKeys.mutations.all(), "bulk-delete"] as const,
+    printMany: () => [...ordersKeys.mutations.all(), "bulk-print"] as const,
   },
 };

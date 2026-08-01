@@ -2,6 +2,7 @@ import type { CreateOrderTyeps } from "./createOrder.types";
 
 export const createOrderData: CreateOrderTyeps = {
   createCustomerModal: {
+    closeButtonLabel: "Врати се назад",
     openButton: {
       label: "додади нов",
       style: "text",
@@ -12,6 +13,11 @@ export const createOrderData: CreateOrderTyeps = {
     options: {
       initialOpen: false,
       returnBack: false,
+      closeButtons: {
+        top: true,
+        bottom: true,
+        outSide: true,
+      },
     },
   },
 

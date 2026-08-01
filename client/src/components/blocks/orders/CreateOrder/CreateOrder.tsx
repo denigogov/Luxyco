@@ -238,6 +238,7 @@ const CreateOrder = () => {
         title: "Грешка при креирање",
         text: message,
       });
+      throw error;
     }
   };
 
@@ -282,7 +283,9 @@ const CreateOrder = () => {
                   contentMapper={customerContentMapper}
                   notFoundActionModal={{
                     ...createOrderData.createCustomerModal,
-                    children: <AddCustomer noFormTag={true} />,
+                    children: (
+                      <AddCustomer noFormTag={true} returnButton={true} />
+                    ),
                   }}
                 />
               ) : (

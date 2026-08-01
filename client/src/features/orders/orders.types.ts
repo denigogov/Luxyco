@@ -33,6 +33,14 @@ export type OrdersListParams = {
   sortDir?: OrdersSortDir;
 };
 
+export type NormalizedOrdersListParams = Omit<
+  OrdersListParams,
+  "page" | "limit"
+> & {
+  page: number;
+  limit: number;
+};
+
 export type OrdersListResponse = {
   data: OrderListItem[];
   meta: {

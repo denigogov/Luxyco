@@ -4,6 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import type { OrdersListParams } from "./orders.types";
 import {
   createOrder,
@@ -25,6 +26,14 @@ import type {
   UpdateOrderPiece,
   UpdateOrderQueryType,
 } from "../../components/blocks/orders/CreateOrder/createOrder.types";
+
+async function invalidateOrderViews(qc: QueryClient) {
+  await Promise.all([
+    // Details may be cached under either the numeric ID or the QR code.
+    qc.invalidateQueries({ queryKey: ordersKeys.details() }),
+    qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
+  ]);
+}
 
 export function useOrdersList(params?: OrdersListParams) {
   const normalized = normalizeOrdersListParams(params ?? {});
@@ -78,24 +87,27 @@ export function useOrderDetail(
   identifier: number | string | undefined,
   enabled = true,
 ) {
+  const normalizedIdentifier =
+    identifier === undefined ? "" : String(identifier).trim();
+  const hasIdentifier =
+    typeof identifier === "number"
+      ? identifier > 0
+      : Boolean(normalizedIdentifier);
+
   return useQuery({
-    queryKey: ordersKeys.detail(identifier ?? ""),
-    queryFn: ({ signal }) => getOrderById(identifier!, signal),
-    enabled: Boolean(identifier) && enabled,
+    queryKey: ordersKeys.detail(normalizedIdentifier),
+    queryFn: ({ signal }) => getOrderById(normalizedIdentifier, signal),
+    enabled: hasIdentifier && enabled,
   });
 }
+
 export function useUpdateOrder(id: number) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationKey: ordersKeys.mutations.update(id),
     mutationFn: (dto: Partial<UpdateOrderQueryType>) => updateOrder(id, dto),
-    onSuccess: async () => {
-      await Promise.all([
-        qc.invalidateQueries({ queryKey: ordersKeys.detail(id) }),
-        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
-      ]);
-    },
+    onSuccess: () => invalidateOrderViews(qc),
   });
 }
 
@@ -106,12 +118,7 @@ export function useCreateAdditionalPiece(id: number) {
     mutationKey: ordersKeys.mutations.createPiece(id),
     mutationFn: (dto: CreateOrderItemsType) =>
       createOrderAdditionalPiece(id, dto),
-    onSuccess: async () => {
-      await Promise.all([
-        qc.invalidateQueries({ queryKey: ordersKeys.detail(id) }),
-        qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
-      ]);
-    },
+    onSuccess: () => invalidateOrderViews(qc),
   });
 }
 
@@ -122,16 +129,7 @@ export function useUpdateOrderPiece(identifier: number | string, qr: string) {
     mutationKey: ordersKeys.mutations.updatePiece(identifier, qr),
     mutationFn: (dto: UpdateOrderPiece) =>
       updateOrderPieces(identifier, qr, dto),
-    onSuccess: async () => {
-      await Promise.all([
-        qc.invalidateQueries({
-          queryKey: ordersKeys.detail(identifier),
-        }),
-        qc.invalidateQueries({
-          queryKey: ordersKeys.lists(),
-        }),
-      ]);
-    },
+    onSuccess: () => invalidateOrderViews(qc),
   });
 }
 
@@ -139,7 +137,7 @@ export function useDeleteOrderPieces() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: ["orders", "delete"] as const,
+    mutationKey: ordersKeys.mutations.deletePieces(),
     mutationFn: ({
       orderId,
       piecesId,
@@ -148,32 +146,23 @@ export function useDeleteOrderPieces() {
       piecesId: string;
     }) => deleteOrderPieces(orderId, piecesId),
 
-    onSuccess: async (_data, variables) => {
-      await Promise.all([
-        qc.invalidateQueries({
-          queryKey: ordersKeys.detail(variables.orderId),
-        }),
-
-        qc.invalidateQueries({
-          queryKey: ordersKeys.lists(),
-        }),
-      ]);
-    },
+    onSuccess: () => invalidateOrderViews(qc),
   });
 }
 
-export function useDeletOrdersBulk() {
+export function useDeleteOrdersBulk() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationKey: ["orders", "bulk-delete"] as const,
+    mutationKey: ordersKeys.mutations.deleteMany(),
     mutationFn: (ids: number[]) => deleteMultipleOrders(ids),
-    onSuccess: (_data, ids) => {
-      ids.forEach((id) =>
-        qc.removeQueries({ queryKey: ordersKeys.detail(id) }),
-      );
+    onSuccess: async () => {
+      // A deleted order may have detail caches under both its ID and QR code.
+      qc.removeQueries({ queryKey: ordersKeys.details() });
 
-      qc.invalidateQueries({ queryKey: ordersKeys.lists() });
+      await qc.invalidateQueries({ queryKey: ordersKeys.lists() });
     },
   });
 }
+
+export const useDeletOrdersBulk = useDeleteOrdersBulk;

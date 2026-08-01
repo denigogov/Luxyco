@@ -7,6 +7,7 @@ export type EditDeliveryTypeFormValues = {
   isActive: boolean;
   status?: string;
   type?: string;
+  deliveryID?: number;
 };
 
 export interface DeliveryTypeConfigEditTypes {

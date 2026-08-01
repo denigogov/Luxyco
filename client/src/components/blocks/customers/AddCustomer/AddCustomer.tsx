@@ -9,9 +9,13 @@ import { useAddCustomerPage } from "../../../../utils/hooks/useAddCustomerPage";
 
 interface AddCustomerProps {
   noFormTag?: boolean;
+  returnButton?: boolean;
 }
 
-const AddCustomer: React.FC<AddCustomerProps> = ({ noFormTag }) => {
+const AddCustomer: React.FC<AddCustomerProps> = ({
+  noFormTag,
+  returnButton,
+}) => {
   const {
     createMut,
     inactiveConflict,
@@ -36,9 +40,9 @@ const AddCustomer: React.FC<AddCustomerProps> = ({ noFormTag }) => {
             loading: createMut.isPending,
           }}
           cancelButton={{
-            label: createMut.isSuccess ? "врати се назад" : "Откажи",
+            label: "",
             style: "tertiary",
-            onClick: () => window.history.back(),
+            onClick: returnButton ? () => {} : () => window.history.back(),
           }}
           className="uk-margin-top"
         />

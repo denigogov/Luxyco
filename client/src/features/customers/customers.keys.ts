@@ -28,44 +28,58 @@ export const customersKeys = {
   lists: () => [...customersKeys.all, "list"] as const,
   list: (params: NormalizedCustomersListParams) =>
     [...customersKeys.lists(), params] as const,
+  orderLists: () => [...customersKeys.lists(), "order"] as const,
   listOrder: (params: NormalizedCustomersListParams) =>
-    [...customersKeys.all, "order-list", params] as const,
+    [...customersKeys.orderLists(), params] as const,
   details: () => [...customersKeys.all, "detail"] as const,
   detail: (id: number) => [...customersKeys.details(), id] as const,
 
   mutations: {
-    create: () => ["customers", "create"] as const,
-    createAddress: (customerId: number) =>
-      ["customers", customerId, "addresses", "create"] as const,
+    all: () => [...customersKeys.all, "mutation"] as const,
+    create: () => [...customersKeys.mutations.all(), "create"] as const,
+    update: (customerId: number) =>
+      [...customersKeys.mutations.all(), "update", customerId] as const,
+    deleteOne: () => [...customersKeys.mutations.all(), "delete"] as const,
+    deleteMany: () =>
+      [...customersKeys.mutations.all(), "bulk-delete"] as const,
+    restoreOne: () => [...customersKeys.mutations.all(), "restore"] as const,
+    deletePermanently: () =>
+      [...customersKeys.mutations.all(), "permanently-delete"] as const,
   },
-  deleteOne: () => ["customers", "delete"] as const,
-  deleteMany: () => ["customers", "bulk-delete"] as const,
-
-  restoreOne: () => ["customers", "restore"] as const,
-  deletePermanently: () => ["customers", "permanently"] as const,
 };
 
 export const customerAddressesKeys = {
   all: ["customer-addresses"] as const,
-  detail: (addressId: number) =>
-    [...customerAddressesKeys.all, "detail", addressId] as const,
+  lists: () => [...customerAddressesKeys.all, "list"] as const,
   listByCustomer: (customerId: number) =>
-    [...customerAddressesKeys.all, "list", { customerId }] as const,
+    [...customerAddressesKeys.lists(), { customerId }] as const,
+  details: () => [...customerAddressesKeys.all, "detail"] as const,
+  detail: (addressId: number) =>
+    [...customerAddressesKeys.details(), addressId] as const,
 
   mutations: {
-    update: (addressId: number) =>
-      ["customer-addresses", addressId, "update"] as const,
+    all: () => [...customerAddressesKeys.all, "mutation"] as const,
+    create: (customerId: number) =>
+      [...customerAddressesKeys.mutations.all(), "create", customerId] as const,
+    update: () => [...customerAddressesKeys.mutations.all(), "update"] as const,
+    deleteOne: () =>
+      [...customerAddressesKeys.mutations.all(), "delete"] as const,
   },
 };
 
 export const customerNotesKeys = {
   all: ["customer-notes"] as const,
-  detail: (customerId: number) =>
-    [...customerNotesKeys.all, "detail", customerId] as const,
+  lists: () => [...customerNotesKeys.all, "list"] as const,
   listByCustomer: (customerId: number) =>
-    [...customerNotesKeys.all, "list", { customerId }] as const,
+    [...customerNotesKeys.lists(), { customerId }] as const,
+  details: () => [...customerNotesKeys.all, "detail"] as const,
+  detail: (noteId: number) => [...customerNotesKeys.details(), noteId] as const,
 
   mutations: {
-    update: (noteId: number) => ["customer-notes", noteId, "update"] as const,
+    all: () => [...customerNotesKeys.all, "mutation"] as const,
+    create: (customerId: number) =>
+      [...customerNotesKeys.mutations.all(), "create", customerId] as const,
+    update: () => [...customerNotesKeys.mutations.all(), "update"] as const,
+    deleteOne: () => [...customerNotesKeys.mutations.all(), "delete"] as const,
   },
 };

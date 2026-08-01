@@ -1,10 +1,15 @@
 import { useCallback, useEffectEvent, useMemo, useRef, useState } from "react";
-import { useDeliveryTypeList } from "../../../../../features/deliveryType/deliveryType.queries";
+import {
+  useDeleteDelivetyType,
+  useDeliveryTypeList,
+  useDeliveryTypeUpdate,
+} from "../../../../../features/deliveryType/deliveryType.queries";
 import { useDataFilters } from "../../../../../utils/hooks/useDataFilters";
 import Table from "../../../../../whitelabel/src/molecules/table/M-table";
 import {
   deliveryPriceConfigData,
   deliveryTypePrompDeleteMessages,
+  deliveryTypePrompRestoreMessages,
 } from "./deliveryPriceConfig.data";
 import {
   CreateDeliveryTypesTags,
@@ -26,6 +31,8 @@ const DeliveryPriceConfig: React.FC = () => {
   const { page, limit, setFilters, active } = useDataFilters();
 
   const canDeleteProduct = true;
+  const deleteMuatation = useDeleteDelivetyType();
+  const updateMutation = useDeliveryTypeUpdate();
 
   const handleNavigateCreateDeliveryType = () => {
     navigate("new");
@@ -42,7 +49,7 @@ const DeliveryPriceConfig: React.FC = () => {
     if (!Number.isFinite(id) || id <= 0 || !canDeleteProduct) return;
 
     try {
-      // await deleteProductMutation.mutateAsync(id);
+      await deleteMuatation.mutateAsync(id);
       closeModal();
       notificationAlert.success(
         deliveryTypePrompDeleteMessages.deleteOne.success,
@@ -53,6 +60,28 @@ const DeliveryPriceConfig: React.FC = () => {
       closeModal();
     }
   });
+
+  const handleRestoreDeliveryType = async (row: RowTypes) => {
+    const id = Number(row.id);
+    if (!Number.isFinite(id) || id <= 0 || !canDeleteProduct) return;
+
+    try {
+      await updateMutation.mutateAsync({
+        deliveryID: id,
+        isActive: true,
+      });
+
+      closeModal();
+      notificationAlert.success(
+        deliveryTypePrompRestoreMessages.restoreOne.success,
+      );
+    } catch (err) {
+      notificationAlert.error(
+        deliveryTypePrompRestoreMessages.restoreOne.error,
+      );
+      closeModal();
+    }
+  };
 
   const params = useMemo(
     () => ({
@@ -101,7 +130,10 @@ const DeliveryPriceConfig: React.FC = () => {
   };
   const tableActionButton: ModalTypes[] = [
     {
-      openButton: { label: "Деактивирај", style: "link" },
+      openButton: {
+        label: showActive ? "Деактивирај" : "Активирај",
+        style: "link",
+      },
       onClose: (close) => (modalCloseRef.current = close),
     },
   ];
@@ -113,18 +145,18 @@ const DeliveryPriceConfig: React.FC = () => {
         buttons={[
           { label: "Откажи", style: "default", onClick: closeModal },
           {
-            label: row?.status === "Активен" ? "Деактивирај" : "",
+            label: row?.status === "Активен" ? "Деактивирај" : "Активирај",
             style: "danger",
             onClick: () => {
               row?.status === "Активен"
                 ? handleDeleteDeliveryType(row)
-                : () => {};
+                : handleRestoreDeliveryType(row);
             },
           },
         ]}
       />
     ),
-    [closeModal, handleDeleteDeliveryType],
+    [closeModal, handleDeleteDeliveryType, handleRestoreDeliveryType],
   );
 
   if (isLoading) return <h1>Loading</h1>;
