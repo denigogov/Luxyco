@@ -52,4 +52,13 @@ export class DeliveryTypeController {
   remove(@Param('id') id: string) {
     return this.deliveryTypeService.remove(+id);
   }
+
+  @Roles('SUPER_ADMIN', 'ADMIN')
+  @Patch(':id')
+  restore(
+    @Param('id') id: string,
+    @Body() updateDeliveryTypeDto: UpdateDeliveryTypeDto,
+  ) {
+    return this.deliveryTypeService.update(+id, updateDeliveryTypeDto);
+  }
 }

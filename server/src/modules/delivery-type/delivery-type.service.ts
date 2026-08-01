@@ -106,7 +106,26 @@ export class DeliveryTypeService {
     return updateDeliveryType;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} deliveryType`;
+  async remove(id: number) {
+    const existing = await this.prisma.delivery_type.findUnique({
+      where: { id },
+      select: { id: true, is_active: true },
+    });
+
+    if (!existing || !existing.is_active) {
+      throw new NotFoundException(
+        `Delivery type with id ${id} not found or already inactive`,
+      );
+    }
+
+    await this.prisma.delivery_type.update({
+      where: { id },
+      data: { is_active: false },
+    });
+    await this.invalidateDeliveryTypeCache();
+
+    return {
+      success: true,
+    };
   }
 }
