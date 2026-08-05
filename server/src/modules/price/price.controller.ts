@@ -43,4 +43,10 @@ export class PriceController {
   remove(@Param('id') id: string) {
     return this.priceService.remove(+id);
   }
+
+  @Roles('SUPER_ADMIN', 'ADMIN')
+  @Delete('permanent/:id')
+  permanentRemove(@Param('id') id: string) {
+    return this.priceService.permanentRemove(+id);
+  }
 }

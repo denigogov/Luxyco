@@ -118,4 +118,23 @@ export class PriceService {
       success: true,
     };
   }
+
+  async permanentRemove(id: number) {
+    const existing = await this.prisma.product_types.findUnique({
+      where: { id },
+      select: { id: true, is_active: false },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(
+        `Product with id ${id} not found or already permanent deleted`,
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.product_types.delete({ where: { id } }),
+    ]);
+
+    return { message: `Product ${id} permanently deleted` };
+  }
 }
