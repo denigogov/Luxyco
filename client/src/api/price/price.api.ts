@@ -6,6 +6,8 @@ import type {
 } from "../../features/price/price.types";
 import { apiDelete, apiGet, apiPatch, apiPost } from "../http";
 
+const PRICE_BASE_URL = "/price";
+
 export function getPriceList(
   params: PriceQueryTypes,
   signal?: AbortSignal,
@@ -16,22 +18,33 @@ export function getPriceList(
   if (params.limit != null) sp.set("limit", String(params.limit));
 
   const query = sp.toString();
-  const path = query ? `/price?${query}` : "/price";
+  const path = query ? `${PRICE_BASE_URL}?${query}` : `${PRICE_BASE_URL}`;
 
   return apiGet<any>(path, signal);
 }
 
 export function createProduct(dto: CreateProductFormValues) {
-  return apiPost(`/price`, dto);
+  return apiPost(`${PRICE_BASE_URL}`, dto);
 }
 
 export function updateProduct(
   productId: number | undefined,
   dto: Partial<EditProductFormValues>,
 ) {
-  return apiPatch<void>(`/price/${productId}`, dto);
+  return apiPatch<void>(`${PRICE_BASE_URL}/${productId}`, dto);
 }
 
 export function deleteProduct(productId: number, signal?: AbortSignal) {
-  return apiDelete<void>(`/price/${productId}`, undefined, signal);
+  return apiDelete<void>(`${PRICE_BASE_URL}/${productId}`, undefined, signal);
+}
+
+export function deleteProductPermanent(
+  productId: number,
+  signal?: AbortSignal,
+) {
+  return apiDelete<void>(
+    `${PRICE_BASE_URL}/permanent/${productId}`,
+    undefined,
+    signal,
+  );
 }

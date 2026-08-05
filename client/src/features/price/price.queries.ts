@@ -9,6 +9,7 @@ import type { PriceQueryTypes } from "./price.types";
 import {
   createProduct,
   deleteProduct,
+  deleteProductPermanent,
   getPriceList,
   updateProduct,
 } from "../../api/price/price.api";
@@ -66,12 +67,39 @@ export function useDeleteProduct() {
   });
 }
 
-export function useProductUpdate(id: number | undefined) {
+export function useProductUpdate(id?: number | undefined) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationKey: priceKeys.mutations.update(id),
-    mutationFn: (dto: Partial<EditProductFormValues>) => updateProduct(id, dto),
+    mutationFn: ({ priceID, ...dto }: Partial<EditProductFormValues>) => {
+      const resolvedID = id ?? priceID;
+
+      if (!resolvedID) {
+        throw new Error("Price Type ID is required");
+      }
+      return updateProduct(resolvedID, dto);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: priceKeys.lists(),
+        }),
+
+        qc.invalidateQueries({
+          queryKey: ordersKeys.references(),
+        }),
+      ]);
+    },
+  });
+}
+
+export function useDeletePermanentProduct() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: priceKeys.mutations.deleteOne(),
+    mutationFn: (id: number) => deleteProductPermanent(id),
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({

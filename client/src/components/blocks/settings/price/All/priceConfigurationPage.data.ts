@@ -248,6 +248,32 @@ export const productPrompDeleteMessages = {
   },
 };
 
+export const productPrompRestoreMessages = {
+  restore: {
+    success: {
+      title: "Продуктот е успешно активиран",
+      text: "Продуктот е активиран во системот.",
+    },
+    error: {
+      title: "Активирањето не беше успешно",
+      text: "Не можевме да го активираме продуктот во моментов. Ве молиме обидете се повторно.",
+    },
+  },
+};
+
+export const productPrompPermanentDeleteMessages = {
+  deleteOne: {
+    success: {
+      title: "Продуктот е успешно трајно отстранет",
+      text: "Продуктот е трајно отстранет од системот.",
+    },
+    error: {
+      title: "Бришењето не беше успешно",
+      text: "Не можевме да го отстраниме продуктот во моментов. Ве молиме обидете се повторно.",
+    },
+  },
+};
+
 const confirmationDeleteDialog: ConfirmDialogTypes = {
   type: "danger",
   title: "Деактивирај Продукт ?",

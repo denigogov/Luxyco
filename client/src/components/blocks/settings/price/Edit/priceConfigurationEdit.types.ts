@@ -8,6 +8,7 @@ export type EditProductFormValues = {
   status: number | "";
   priceModelId: string | "";
   isActive: boolean;
+  priceID?: number; // special case ID when reactivate the price
 };
 
 export interface PriceConfigEditTypes {

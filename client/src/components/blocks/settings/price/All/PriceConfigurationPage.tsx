@@ -5,10 +5,14 @@ import Table from "../../../../../whitelabel/src/molecules/table/M-table";
 import {
   PriceConfigurationPageData,
   productPrompDeleteMessages,
+  productPrompPermanentDeleteMessages,
+  productPrompRestoreMessages,
 } from "./priceConfigurationPage.data";
 import {
+  useDeletePermanentProduct,
   useDeleteProduct,
   usePriceList,
+  useProductUpdate,
 } from "../../../../../features/price/price.queries";
 import {
   CreateOrderTags,
@@ -18,8 +22,11 @@ import { useCallback, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useDataFilters } from "../../../../../utils/hooks/useDataFilters";
 import ActiveTag from "../../../../../whitelabel/src/molecules/activeTag/ActiveTag";
 import ConfirmDialog from "../../../../../whitelabel/src/molecules/confirmDialog/M-ConfirmDialog";
-import type { RowTypes } from "../../../../../whitelabel/src/molecules/table/m-table.types";
-import type { ModalTypes } from "../../../../../whitelabel/src/organisms/Modal/modal.types";
+import type {
+  RowTypes,
+  TableActionModal,
+  TableModalAction,
+} from "../../../../../whitelabel/src/molecules/table/m-table.types";
 import { notificationAlert } from "../../../../../utils/hooks/notify";
 import ToggleButton from "../../../../../whitelabel/src/atoms/toggle/ToggleButton";
 
@@ -27,6 +34,8 @@ const PriceConfigurationPage: React.FC = () => {
   const [showIsActive, setIsActive] = useState<boolean>(true);
   const navigate = useNavigate();
   const deleteProductMutation = useDeleteProduct();
+  const deleteProductPermanentMutation = useDeletePermanentProduct();
+  const useRestoreProductMutation = useProductUpdate();
   const canDeleteProduct = true;
 
   const handleNavigateCreateProduct = () => {
@@ -62,12 +71,54 @@ const PriceConfigurationPage: React.FC = () => {
       .map(mapPriceListToRow);
   }, [tableListData, showIsActive]);
 
-  const tableActionButton: ModalTypes[] = [
-    {
-      openButton: { label: "Деактивирај", style: "link" },
-      onClose: (close) => (modalCloseRef.current = close),
-    },
-  ];
+  const tableActionButton: TableActionModal[] = showIsActive
+    ? [
+        {
+          actionKey: "deactivate",
+          openButton: {
+            label: "Деактивирај",
+            style: "link",
+            role: "delete",
+          },
+          onClose: (close) => (modalCloseRef.current = close),
+        },
+      ]
+    : [
+        {
+          actionKey: "restore",
+          openButton: {
+            label: "Активирај",
+            style: "link",
+          },
+          onClose: (close) => (modalCloseRef.current = close),
+        },
+        {
+          actionKey: "hardDelete",
+          openButton: {
+            label: "Избриши",
+            style: "link",
+            role: "delete",
+          },
+          onClose: (close) => (modalCloseRef.current = close),
+        },
+      ];
+
+  const handleRestoreProduct = useEffectEvent(async (row: RowTypes) => {
+    const id = Number(row.id);
+    if (!Number.isFinite(id) || id <= 0 || !canDeleteProduct) return;
+
+    try {
+      await useRestoreProductMutation.mutateAsync({
+        priceID: id,
+        isActive: true,
+      });
+      closeModal();
+      notificationAlert.success(productPrompRestoreMessages.restore.success);
+    } catch (err) {
+      notificationAlert.error(productPrompRestoreMessages.restore.error);
+      closeModal();
+    }
+  });
 
   const handleDeleteProduct = useEffectEvent(async (row: RowTypes) => {
     const id = Number(row.id);
@@ -79,10 +130,28 @@ const PriceConfigurationPage: React.FC = () => {
       notificationAlert.success(productPrompDeleteMessages.deleteOne.success);
     } catch (err) {
       notificationAlert.error(productPrompDeleteMessages.deleteOne.error);
-      console.error(err);
       closeModal();
     }
   });
+
+  const handleHardDeleteProduct = async (row: RowTypes) => {
+    const id = Number(row.id);
+    if (!Number.isFinite(id) || id <= 0 || !canDeleteProduct) return;
+    console.log("test", row);
+
+    try {
+      await deleteProductPermanentMutation.mutateAsync(id);
+      closeModal();
+      notificationAlert.success(
+        productPrompPermanentDeleteMessages.deleteOne.success,
+      );
+    } catch (error) {
+      notificationAlert.error(
+        productPrompPermanentDeleteMessages.deleteOne.error,
+      );
+      closeModal();
+    }
+  };
 
   const handleFilterReset = () => {
     setFilters({
@@ -92,22 +161,54 @@ const PriceConfigurationPage: React.FC = () => {
   };
 
   const renderDeleteProductrDialog = useCallback(
-    (row: RowTypes) => (
-      <ConfirmDialog
-        {...PriceConfigurationPageData.confirmationDeleteDialog}
-        buttons={[
-          { label: "Откажи", style: "default", onClick: closeModal },
-          {
-            label: row?.status === "Активен" ? "Деактивирај" : "",
-            style: "danger",
-            onClick: () => {
-              row?.status === "Активен" ? handleDeleteProduct(row) : () => {};
+    (row: RowTypes, action?: TableModalAction) => {
+      if (action === "hardDelete") {
+        return (
+          <ConfirmDialog
+            type="danger"
+            title="Трајно избриши продукт?"
+            message="Оваа акција е трајна и продуктот не може повторно да се врати."
+            buttons={[
+              {
+                label: "Откажи",
+                style: "default",
+                onClick: closeModal,
+              },
+              {
+                label: "Избриши",
+                style: "danger",
+                onClick: () => handleHardDeleteProduct(row),
+              },
+            ]}
+          />
+        );
+      }
+
+      const isDeactivate = action === "deactivate";
+
+      return (
+        <ConfirmDialog
+          {...PriceConfigurationPageData.confirmationDeleteDialog}
+          title={isDeactivate ? "Деактивирај продукт?" : "Активирај продукт?"}
+          buttons={[
+            {
+              label: "Откажи",
+              style: "default",
+              onClick: closeModal,
             },
-          },
-        ]}
-      />
-    ),
-    [closeModal, handleDeleteProduct],
+            {
+              label: isDeactivate ? "Деактивирај" : "Активирај",
+              style: isDeactivate ? "danger" : "tertiary",
+              onClick: () =>
+                isDeactivate
+                  ? handleDeleteProduct(row)
+                  : handleRestoreProduct(row),
+            },
+          ]}
+        />
+      );
+    },
+    [],
   );
 
   const clearAllFilterTags = (

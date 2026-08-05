@@ -31,7 +31,7 @@ export const priceConfigurationNewPageData: PriceConfigNewTypes = {
       type: "text",
       filedType: "select",
       label: "Вид на цена",
-      selectPlaceholder: "Избери статус",
+      selectPlaceholder: "Избери тип наплата",
       selectValueType: "number",
       options: [
         {
@@ -51,12 +51,12 @@ export const priceConfigurationNewPageData: PriceConfigNewTypes = {
   ],
   notification: {
     success: {
-      title: "Ажурирањето е успешно",
-      text: "Нарачката е успешно ажурирана.",
+      title: "Продуктот е додаден",
+      text: "Продуктот е успешно додаден во системот.",
     },
     error: {
-      title: "Ажурирањето не беше успешно",
-      text: "Не можевме да ја ажурираме нарачката во моментов. Ве молиме обидете се повторно.",
+      title: "Неуспешен обид да се додаде нов продукт",
+      text: "Не можевме да го додадиме продуктот во моментов. Ве молиме обидете се повторно.",
     },
   },
 };
