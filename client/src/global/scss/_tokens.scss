@@ -77,6 +77,7 @@ $fontSizeMap: (
  * Fontweights
  */
 $fontWeightMap: (
+  tiny: 100,
   extraLight: 200,
   light: 300,
   default: 400,
@@ -88,8 +89,9 @@ $fontWeightMap: (
 );
 
 $fontFamilyMap: (
-  primary: "poppins",
-  secondary: "Quicksand",
+  primary: "Quicksand",
+  secondary: "poppins",
+  tertiary: "IBM Plex Sans",
 );
 
 /**
