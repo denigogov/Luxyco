@@ -37,7 +37,6 @@ export function filterMobileQuickMenuByNavbar(
       ];
     }
 
-    // Keep action items such as scanner.
     return [item];
   });
 }
