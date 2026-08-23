@@ -14,6 +14,9 @@ import { QrScanner } from "../whitelabel/src/molecules/qrScanner/QrScanner";
 import { MAIN_NAVIGATION_MENU } from "../utils/brands/navigationMenu.global";
 import { useLastValidRouteTracker } from "../utils/routes/useLastValidRouteTracker";
 import { useNetworkStatus } from "../utils/hooks/useNetworkStatus";
+import MobileQuickMenu from "../whitelabel/src/organisms/MobileQuickMenu/o-mobileQuickMenu";
+import { MOBILE_QUICK_MENU_ITEMS } from "../whitelabel/src/organisms/MobileQuickMenu/o-mobileQuickMenu.data";
+import { filterMobileQuickMenuByNavbar } from "../utils/helpers/filterMobileQuickMenuByNavbar";
 
 const AppRoute: React.FC = () => {
   const location = useLocation();
@@ -23,7 +26,7 @@ const AppRoute: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const { isNavOpen } = useUIState();
+  const { isNavOpen, isMobileQuickMenuVisible } = useUIState();
   const isUserOnline = useNetworkStatus();
   const { isAuthenticated, logout, status, user } = useAuth(); // user has role
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -72,6 +75,11 @@ const AppRoute: React.FC = () => {
   }
 
   const navbarForRole = filterNavbarByRole(MAIN_NAVIGATION_MENU, role);
+
+  const mobileNavbarFiltered = filterMobileQuickMenuByNavbar(
+    MOBILE_QUICK_MENU_ITEMS,
+    navbarForRole,
+  );
 
   const navbarConfig: NavbarTypes = {
     ...navbarForRole,
@@ -122,11 +130,20 @@ const AppRoute: React.FC = () => {
     );
   };
 
+  const showMobileQuickMenu =
+    isMobileQuickMenuVisible && mobileNavbarFiltered.length > 0;
+
   return (
     <div className="app-layout">
       <Navbar {...navbarConfig} />
       <main
-        className={`app-main ${isNavOpen ? "app-main--collapsed" : ""}`}
+        className={[
+          "app-main",
+          isNavOpen && "app-main--collapsed",
+          showMobileQuickMenu && "app-main--withMobileQuickMenu",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         onContextMenu={handleContextMenu}
       >
         {/* <Button label="Скенирај" onClick={() => setIsQrScannerOpen(true)} /> */}
@@ -164,6 +181,12 @@ const AppRoute: React.FC = () => {
         )}
         <Outlet />
       </main>
+      {showMobileQuickMenu && (
+        <MobileQuickMenu
+          onScan={() => setIsQrScannerOpen(true)}
+          items={mobileNavbarFiltered}
+        />
+      )}
     </div>
   );
 };

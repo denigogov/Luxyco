@@ -1,12 +1,19 @@
+:root {
+  --mobile-quick-menu-height: 4.75rem;
+}
+
 .app-layout {
+  min-height: 100dvh;
+
   @include breakpoint(medium, true) {
     padding-top: spacing(medium);
   }
 }
 
 .app-main {
+  box-sizing: border-box;
   margin-left: var(--nav-expanded);
-  padding: 5px;
+  padding: spacing(xxsmall);
   transition: margin-left 0.3s ease;
   background: var(--main-backgroundColor);
 
@@ -19,6 +26,13 @@
 
     &--collapsed {
       margin-left: 0;
+    }
+
+    &--withMobileQuickMenu {
+      padding-bottom: calc(
+        var(--mobile-quick-menu-height) + env(safe-area-inset-bottom) +
+          spacing(xsmall)
+      );
     }
   }
 }
