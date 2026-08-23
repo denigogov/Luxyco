@@ -335,42 +335,52 @@ const CustomerDetails: React.FC = () => {
     [rows, addressesBoxSectionData, notesBoxSectionData],
   );
 
-  if (isLoading || isFetching) {
-    return <h1>Loading</h1>;
-  }
-
   if (error) {
-    return <ErrorWrapper />;
+    const status = (error as Error & { status?: number }).status;
+    return <ErrorWrapper status={status} />;
   }
 
-  if (!data) {
-    return <h1>Loading</h1>;
-  }
+  const activateLoading = (isLoading && !data) || isFetching;
+  const isRefreshing = isFetching && !!data;
+
   return (
     <div className="b-customerDetails">
       <Breadcrumbs {...breadcrumbsProps} />
+
+      <h1>{isLoading ? "loading" : !data ? "nodata" : ""}</h1>
+      <h4>{isFetching ? "fetching" : ""}</h4>
 
       <div className="uk-card-default uk-padding-small">
         <div className="uk-flex uk-flex-middle uk-flex-between">
           {/* Left side */}
           <div className="b-customerDetails__name">
-            <div className="uk-text-large uk-text-bold uk-margin-remove">
-              {`${data?.firstName ?? ""} ${data?.lastName ?? ""}`}
+            <div
+              className={`uk-text-large uk-text-bold uk-margin-remove ${activateLoading ? "b-customerDetails__skeleton-loading" : ""}`}
+            >
+              {`${!isRefreshing ? (data?.firstName ?? "") : ""} ${!isRefreshing ? (data?.lastName ?? "") : ""}`}
+            </div>
+            <div
+              className={` ${activateLoading ? "uk-margin-xsmall-top  b-customerDetails__skeleton-loading  b-customerDetails__skeleton-loading-short" : ""} `}
+            >
+              {isRefreshing ? "" : phoneNumberFormat(data?.phoneNumber ?? "")}
             </div>
 
-            <div className="uk-margin-remove">
-              {phoneNumberFormat(data?.phoneNumber ?? "")}
-            </div>
-
-            <div className="uk-margin-small-top">
-              {defaultAddress?.formattedAddress
+            <div
+              className={`uk-margin-small-top ${isLoading ? "b-customerDetails__skeleton-loading" : ""}`}
+            >
+              {defaultAddress?.formattedAddress && !isRefreshing
                 ? " Ул. " + defaultAddress?.formattedAddress
-                : "Без Адреса"}{" "}
+                : `${isLoading || isFetching ? "" : "Без Адреса"}`}{" "}
               <br />
             </div>
 
             <div className="uk-margin-small-top uk-text-muted">
-              Клиент од: {timeFormat(data?.createdAt ?? "")}
+              Клиент од:{" "}
+              <span
+                className={`${activateLoading ? "b-customerDetails__skeleton-loading b-customerDetails__skeleton-loading-short" : ""}`}
+              >
+                {isRefreshing ? "" : timeFormat(data?.createdAt ?? "")}
+              </span>
             </div>
           </div>
 
@@ -401,7 +411,7 @@ const CustomerDetails: React.FC = () => {
         </div>
       </div>
 
-      <BoxStatistic {...customerStatistic} />
+      <BoxStatistic {...customerStatistic} loading={activateLoading} />
       <Tabs {...tabsData} />
       <Outlet />
     </div>
