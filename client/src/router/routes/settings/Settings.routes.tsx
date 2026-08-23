@@ -4,6 +4,7 @@ import { allowedPaths } from "../../../utils/brands";
 import { userSubRoutes } from "./UserSettingsPath.routes";
 import { deliverySettingsSubRoutes } from "./DeliverySettingsPath.routes";
 import { priceSettingsSubRoutes } from "./PriceSettingsPath.routes";
+import SettingsRoot from "../../../components/blocks/settings/SettintsRoot/SettingsRoot";
 
 // const modalBase: ModalTypes = {
 //   options: {
@@ -11,10 +12,6 @@ import { priceSettingsSubRoutes } from "./PriceSettingsPath.routes";
 //     returnBack: true,
 //   },
 // };
-
-const SimpleSetupPage = () => {
-  return <h1>Setup Page</h1>;
-};
 
 const Status = () => (
   <div>
@@ -41,7 +38,7 @@ const settingsSubRoute = [
 
 export const SettingsRoutes = (
   <Route path="/settings">
-    <Route index element={<SimpleSetupPage />} />
+    <Route index element={<SettingsRoot />} />
     {settingsSubRoute
       .filter((r) => allowedPaths.includes(r.fullPath))
       .map((r) => (
