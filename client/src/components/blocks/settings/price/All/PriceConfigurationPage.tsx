@@ -59,7 +59,7 @@ const PriceConfigurationPage: React.FC = () => {
   );
 
   const { data, isLoading, error, isFetching } = usePriceList(params);
-  let tableListData = data?.data ?? [];
+  const tableListData = data?.data ?? [];
 
   const displayTableFilterRow = () => {
     setIsActive((e) => !e);
@@ -115,6 +115,7 @@ const PriceConfigurationPage: React.FC = () => {
       closeModal();
       notificationAlert.success(productPrompRestoreMessages.restore.success);
     } catch (err) {
+      console.error(err);
       notificationAlert.error(productPrompRestoreMessages.restore.error);
       closeModal();
     }
@@ -146,6 +147,7 @@ const PriceConfigurationPage: React.FC = () => {
         productPrompPermanentDeleteMessages.deleteOne.success,
       );
     } catch (error) {
+      console.error(error);
       notificationAlert.error(
         productPrompPermanentDeleteMessages.deleteOne.error,
       );

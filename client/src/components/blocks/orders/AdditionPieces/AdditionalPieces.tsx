@@ -16,8 +16,7 @@ const AdditionalPieces: React.FC = () => {
 
   const createAdditionalPieceMut = useCreateAdditionalPiece(Number(id));
 
-  const { data: referencesData, isLoading: referencesLoading } =
-    useOrderReferencesList();
+  const { data: referencesData } = useOrderReferencesList();
 
   const productTypesData = referencesData?.productTypes || [];
 

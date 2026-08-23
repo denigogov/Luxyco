@@ -29,7 +29,7 @@ const EditNote: React.FC = () => {
 
       navigate(`/customers/${customerId}`, { replace: true });
     }
-  }, [noteText, navigate]);
+  }, [noteText, navigate, customerId]);
 
   const fields = (
     CustomerNotesUpdate.filedsData as RHFInputProps<NoteType>[]

@@ -76,6 +76,7 @@ const DeliveryPriceConfig: React.FC = () => {
         deliveryTypePrompRestoreMessages.restoreOne.success,
       );
     } catch (err) {
+      console.error(err);
       notificationAlert.error(
         deliveryTypePrompRestoreMessages.restoreOne.error,
       );
@@ -147,6 +148,7 @@ const DeliveryPriceConfig: React.FC = () => {
           {
             label: row?.status === "Активен" ? "Деактивирај" : "Активирај",
             style: "danger",
+            //@typescript-eslint/no-unused-expressions
             onClick: () => {
               row?.status === "Активен"
                 ? handleDeleteDeliveryType(row)

@@ -1,4 +1,3 @@
-import { act } from "react";
 import type { DeliveryTypeInterface } from "../../../../../features/deliveryType/deliveryType.types";
 import { priceFormatted } from "../../../../../utils/helpers/priceFormater";
 import { timeFormat } from "../../../../../utils/helpers/timeFormat";

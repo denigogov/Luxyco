@@ -1,1 +1,2 @@
+//allowInterfaces
 export interface AdditionalPiecesTypes {}

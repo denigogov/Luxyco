@@ -104,6 +104,7 @@ const AllOrders: React.FC = () => {
         text: `нарачка e успешно избришена}.`,
       });
     } catch (error) {
+      console.error(error);
       notificationAlert.error({
         title: "Грешка",
         text: "Неуспешен обид, Обидете се повторно.",
@@ -121,6 +122,7 @@ const AllOrders: React.FC = () => {
         text: `${selectedOrders.length} нарачк${selectedOrders.length === 1 ? "а" : "и"} успешно избришен${selectedOrders.length === 1 ? "а" : "и"}.`,
       });
     } catch (error) {
+      console.error(error);
       notificationAlert.error({
         title: "Грешка",
         text: "Неуспешен обид, Обидете се повторно.",
@@ -461,6 +463,7 @@ const AllOrders: React.FC = () => {
       setOrdersForPrint(orders);
       setResetSelection(true);
     } catch (error) {
+      console.error(error);
       notificationAlert.error({
         title: "Грешка",
         text: "Неуспешна подготовка за печатење.",

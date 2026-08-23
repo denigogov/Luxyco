@@ -1,4 +1,4 @@
-import { useCallback, useEffectEvent, useMemo, useRef, useState } from "react";
+import { useCallback, useEffectEvent, useMemo, useRef } from "react";
 import {
   useDeleteUser,
   useUserList,
@@ -51,6 +51,7 @@ const AllUsers: React.FC = () => {
       closeModal();
       notificationAlert.success(userPrompDeleteMessages.deleteOne.success);
     } catch (err) {
+      console.log(err);
       notificationAlert.error(userPrompDeleteMessages.deleteOne.error);
       closeModal();
     }
