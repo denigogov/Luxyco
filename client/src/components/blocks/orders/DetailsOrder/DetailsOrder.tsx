@@ -154,7 +154,7 @@ const DetailsOrder: React.FC = () => {
   });
 
   // enable to send or qr-code | the customer ID depend from where its scan
-  const { data, isLoading, error, isPending, refetch } = useOrderDetail(
+  const { data, isLoading, error, isFetching, refetch } = useOrderDetail(
     isQrCodeParam ? id : Number(id),
   );
   const updateOrderMutattion = useUpdateOrder(data?.id);
@@ -296,11 +296,9 @@ const DetailsOrder: React.FC = () => {
     });
   }, [data]);
 
-  if (isLoading || isPending) {
-    return <h1>Loading</h1>;
-  }
   if (error) {
-    return <ErrorWrapper />;
+    const status = (error as Error & { status?: number }).status;
+    return <ErrorWrapper status={status} />;
   }
 
   const handleScan = (qrCode: string) => {
@@ -342,14 +340,20 @@ const DetailsOrder: React.FC = () => {
 
   const createdDateFormatedString = `${timeFormat(data?.createdAt, { showTime: true })} / ${data?.users?.firstName}`;
 
+  const initLoadingSkeletton = isLoading || !data;
+  const initFetchingSkeleton = isFetching || !data;
+
   return (
     <div className="detailsOrder">
       <Breadcrumbs {...breadcrumbsProps} />
 
       <div className="order-card__row uk-padding-small uk-flex  uk-flex-right uk-visible@m">
         <span uk-icon="history"> </span>
-        <span className=" uk-text-small">
-          Ажурирано: {timeFormat(data?.updatedAt, { showTime: true })}
+        <span
+          className={`uk-text-small ${initLoadingSkeletton ? "detailsOrder__skeleton-loading detailsOrder__skeleton-loading-short" : ""}`}
+        >
+          {initLoadingSkeletton ||
+            `Ажурирано: ${timeFormat(data?.updatedAt, { showTime: true })}`}
         </span>
       </div>
       <div>
@@ -384,14 +388,22 @@ const DetailsOrder: React.FC = () => {
           }
           updateOrderStatus={handleUpdateOrderStatus}
           onRefetchData={() => refetch()}
+          isFetching={initFetchingSkeleton}
+          isLoading={initLoadingSkeletton}
         />
       )}
       {data?.orderNote && (
-        <div className="detailsOrder__note">{data?.orderNote}</div>
+        <div
+          className={`detailsOrder__note ${initLoadingSkeletton ? "detailsOrder__skeleton-loading" : ""}`}
+        >
+          {initLoadingSkeletton || data?.orderNote}
+        </div>
       )}
       <OrderStepper currentStatusId={status?.id ?? ORDER_STATUS.PROCESSING} />
       <ButtonGroup {...buttonGroupProps} />
       <OrderItemsDetails
+        isFetching={initFetchingSkeleton}
+        isLoading={initLoadingSkeletton}
         items={tableRows}
         onDelete={handleDeleteOrderPiece}
         onMeasure={(pieces) =>
@@ -405,7 +417,7 @@ const DetailsOrder: React.FC = () => {
         updatePermission={canUserOrderPiecesUpdate}
         deletePermission={
           canUserDeleteOrderPieces &&
-          !AllowedStatuses.includes(Number(status.id))
+          !AllowedStatuses.includes(Number(status?.id))
         }
       />
       {isPrintModalOpen && data && (

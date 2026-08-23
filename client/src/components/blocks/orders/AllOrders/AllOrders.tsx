@@ -318,8 +318,10 @@ const AllOrders: React.FC = () => {
     return () => cancelAnimationFrame(frame);
   }, [ordersForPrint, handlePrintBills]);
 
-  if (isLoading) return <h1>Loading</h1>;
-  if (error || referencesError) return <ErrorWrapper />;
+  if (error || referencesError) {
+    const status = (error as Error & { status?: number }).status;
+    return <ErrorWrapper status={status} />;
+  }
 
   // values that are selected and after refresh the inputs are still with value
   const filterValues = setFilterValues({
@@ -471,6 +473,8 @@ const AllOrders: React.FC = () => {
     }
   };
 
+  const initLoadingSkeletton = isLoading || (isFetching && !data);
+
   return (
     <div className="b-orders">
       <div className="b-orders-toolbar">
@@ -598,7 +602,7 @@ const AllOrders: React.FC = () => {
             modals: [...(canUserDeleteOrder ? tableActionButton : [])],
           }}
           rows={rows}
-          loading={isFetching}
+          loading={initLoadingSkeletton}
           loadingVariant="bar+skeleton"
           loadingRows={limit ?? 20}
           setSelectedCustomers={setSelectedOrders}

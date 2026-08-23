@@ -347,9 +347,6 @@ const CustomerDetails: React.FC = () => {
     <div className="b-customerDetails">
       <Breadcrumbs {...breadcrumbsProps} />
 
-      <h1>{isLoading ? "loading" : !data ? "nodata" : ""}</h1>
-      <h4>{isFetching ? "fetching" : ""}</h4>
-
       <div className="uk-card-default uk-padding-small">
         <div className="uk-flex uk-flex-middle uk-flex-between">
           {/* Left side */}
