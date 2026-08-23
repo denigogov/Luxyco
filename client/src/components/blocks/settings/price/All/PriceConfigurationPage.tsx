@@ -130,6 +130,7 @@ const PriceConfigurationPage: React.FC = () => {
       closeModal();
       notificationAlert.success(productPrompDeleteMessages.deleteOne.success);
     } catch (err) {
+      console.error(err);
       notificationAlert.error(productPrompDeleteMessages.deleteOne.error);
       closeModal();
     }

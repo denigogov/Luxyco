@@ -150,9 +150,11 @@ const DeliveryPriceConfig: React.FC = () => {
             style: "danger",
             //@typescript-eslint/no-unused-expressions
             onClick: () => {
-              row?.status === "Активен"
-                ? handleDeleteDeliveryType(row)
-                : handleRestoreDeliveryType(row);
+              if (row?.status === "Активен") {
+                handleDeleteDeliveryType(row);
+              } else {
+                handleRestoreDeliveryType(row);
+              }
             },
           },
         ]}

@@ -31,7 +31,7 @@ export function mapPriceListToRow(o: PriceListTypes): RowTypes {
     updatedAt: timeFormat(o.updatedAt, { showTime: true }),
     product: o.name ?? "-",
     priceModel: o?.priceModel?.name === "PER_PIECE" ? "По Парче" : "По М2",
-    price: String(o?.basePrice) ?? "-",
+    price: o.basePrice != null ? String(o.basePrice) : "-",
     status: o.isActive ? "Активен" : "Неактивен",
     rowMarker: getOrderRowMarker(o.isActive),
   };
