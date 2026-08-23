@@ -211,8 +211,10 @@ const Customers: React.FC = () => {
     }));
   }, [rawRows]);
 
-  if (isLoading) return <h1>Loading</h1>;
-  if (error) return <ErrorWrapper />;
+  if (error) {
+    const status = (error as Error & { status?: number }).status;
+    return <ErrorWrapper status={status} />;
+  }
 
   const filterValues: FilterValues = {
     name: name ?? "",
@@ -526,7 +528,7 @@ const Customers: React.FC = () => {
         onRowDelete={canDeleteCustomer ? handleDeleteCustomer : undefined}
         renderActionModalChildren={renderDeleteCustomerDialog}
         enableMultiSelect={canDeleteCustomer || false}
-        loading={isFetching}
+        loading={isFetching || isLoading}
         loadingVariant="bar+skeleton"
         loadingRows={limit ?? 20}
       />
