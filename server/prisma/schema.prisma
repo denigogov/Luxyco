@@ -114,29 +114,30 @@ model order_pieces {
 }
 
 model orders {
-  id                  Int                 @id @default(autoincrement()) @db.UnsignedInt
-  qr_code             String              @unique(map: "orders_qr_code_unique") @db.VarChar(100)
-  customer_id         Int?                @db.UnsignedInt
-  delivery_address_id Int?                @db.UnsignedInt
-  delivery_type_id    Int?                @db.UnsignedInt
-  service_type_id     Int?                @db.UnsignedInt
-  order_status_id     Int?                @db.UnsignedInt
-  created_by_user_id  Int?                @db.UnsignedInt
-  scheduled_date      DateTime            @db.Date
-  total_pieces        Int                 @db.UnsignedInt
-  measured_pieces     Int                 @default(0) @db.UnsignedInt
-  total_price         Decimal             @default(0.00) @db.Decimal(10, 2)
-  order_note          String?             @db.Text
-  created_at          DateTime            @default(now()) @db.Timestamp(0)
-  updated_at          DateTime            @default(now()) @db.Timestamp(0)
-  customer_notes      customer_notes[]
-  order_pieces        order_pieces[]
-  users               users?              @relation(fields: [created_by_user_id], references: [id], map: "orders_created_by_user_id_foreign")
-  customers           customers?          @relation(fields: [customer_id], references: [id], map: "orders_customer_id_foreign")
-  customer_addresses  customer_addresses? @relation(fields: [delivery_address_id], references: [id], map: "orders_delivery_address_id_foreign")
-  delivery_type       delivery_type?      @relation(fields: [delivery_type_id], references: [id], map: "orders_delivery_type_id_foreign")
-  status              status?             @relation(fields: [order_status_id], references: [id], map: "orders_order_status_id_foreign")
-  service_type        service_type?       @relation(fields: [service_type_id], references: [id], map: "orders_service_type_id_foreign")
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  qr_code              String                 @unique(map: "orders_qr_code_unique") @db.VarChar(100)
+  customer_id          Int?                   @db.UnsignedInt
+  delivery_address_id  Int?                   @db.UnsignedInt
+  delivery_type_id     Int?                   @db.UnsignedInt
+  service_type_id      Int?                   @db.UnsignedInt
+  order_status_id      Int?                   @db.UnsignedInt
+  created_by_user_id   Int?                   @db.UnsignedInt
+  scheduled_date       DateTime               @db.Date
+  total_pieces         Int                    @db.UnsignedInt
+  measured_pieces      Int                    @default(0) @db.UnsignedInt
+  total_price          Decimal                @default(0.00) @db.Decimal(10, 2)
+  order_note           String?                @db.Text
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  customer_notes       customer_notes[]
+  order_pieces         order_pieces[]
+  order_status_history order_status_history[]
+  users                users?                 @relation(fields: [created_by_user_id], references: [id], map: "orders_created_by_user_id_foreign")
+  customers            customers?             @relation(fields: [customer_id], references: [id], map: "orders_customer_id_foreign")
+  customer_addresses   customer_addresses?    @relation(fields: [delivery_address_id], references: [id], map: "orders_delivery_address_id_foreign")
+  delivery_type        delivery_type?         @relation(fields: [delivery_type_id], references: [id], map: "orders_delivery_type_id_foreign")
+  status               status?                @relation(fields: [order_status_id], references: [id], map: "orders_order_status_id_foreign")
+  service_type         service_type?          @relation(fields: [service_type_id], references: [id], map: "orders_service_type_id_foreign")
 
   @@index([created_by_user_id], map: "orders_created_by_user_id_index")
   @@index([customer_id], map: "orders_customer_id_index")
@@ -171,12 +172,13 @@ model product_types {
 }
 
 model status {
-  id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  status_name String   @unique(map: "status_name_unique") @db.VarChar(50)
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now()) @db.Timestamp(0)
-  updated_at  DateTime @default(now()) @db.Timestamp(0)
-  orders      orders[]
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  status_name          String                 @unique(map: "status_name_unique") @db.VarChar(50)
+  is_active            Boolean                @default(true)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  order_status_history order_status_history[]
+  orders               orders[]
 }
 
 model users {
@@ -193,6 +195,7 @@ model users {
   customer_notes           customer_notes[]
   driver_current_locations driver_current_locations?
   order_pieces             order_pieces[]
+  order_status_history     order_status_history[]
   orders                   orders[]
   account_types            account_types             @relation(fields: [account_type_id], references: [id], map: "users_account_type_id_foreign")
 
@@ -206,4 +209,19 @@ model service_type {
   created_at   DateTime @default(now()) @db.Timestamp(0)
   updated_at   DateTime @default(now()) @db.Timestamp(0)
   orders       orders[]
+}
+
+model order_status_history {
+  id                 BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  order_id           Int      @db.UnsignedInt
+  status_id          Int      @db.UnsignedInt
+  changed_by_user_id Int?     @db.UnsignedInt
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+  orders             orders   @relation(fields: [order_id], references: [id], onDelete: Cascade, map: "order_status_history_order_id_foreign")
+  status             status   @relation(fields: [status_id], references: [id], map: "order_status_history_status_id_foreign")
+  users              users?   @relation(fields: [changed_by_user_id], references: [id], map: "order_status_history_user_id_foreign")
+
+  @@index([order_id, created_at], map: "order_status_history_order_created_index")
+  @@index([status_id], map: "order_status_history_status_id_index")
+  @@index([changed_by_user_id], map: "order_status_history_user_id_index")
 }
