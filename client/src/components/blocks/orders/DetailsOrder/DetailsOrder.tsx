@@ -259,7 +259,7 @@ const DetailsOrder: React.FC = () => {
 
   const tableRows = useMemo(() => {
     return (data?.orderPieces ?? []).map((piece: any) => {
-      const customerData = piece?.orders?.customers;
+      const customerData = data.customers;
       const status = data?.status?.id;
 
       const priceModel = piece.productTypes?.priceModel?.name;

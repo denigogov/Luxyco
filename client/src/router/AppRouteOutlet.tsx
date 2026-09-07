@@ -26,7 +26,8 @@ const AppRoute: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const { isNavOpen, isMobileQuickMenuVisible } = useUIState();
+  const { isNavOpen, isMobileQuickMenuVisible, isDesktopQuickMenuVisible } =
+    useUIState();
   const isUserOnline = useNetworkStatus();
   const { isAuthenticated, logout, status, user } = useAuth(); // user has role
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -90,6 +91,8 @@ const AppRoute: React.FC = () => {
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
+    if (!isDesktopQuickMenuVisible) return null;
+
     const target = e.target as HTMLElement;
     if (
       target.closest("input") ||
@@ -154,20 +157,22 @@ const AppRoute: React.FC = () => {
           onError={(error) => console.error(error)}
         />
 
-        <QuickContextMenu
-          open={quickMenu.open}
-          x={quickMenu.x}
-          y={quickMenu.y}
-          items={quickMenuItems}
-          onNavigate={(path) => navigate(path)}
-          onScan={() => setIsQrScannerOpen(true)}
-          onClose={() =>
-            setQuickMenu((prev) => ({
-              ...prev,
-              open: false,
-            }))
-          }
-        />
+        {isDesktopQuickMenuVisible && (
+          <QuickContextMenu
+            open={quickMenu.open}
+            x={quickMenu.x}
+            y={quickMenu.y}
+            items={quickMenuItems}
+            onNavigate={(path) => navigate(path)}
+            onScan={() => setIsQrScannerOpen(true)}
+            onClose={() =>
+              setQuickMenu((prev) => ({
+                ...prev,
+                open: false,
+              }))
+            }
+          />
+        )}
         {!isUserOnline && (
           <div
             className="uk-alert-warning"

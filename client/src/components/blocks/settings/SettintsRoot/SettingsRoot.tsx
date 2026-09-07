@@ -2,7 +2,12 @@ import { useUIState } from "../../../../whitelabel/src/global/utils/hooks/useUIS
 import "./_settingsRoot.styles.scss";
 
 const SettingsRoot: React.FC = () => {
-  const { isMobileQuickMenuVisible, setMobileQuickMenuVisible } = useUIState();
+  const {
+    isMobileQuickMenuVisible,
+    setMobileQuickMenuVisible,
+    isDesktopQuickMenuVisible,
+    setDesktopQuickMenuVisible,
+  } = useUIState();
 
   return (
     <div className="settings-root">
@@ -29,6 +34,28 @@ const SettingsRoot: React.FC = () => {
               checked={isMobileQuickMenuVisible}
               onChange={(event) =>
                 setMobileQuickMenuVisible(event.target.checked)
+              }
+            />
+          </label>
+          <label
+            className="settings-root__preference"
+            htmlFor="mobileQuickMenuVisible"
+          >
+            <span className="settings-root__preferenceText">
+              <strong>Десктоп брзо мени</strong>
+
+              <small>
+                Прикажи брза навигација со претискање на десен клик.
+              </small>
+            </span>
+
+            <input
+              id="mobileQuickMenuVisible"
+              type="checkbox"
+              role="switch"
+              checked={isDesktopQuickMenuVisible}
+              onChange={(event) =>
+                setDesktopQuickMenuVisible(event.target.checked)
               }
             />
           </label>
