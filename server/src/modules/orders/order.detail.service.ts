@@ -66,16 +66,6 @@ export class OrdersDetailService {
             height: true,
             price: true,
             piece_note: true,
-            orders: {
-              select: {
-                customers: {
-                  select: {
-                    first_name: true,
-                    last_name: true,
-                  },
-                },
-              },
-            },
 
             product_types: {
               select: {
