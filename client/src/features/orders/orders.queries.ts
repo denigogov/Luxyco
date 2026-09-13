@@ -12,6 +12,7 @@ import {
   deleteMultipleOrders,
   deleteOrderPieces,
   getOrderById,
+  getOrderHistory,
   getOrderReferencesList,
   getOrdersList,
   printBulkOrders,
@@ -166,3 +167,21 @@ export function useDeleteOrdersBulk() {
 }
 
 export const useDeletOrdersBulk = useDeleteOrdersBulk;
+
+export function useOrderHistory(
+  identifier: number | string | undefined,
+  enabled = true,
+) {
+  const normalizedIdentifier =
+    identifier === undefined ? "" : String(identifier).trim();
+  const hasIdentifier =
+    typeof identifier === "number"
+      ? identifier > 0
+      : Boolean(normalizedIdentifier);
+
+  return useQuery({
+    queryKey: ordersKeys.history(normalizedIdentifier),
+    queryFn: ({ signal }) => getOrderHistory(normalizedIdentifier, signal),
+    enabled: hasIdentifier && enabled,
+  });
+}

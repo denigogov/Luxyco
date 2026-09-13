@@ -47,8 +47,11 @@ export const ordersKeys = {
     [...ordersKeys.lists(), params] as const,
   references: () => [...ordersKeys.all, "references"] as const,
   details: () => [...ordersKeys.all, "detail"] as const,
+  historys: () => [...ordersKeys.all, "historys"] as const,
   detail: (identifier: number | string) =>
     [...ordersKeys.details(), String(identifier).trim()] as const,
+  history: (identifier: number | string) =>
+    [...ordersKeys.historys(), String(identifier).trim()] as const,
 
   mutations: {
     all: () => [...ordersKeys.all, "mutation"] as const,

@@ -11,6 +11,7 @@ import {
   useDeleteOrderPieces,
   useDeletOrdersBulk,
   useOrderDetail,
+  useOrderHistory,
   useUpdateOrder,
 } from "../../../../features/orders/orders.queries";
 import ButtonGroup from "../../../../whitelabel/src/molecules/buttonGroup/ButtonGroup";
@@ -41,6 +42,7 @@ const DetailsOrder: React.FC = () => {
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedStatusId, setSelectedStatusId] = useState<string>("");
+  const [loadOrderHistory, setLoadOrderHistory] = useState(false);
 
   const modalCloseRef = useRef<null | (() => void)>(null);
   const statusModalCloseRef = useRef<null | (() => void)>(null);
@@ -157,6 +159,15 @@ const DetailsOrder: React.FC = () => {
   const { data, isLoading, error, isFetching, refetch } = useOrderDetail(
     isQrCodeParam ? id : Number(id),
   );
+
+  const {
+    data: historyData,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useOrderHistory(isQrCodeParam ? id : Number(id), loadOrderHistory);
+
+  console.log("test", historyData);
+
   const updateOrderMutattion = useUpdateOrder(data?.id);
   const status = data?.status;
 
@@ -390,6 +401,9 @@ const DetailsOrder: React.FC = () => {
           onRefetchData={() => refetch()}
           isFetching={initFetchingSkeleton}
           isLoading={initLoadingSkeletton}
+          onHistoryOpen={() => setLoadOrderHistory(true)}
+          historyData={historyData}
+          historyLoading={historyLoading}
         />
       )}
       {data?.orderNote && (

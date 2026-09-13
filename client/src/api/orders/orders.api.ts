@@ -113,3 +113,13 @@ export function deleteOrderPieces(
 export function deleteMultipleOrders(ids: number[], signal?: AbortSignal) {
   return apiDelete<void>("/orders/bulk", { ids }, signal);
 }
+
+export function getOrderHistory(
+  identifier: number | string,
+  signal?: AbortSignal,
+) {
+  return apiGet<any>(
+    `/orders/${encodeURIComponent(String(identifier))}/history`,
+    signal,
+  );
+}
