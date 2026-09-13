@@ -166,8 +166,6 @@ const DetailsOrder: React.FC = () => {
     error: historyError,
   } = useOrderHistory(isQrCodeParam ? id : Number(id), loadOrderHistory);
 
-  console.log("test", historyData);
-
   const updateOrderMutattion = useUpdateOrder(data?.id);
   const status = data?.status;
 
@@ -252,7 +250,6 @@ const DetailsOrder: React.FC = () => {
         }
 
         if (button.role === "add") {
-          console.log("is add");
           return {
             ...button,
             onClick: () => navigate("piece-new"),
@@ -307,7 +304,7 @@ const DetailsOrder: React.FC = () => {
     });
   }, [data]);
 
-  if (error) {
+  if (error || historyError) {
     const status = (error as Error & { status?: number }).status;
     return <ErrorWrapper status={status} />;
   }

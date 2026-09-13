@@ -168,12 +168,6 @@ export class OrdersService {
       select: {
         id: true,
         qr_code: true,
-        users: {
-          select: {
-            first_name: true,
-            last_name: true,
-          },
-        },
       },
     });
 
@@ -192,6 +186,12 @@ export class OrdersService {
             status_name: true,
           },
         },
+        users: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
         created_at: true,
       },
       orderBy: {
@@ -204,7 +204,6 @@ export class OrdersService {
         id: order.id,
         qrCode: order.qr_code,
       },
-      user: order.users,
       history,
     };
   }

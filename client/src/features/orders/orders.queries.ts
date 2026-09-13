@@ -32,6 +32,7 @@ async function invalidateOrderViews(qc: QueryClient) {
   await Promise.all([
     // Details may be cached under either the numeric ID or the QR code.
     qc.invalidateQueries({ queryKey: ordersKeys.details() }),
+    qc.invalidateQueries({ queryKey: ordersKeys.historys() }),
     qc.invalidateQueries({ queryKey: ordersKeys.lists() }),
   ]);
 }
