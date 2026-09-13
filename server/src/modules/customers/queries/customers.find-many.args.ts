@@ -23,8 +23,8 @@ export function buildCustomersFindManyArgs(
     for (const token of tokens) {
       AND.push({
         OR: [
-          { first_name: { search: token } },
-          { last_name: { search: token } },
+          { first_name: { startsWith: token } },
+          { last_name: { startsWith: token } },
           { phone_number: { startsWith: token } },
           {
             customer_addresses: {
