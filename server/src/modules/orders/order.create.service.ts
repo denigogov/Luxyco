@@ -262,6 +262,14 @@ export class OrdersCreateService {
         })),
       });
 
+      await tx.order_status_history.create({
+        data: {
+          order_id: order.id,
+          status_id: pendingStatusId,
+          changed_by_user_id: userId,
+        },
+      });
+
       return tx.orders.findUnique({
         where: { id: order.id },
         include: {

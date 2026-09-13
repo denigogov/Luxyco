@@ -212,7 +212,7 @@ model service_type {
 }
 
 model order_status_history {
-  id                 BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id                 Int      @id @default(autoincrement()) @db.UnsignedInt
   order_id           Int      @db.UnsignedInt
   status_id          Int      @db.UnsignedInt
   changed_by_user_id Int?     @db.UnsignedInt

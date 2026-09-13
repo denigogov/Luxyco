@@ -58,6 +58,11 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Get(':id/history')
+  findOrderHistory(@Param('id') id: string) {
+    return this.ordersService.findOrderHistory(id);
+  }
+
   @Post('pieces/:id')
   addOrderPiece(
     @Param('id') id: string,
@@ -78,13 +83,21 @@ export class OrdersController {
   }
 
   @Delete(':id/item/:qr')
-  removeOrderPiece(@Param('id') id: string, @Param('qr') qr: string) {
-    return this.ordersService.removeOrderPiece(id, qr);
+  removeOrderPiece(
+    @Param('id') id: string,
+    @Param('qr') qr: string,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.ordersService.removeOrderPiece(id, qr, req.user.sub);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.ordersService.update(+id, updateOrderDto, req.user.sub);
   }
 
   @Delete('bulk')

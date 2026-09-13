@@ -47,6 +47,30 @@ export class OrderPieceUpdateService {
     return order;
   }
 
+  private async writeStatusHistoryIfChanged(
+    tx: Prisma.TransactionClient,
+    orderId: number,
+    previousStatusId: number | null,
+    nextStatusId: number | null | undefined,
+    userId: number,
+  ) {
+    if (
+      nextStatusId === undefined ||
+      nextStatusId === null ||
+      nextStatusId === previousStatusId
+    ) {
+      return;
+    }
+
+    await tx.order_status_history.create({
+      data: {
+        order_id: orderId,
+        status_id: nextStatusId,
+        changed_by_user_id: userId,
+      },
+    });
+  }
+
   private getNextStatusId(args: {
     orderStatusId: number | null;
     measuredPieces: number;
@@ -220,7 +244,14 @@ export class OrderPieceUpdateService {
       });
 
       const recalculated = await this.recalculateOrder(tx, order);
-
+      const finalStatusId = recalculated.nextStatusId ?? PENDING_STATUS_ID;
+      await this.writeStatusHistoryIfChanged(
+        tx,
+        order.id,
+        order.order_status_id,
+        finalStatusId,
+        userId,
+      );
       return {
         orderId: order.id,
         customerId: order.customer_id,
@@ -301,6 +332,14 @@ export class OrderPieceUpdateService {
 
       const recalculated = await this.recalculateOrder(tx, order);
 
+      await this.writeStatusHistoryIfChanged(
+        tx,
+        order.id,
+        order.order_status_id,
+        recalculated.nextStatusId,
+        userId,
+      );
+
       return {
         orderId: order.id,
         customerId: order.customer_id,
@@ -313,7 +352,11 @@ export class OrderPieceUpdateService {
     return result;
   }
 
-  async removePiece(orderIdentifier: number | string, pieceQr: string) {
+  async removePiece(
+    orderIdentifier: number | string,
+    pieceQr: string,
+    userId: number,
+  ) {
     const order = await this.findOrder(orderIdentifier);
     const value = String(orderIdentifier);
 
@@ -356,6 +399,13 @@ export class OrderPieceUpdateService {
 
       const recalculated = await this.recalculateOrder(tx, order);
 
+      await this.writeStatusHistoryIfChanged(
+        tx,
+        order.id,
+        order.order_status_id,
+        recalculated.nextStatusId,
+        userId,
+      );
       return {
         orderId: order.id,
         customerId: order.customer_id,

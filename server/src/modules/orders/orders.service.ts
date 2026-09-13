@@ -159,8 +159,58 @@ export class OrdersService {
     return orderDetails;
   }
 
-  async update(id: number, dto: UpdateOrderDto) {
-    const result = await this.ordersUpdateService.update(id, dto);
+  async findOrderHistory(identifier: number | string) {
+    const value = String(identifier);
+    const isNumericId = /^\d+$/.test(value);
+
+    const order = await this.prisma.orders.findUnique({
+      where: isNumericId ? { id: Number(value) } : { qr_code: value },
+      select: {
+        id: true,
+        qr_code: true,
+        users: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${value} not found`);
+    }
+
+    const history = await this.prisma.order_status_history.findMany({
+      where: {
+        order_id: order.id,
+      },
+      select: {
+        status: {
+          select: {
+            id: true,
+            status_name: true,
+          },
+        },
+        created_at: true,
+      },
+      orderBy: {
+        created_at: 'asc',
+      },
+    });
+
+    return {
+      order: {
+        id: order.id,
+        qrCode: order.qr_code,
+      },
+      user: order.users,
+      history,
+    };
+  }
+
+  async update(id: number, dto: UpdateOrderDto, userId: number) {
+    const result = await this.ordersUpdateService.update(id, dto, userId);
 
     await Promise.all([
       this.invalidateOrdersCache({
@@ -240,10 +290,15 @@ export class OrdersService {
     };
   }
 
-  async removeOrderPiece(orderIdentifier: number | string, pieceQr: string) {
+  async removeOrderPiece(
+    orderIdentifier: number | string,
+    pieceQr: string,
+    userId: number,
+  ) {
     const result = await this.orderPieceUpdateService.removePiece(
       orderIdentifier,
       pieceQr,
+      userId,
     );
 
     await this.invalidateOrdersCache({

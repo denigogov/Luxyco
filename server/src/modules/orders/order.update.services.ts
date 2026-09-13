@@ -11,13 +11,14 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 export class OrdersUpdateService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async update(id: number, dto: UpdateOrderDto) {
+  async update(id: number, dto: UpdateOrderDto, userId: number) {
     const existingOrder = await this.prisma.orders.findUnique({
       where: { id },
       select: {
         id: true,
         customer_id: true,
         delivery_type_id: true,
+        order_status_id: true,
       },
     });
 
@@ -40,6 +41,10 @@ export class OrdersUpdateService {
         );
       }
     }
+
+    const statusChanged =
+      dto.orderStatusId !== undefined &&
+      dto.orderStatusId !== existingOrder.order_status_id;
 
     let nextDeliveryPrice: Prisma.Decimal | undefined;
 
@@ -139,41 +144,53 @@ export class OrdersUpdateService {
       nextTotalPrice = piecesPrice.plus(deliveryPrice);
     }
 
-    await this.prisma.orders.update({
-      where: { id },
-      data: {
-        ...(dto.customerId !== undefined && {
-          customer_id: dto.customerId,
-        }),
+    await this.prisma.$transaction(async (tx) => {
+      await tx.orders.update({
+        where: { id },
+        data: {
+          ...(dto.customerId !== undefined && {
+            customer_id: dto.customerId,
+          }),
 
-        ...(dto.deliveryAddressId !== undefined && {
-          delivery_address_id: dto.deliveryAddressId,
-        }),
+          ...(dto.deliveryAddressId !== undefined && {
+            delivery_address_id: dto.deliveryAddressId,
+          }),
 
-        ...(dto.deliveryTypeId !== undefined && {
-          delivery_type_id: dto.deliveryTypeId,
-        }),
+          ...(dto.deliveryTypeId !== undefined && {
+            delivery_type_id: dto.deliveryTypeId,
+          }),
 
-        ...(dto.serviceTypeId !== undefined && {
-          service_type_id: dto.serviceTypeId,
-        }),
+          ...(dto.serviceTypeId !== undefined && {
+            service_type_id: dto.serviceTypeId,
+          }),
 
-        ...(dto.orderStatusId !== undefined && {
-          order_status_id: dto.orderStatusId,
-        }),
+          ...(dto.orderStatusId !== undefined && {
+            order_status_id: dto.orderStatusId,
+          }),
 
-        ...(dto.scheduledDate !== undefined && {
-          scheduled_date: new Date(dto.scheduledDate),
-        }),
+          ...(dto.scheduledDate !== undefined && {
+            scheduled_date: new Date(dto.scheduledDate),
+          }),
 
-        ...(dto.orderNote !== undefined && {
-          order_note: dto.orderNote?.trim() || null,
-        }),
+          ...(dto.orderNote !== undefined && {
+            order_note: dto.orderNote?.trim() || null,
+          }),
 
-        ...(nextTotalPrice !== undefined && {
-          total_price: nextTotalPrice,
-        }),
-      },
+          ...(nextTotalPrice !== undefined && {
+            total_price: nextTotalPrice,
+          }),
+        },
+      });
+
+      if (statusChanged) {
+        await tx.order_status_history.create({
+          data: {
+            order_id: id,
+            status_id: dto.orderStatusId!,
+            changed_by_user_id: userId,
+          },
+        });
+      }
     });
 
     return {
