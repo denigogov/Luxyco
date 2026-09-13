@@ -33,9 +33,18 @@ const baseRouteAccess: BrandRouteAccess = {
     "/customers/:customerId/notes/add",
     "/customers/:customerId/notes/:noteId/edit",
 
+    "/settings",
     "/settings/price",
     "/settings/price/edit/:id",
+    "/settings/price/new",
+
     "/settings/delivery",
+    "/settings/delivery/new",
+    "/settings/delivery/edit/:id",
+
+    "/settings/user",
+    "/settings/user/add",
+    "/settings/user/edit/:id",
   ],
 
   MANAGER: [
