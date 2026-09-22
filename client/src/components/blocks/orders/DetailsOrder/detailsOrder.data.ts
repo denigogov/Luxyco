@@ -1,3 +1,4 @@
+import { ORDER_STATUS_OPTIONS } from "../../../../utils/helpers/hardcodedDataImportant";
 import type { ButtonTypes } from "../../../../whitelabel/src/atoms/button/a-button.types";
 import type { SelectTypes } from "../../../../whitelabel/src/atoms/formComponents/select/a-select.types";
 import type { BreadcrumbsTypes } from "../../../../whitelabel/src/molecules/Breadcrumbs/m-breadcrumbs.types";
@@ -280,32 +281,7 @@ const refreshDataButton: ButtonTypes = {
 const orderStatusSelect: SelectTypes = {
   name: "orderStatusId",
   label: "Статус",
-  options: [
-    {
-      value: "1",
-      label: "Во Обработка",
-    },
-    {
-      value: "2",
-      label: "Се мери",
-    },
-    {
-      value: "3",
-      label: "Подготвено за достава",
-    },
-    {
-      value: "4",
-      label: "Се доставува",
-    },
-    {
-      value: "5",
-      label: "Завршено",
-    },
-    {
-      value: "6",
-      label: "Откажано",
-    },
-  ],
+  options: ORDER_STATUS_OPTIONS,
 };
 
 const notification = {
