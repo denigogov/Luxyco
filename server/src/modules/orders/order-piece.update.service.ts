@@ -11,6 +11,8 @@ import { AddOrderPieceItemDto } from './dto/add-order-piece.dto';
 const PENDING_STATUS_ID = 1;
 const MEASURING_STATUS_ID = 2;
 const WAITING_FOR_DELIVERY_STATUS_ID = 3;
+const TAKEAWAY_STATUS_ID = 7;
+const DELIVERY_TYPE_ID = 1;
 
 @Injectable()
 export class OrderPieceUpdateService {
@@ -32,6 +34,7 @@ export class OrderPieceUpdateService {
         customer_id: true,
         total_pieces: true,
         order_status_id: true,
+        delivery_type_id: true,
         delivery_type: {
           select: {
             price: true,
@@ -75,6 +78,7 @@ export class OrderPieceUpdateService {
     orderStatusId: number | null;
     measuredPieces: number;
     totalPieces: number;
+    deliveryTypeId: number | null;
   }) {
     const orderStatusId = args.orderStatusId ?? PENDING_STATUS_ID;
 
@@ -84,6 +88,19 @@ export class OrderPieceUpdateService {
 
     const isFullyMeasured =
       args.totalPieces > 0 && args.measuredPieces === args.totalPieces;
+
+    if (isFullyMeasured) {
+      const readyStatusId =
+        args.deliveryTypeId === DELIVERY_TYPE_ID
+          ? TAKEAWAY_STATUS_ID
+          : WAITING_FOR_DELIVERY_STATUS_ID;
+
+      if (orderStatusId !== readyStatusId) {
+        return readyStatusId;
+      }
+
+      return undefined;
+    }
 
     if (isFullyMeasured && orderStatusId !== WAITING_FOR_DELIVERY_STATUS_ID) {
       return WAITING_FOR_DELIVERY_STATUS_ID;
@@ -104,6 +121,7 @@ export class OrderPieceUpdateService {
       id: number;
       customer_id: number | null;
       order_status_id: number | null;
+      delivery_type_id: number | null;
       delivery_type: {
         price: Prisma.Decimal | number | string | null;
       } | null;
@@ -161,6 +179,7 @@ export class OrderPieceUpdateService {
       orderStatusId: order.order_status_id,
       measuredPieces,
       totalPieces,
+      deliveryTypeId: order.delivery_type_id,
     });
 
     await tx.orders.update({
