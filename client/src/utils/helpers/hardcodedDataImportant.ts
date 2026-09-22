@@ -10,6 +10,10 @@ export const ORDER_STATUS_OPTIONS = [
     label: "Се мери",
   },
   {
+    value: "7",
+    label: "За Подигнување",
+  },
+  {
     value: "3",
     label: "Подготвено за достава",
   },
@@ -34,6 +38,7 @@ export const ORDER_STATUS = {
   DELIVERING: 4,
   FINISHED: 5,
   CANCELLED: 6,
+  TAKEAWAY: 7,
 };
 
 export const ACCOUNT_TYPES_OPTIONS = [

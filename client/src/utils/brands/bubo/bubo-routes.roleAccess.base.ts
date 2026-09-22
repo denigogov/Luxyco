@@ -14,6 +14,24 @@ type BrandRouteAccess = Partial<Record<BrandUserRole, string[]>>;
 const baseRouteAccess: BrandRouteAccess = {
   SUPER_ADMIN: ["*"],
 
+  ADMIN: [
+    "/",
+    "/dashboard",
+    "/orders",
+    "/orders/new",
+    "/orders/:id",
+    "/orders/:id/edit",
+    "/customers",
+    "/customers/new",
+    "/customers/:customerId",
+    "/customers/:customerId/addresses/new",
+    "/customers/:customerId/addresses/:addressId/edit",
+    "/customers/:customerId/notes/add",
+    "/customers/:customerId/notes/:noteId/edit",
+    "/settings",
+    "/settings/price",
+  ],
+
   MANAGER: [
     "/",
     "/dashboard",
@@ -41,8 +59,21 @@ const baseRouteAccess: BrandRouteAccess = {
     "/customers/:customerId",
   ],
 
-  ADMIN: [],
-  RECEPTION: [],
+  RECEPTION: [
+    "/",
+    "/dashboard",
+    "/orders",
+    "/orders/new",
+    "/orders/:id",
+    "/orders/:id/edit",
+    "/customers",
+    "/customers/new",
+    "/customers/:customerId",
+    "/customers/:customerId/addresses/new",
+    "/customers/:customerId/addresses/:addressId/edit",
+    "/customers/:customerId/notes/add",
+    "/customers/:customerId/notes/:noteId/edit",
+  ],
   MACHINE_OPERATOR: [],
 };
 
@@ -52,9 +83,27 @@ const permissionAccess: BrandRouteAccess = {
   SUPER_ADMIN: [
     PERMISSIONS.CUSTOMERS_DELETE,
     PERMISSIONS.CUSTOMERS_ADDRESSES_DELETE,
+    PERMISSIONS.ORDERS_DELETE,
+    PERMISSIONS.ORDERS_PRINT,
   ],
   MANAGER: [PERMISSIONS.CUSTOMERS_DELETE],
-  // DRIVER: [], etc.
+  ADMIN: [PERMISSIONS.ORDERS_PRINT],
+
+  // DEMO ACCOUNT
+  RECEPTION: [
+    PERMISSIONS.CUSTOMERS_DELETE,
+    PERMISSIONS.CUSTOMERS_ADDRESSES_DELETE,
+    PERMISSIONS.ORDERS_DELETE,
+    PERMISSIONS.ORDERS_PRINT,
+    PERMISSIONS.CUSTOMERS_NOTES_DELETE,
+
+    // orders keys
+    PERMISSIONS.ORDERS_DELETE,
+    PERMISSIONS.ORDERS_PIECES_DELETE,
+    PERMISSIONS.ORDERS_PIECES_UPDATE,
+    PERMISSIONS.ORDERS_UPDATE,
+    PERMISSIONS.ORDERS_PRINT,
+  ],
 };
 
 export const BRAND_BUBO_ROLE_ROUTE_CONFIG: BrandRouteAccess = {

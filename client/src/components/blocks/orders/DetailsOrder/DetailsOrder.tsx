@@ -64,6 +64,7 @@ const DetailsOrder: React.FC = () => {
   const deleteOrderMutation = useDeletOrdersBulk();
 
   const AllowedStatuses = [
+    ORDER_STATUS.TAKEAWAY,
     ORDER_STATUS.DELIVERING,
     ORDER_STATUS.READY_FOR_DELIVERY,
     ORDER_STATUS.FINISHED,
@@ -73,6 +74,7 @@ const DetailsOrder: React.FC = () => {
     ORDER_STATUS.FINISHED,
     ORDER_STATUS.DELIVERING,
     ORDER_STATUS.READY_FOR_DELIVERY,
+    ORDER_STATUS.TAKEAWAY,
   ];
 
   const returnToPrevRoute = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -410,7 +412,12 @@ const DetailsOrder: React.FC = () => {
           {initLoadingSkeletton || data?.orderNote}
         </div>
       )}
-      <OrderStepper currentStatusId={status?.id ?? ORDER_STATUS.PROCESSING} />
+      <OrderStepper
+        currentStatusId={status?.id ?? ORDER_STATUS.PROCESSING}
+        isCustomerPickup={
+          data?.deliveryType?.typeName === "Без Достава" ? true : false
+        }
+      />
       <ButtonGroup {...buttonGroupProps} />
       <OrderItemsDetails
         isFetching={initFetchingSkeleton}

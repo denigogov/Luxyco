@@ -9,12 +9,29 @@ export const BRAND_BUBO_ROUTE_CONFIG = {
       "/orders/new": true,
       "/orders/:id": true,
       "/orders/:id/edit": true,
+      "/orders/:id/piece-new": true,
       "/orders/:id/item/:qr": true,
     },
     "/settings": {
       "/settings": true,
+
+      // price route
       "/settings/price": true,
-      "/settings/status": true,
+      "/settings/price/new": true,
+      "/settings/price/edit/:id": true,
+
+      // delivery type
+      "/settings/delivery": true,
+      "/settings/delivery/new": true,
+      "/settings/delivery/edit/:id": true,
+
+      // user route
+      "/settings/user": true,
+      "/settings/user/add": true,
+      "/settings/user/edit/:id": true,
+
+      // fake status nothing just example
+      "/settings/status": false,
     },
 
     "/customers": {
